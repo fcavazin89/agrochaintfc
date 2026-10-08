@@ -1,0 +1,261 @@
+{
+  "gerado_em": "2026-10-07T02:03:33",
+  "semente_aleatoria": 20261006,
+  "ancoras_de_mercado": {
+    "cafe_arabica": 1568.95,
+    "cafe_conilon": 976.94,
+    "cacau": 25.8
+  },
+  "aviso": "Dados de treino sintéticos calibrados com parâmetros agronômicos e de mercado reais. As métricas medem o aprendizado sobre o simulador e demonstram o pipeline completo; a validação em campo exige dados históricos da cooperativa.",
+  "modelos": {
+    "produtividade_cafe_conilon": {
+      "modelo": "Produtividade de café conilon (sacas 60 kg/ha)",
+      "algoritmo": "GradientBoostingRegressor",
+      "registros": 1200,
+      "atributos": [
+        "idade_lavoura",
+        "ndvi",
+        "chuva_trimestre_mm",
+        "irrigado",
+        "temperatura_media",
+        "pressao_ferrugem",
+        "safra_anterior"
+      ],
+      "validacao_cruzada_5x": {
+        "r2_medio": 0.9598,
+        "r2_desvio": 0.0038,
+        "mae_medio": 2.08,
+        "mape_medio_pct": 4.81
+      },
+      "conjunto_teste": {
+        "r2": 0.9633,
+        "mae": 2.0,
+        "mape_pct": 4.5
+      },
+      "importancia_variaveis": [
+        {
+          "variavel": "safra_anterior",
+          "importancia": 0.8659
+        },
+        {
+          "variavel": "idade_lavoura",
+          "importancia": 0.0672
+        },
+        {
+          "variavel": "ndvi",
+          "importancia": 0.0401
+        },
+        {
+          "variavel": "chuva_trimestre_mm",
+          "importancia": 0.0099
+        },
+        {
+          "variavel": "pressao_ferrugem",
+          "importancia": 0.0082
+        },
+        {
+          "variavel": "temperatura_media",
+          "importancia": 0.0046
+        },
+        {
+          "variavel": "irrigado",
+          "importancia": 0.004
+        }
+      ]
+    },
+    "produtividade_cacau": {
+      "modelo": "Produtividade de cacaueiro (kg de amêndoa seca/ha)",
+      "algoritmo": "GradientBoostingRegressor",
+      "registros": 1000,
+      "atributos": [
+        "idade_lavoura",
+        "ndvi",
+        "chuva_trimestre_mm",
+        "sombreamento",
+        "temperatura_media",
+        "umidade_relativa",
+        "pressao_vassoura",
+        "safra_anterior"
+      ],
+      "validacao_cruzada_5x": {
+        "r2_medio": 0.9559,
+        "r2_desvio": 0.0032,
+        "mae_medio": 37.78,
+        "mape_medio_pct": 5.24
+      },
+      "conjunto_teste": {
+        "r2": 0.9514,
+        "mae": 39.4,
+        "mape_pct": 5.48
+      },
+      "importancia_variaveis": [
+        {
+          "variavel": "safra_anterior",
+          "importancia": 0.7663
+        },
+        {
+          "variavel": "idade_lavoura",
+          "importancia": 0.1198
+        },
+        {
+          "variavel": "ndvi",
+          "importancia": 0.0446
+        },
+        {
+          "variavel": "chuva_trimestre_mm",
+          "importancia": 0.0388
+        },
+        {
+          "variavel": "sombreamento",
+          "importancia": 0.0124
+        },
+        {
+          "variavel": "pressao_vassoura",
+          "importancia": 0.0078
+        },
+        {
+          "variavel": "umidade_relativa",
+          "importancia": 0.0065
+        },
+        {
+          "variavel": "temperatura_media",
+          "importancia": 0.0039
+        }
+      ]
+    },
+    "preco_cafe_conilon_30d": {
+      "modelo": "Preço do café conilon em 30 dias (R$/saca 60 kg)",
+      "algoritmo": "RandomForestRegressor",
+      "registros": 3000,
+      "atributos": [
+        "preco_atual",
+        "media_movel_30d",
+        "media_movel_60d",
+        "retorno_30d",
+        "retorno_7d",
+        "volatilidade_anualizada",
+        "mes",
+        "aperto_de_oferta",
+        "cambio_usd"
+      ],
+      "validacao_cruzada_5x": {
+        "r2_medio": 0.9363,
+        "r2_desvio": 0.0048,
+        "mae_medio": 59.07,
+        "mape_medio_pct": 5.42
+      },
+      "conjunto_teste": {
+        "r2": 0.9339,
+        "mae": 60.59,
+        "mape_pct": 5.52
+      },
+      "importancia_variaveis": [
+        {
+          "variavel": "preco_atual",
+          "importancia": 0.9548
+        },
+        {
+          "variavel": "retorno_30d",
+          "importancia": 0.0096
+        },
+        {
+          "variavel": "media_movel_60d",
+          "importancia": 0.0068
+        },
+        {
+          "variavel": "volatilidade_anualizada",
+          "importancia": 0.0061
+        },
+        {
+          "variavel": "retorno_7d",
+          "importancia": 0.0056
+        },
+        {
+          "variavel": "media_movel_30d",
+          "importancia": 0.0054
+        },
+        {
+          "variavel": "aperto_de_oferta",
+          "importancia": 0.0046
+        },
+        {
+          "variavel": "cambio_usd",
+          "importancia": 0.0045
+        },
+        {
+          "variavel": "mes",
+          "importancia": 0.0027
+        }
+      ]
+    },
+    "direcao_preco_cacau_30d": {
+      "modelo": "Direção do preço do cacau em 30 dias (alta/baixa)",
+      "algoritmo": "RandomForestClassifier",
+      "registros": 6000,
+      "atributos": [
+        "preco_atual",
+        "media_movel_30d",
+        "media_movel_60d",
+        "retorno_30d",
+        "retorno_7d",
+        "volatilidade_anualizada",
+        "mes",
+        "aperto_de_oferta",
+        "cambio_usd"
+      ],
+      "validacao_cruzada_5x": {
+        "acuracia_media": 0.7163,
+        "auc_medio": 0.7919,
+        "acuracia_desvio": 0.0112
+      },
+      "conjunto_teste": {
+        "acuracia": 0.7153,
+        "auc": 0.7955
+      },
+      "importancia_variaveis": [
+        {
+          "variavel": "preco_atual",
+          "importancia": 0.2535
+        },
+        {
+          "variavel": "media_movel_30d",
+          "importancia": 0.1847
+        },
+        {
+          "variavel": "media_movel_60d",
+          "importancia": 0.176
+        },
+        {
+          "variavel": "retorno_30d",
+          "importancia": 0.088
+        },
+        {
+          "variavel": "retorno_7d",
+          "importancia": 0.0736
+        },
+        {
+          "variavel": "cambio_usd",
+          "importancia": 0.0643
+        },
+        {
+          "variavel": "aperto_de_oferta",
+          "importancia": 0.0636
+        },
+        {
+          "variavel": "volatilidade_anualizada",
+          "importancia": 0.0635
+        },
+        {
+          "variavel": "mes",
+          "importancia": 0.0327
+        }
+      ]
+    }
+  },
+  "aplicacao_cenario_real": {
+    "talhao": "T-01",
+    "previsao_python": 53.0,
+    "previsao_app": 52.9,
+    "observacao": "Divergência esperada: o app usa regras agronômicas explicáveis sobre a base histórica real de 4 safras; o modelo Python aprende a estrutura do simulador sintético."
+  }
+}

@@ -1,0 +1,42 @@
+==============================================================================
+AGROCHAIN · TREINAMENTO E VALIDAÇÃO DOS MODELOS DE IA
+==============================================================================
+
+[1] Produtividade de café conilon (sacas 60 kg/ha)
+    algoritmo: GradientBoostingRegressor · registros: 1200
+    R² (validação cruzada 5x): 0.9598 (± 0.0038) · MAE: 2.08 sacas/ha · MAPE: 4.81%
+    variáveis mais importantes: safra_anterior (87%), idade_lavoura (7%), ndvi (4%), chuva_trimestre_mm (1%)
+
+[2] Produtividade de cacaueiro (kg de amêndoa seca/ha)
+    algoritmo: GradientBoostingRegressor · registros: 1000
+    R² (validação cruzada 5x): 0.9559 (± 0.0032) · MAE: 37.78 kg/ha · MAPE: 5.24%
+    variáveis mais importantes: safra_anterior (77%), idade_lavoura (12%), ndvi (4%), chuva_trimestre_mm (4%)
+
+[3] Preço do café conilon em 30 dias (R$/saca 60 kg)
+    algoritmo: RandomForestRegressor · registros: 3000
+    R² (validação cruzada 5x): 0.9363 (± 0.0048) · MAPE: 5.42% (≈ R$ 53/saca de erro médio)
+    variáveis mais importantes: preco_atual (95%), retorno_30d (1%), media_movel_60d (1%), volatilidade_anualizada (1%)
+
+[4] Direção do preço do cacau em 30 dias (alta/baixa)
+    algoritmo: RandomForestClassifier · registros: 6000
+    acurácia (validação cruzada 5x): 0.7163 · AUC: 0.7919
+    variáveis mais importantes: preco_atual (25%), media_movel_30d (18%), media_movel_60d (18%), retorno_30d (9%)
+
+==============================================================================
+APLICAÇÃO DO MODELO AO CENÁRIO DA DEMONSTRAÇÃO (dados do protótipo)
+==============================================================================
+
+  Talhão T-01 (conilon irrigado, 7 anos, NDVI 0,71, 154,5 mm no trimestre)
+    previsão do modelo Python (dados sintéticos): 53.0 sacas 60 kg/ha
+    previsão do motor explicável embutido no app: 52,9 sacas 60 kg/ha
+
+------------------------------------------------------------------------------
+PRÓXIMO PASSO PARA VIRAR PRODUÇÃO
+------------------------------------------------------------------------------
+  1. Trocar gerar_base_* pelo histórico real: balança + laudo de classificação
+     da cooperativa, NDVI/NDWI de satélite (Sentinel-2), estação meteorológica
+     e série de cotações via API (Cepea/B3/NYBOT).
+  2. Separar treino por município e cultivar — o modelo global esconde viés local.
+  3. Validar em talhões que ficaram fora do treino, com ao menos duas safras.
+  4. Publicar o hash do modelo no consórcio: qualquer participante audita qual
+     versão gerou qual recomendação — rastreabilidade também para a IA.

@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AgroChain · Documento Técnico — Rastreabilidade de Café e Cacau com Blockchain e IA</title>
+<style>
+:root{
+  --verde:#1d6b3c; --verde-esc:#0f3d25; --verde-claro:#e8f3ec; --verde-medio:#2f8f52;
+  --ouro:#a8841a; --ouro-claro:#fdf7e3; --cafe:#6f4423; --cafe-claro:#f6efe8;
+  --tinta:#16211a; --cinza:#5b6b60; --cinza-claro:#eef2ef; --linha:#d5ded8;
+  --vermelho:#b03a2e; --azul:#1d6fa5;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Georgia,'Times New Roman',serif;color:var(--tinta);background:#f4f6f4;line-height:1.62;font-size:15.5px}
+.pagina{max-width:900px;margin:0 auto;background:#fff;box-shadow:0 0 40px rgba(0,0,0,.07)}
+header.capa{background:linear-gradient(150deg,#0b2e1c 0%,#14532d 55%,#1d6b3c 100%);color:#fff;padding:52px 54px 42px;position:relative;overflow:hidden}
+header.capa:after{content:'';position:absolute;right:-90px;bottom:-120px;width:340px;height:340px;border-radius:50%;background:radial-gradient(circle,rgba(201,162,39,.28),transparent 68%)}
+header.capa .selo{display:inline-block;font-family:'Segoe UI',system-ui,sans-serif;font-size:11.5px;letter-spacing:2.4px;text-transform:uppercase;
+  border:1px solid rgba(201,162,39,.55);color:#e8c95a;padding:6px 14px;border-radius:999px;margin-bottom:20px}
+header.capa h1{font-size:40px;line-height:1.12;font-weight:400;letter-spacing:-.5px;margin-bottom:12px}
+header.capa h1 b{font-weight:700}
+header.capa p{font-family:'Segoe UI',system-ui,sans-serif;font-size:15.5px;color:#cfe6d8;max-width:640px;line-height:1.6}
+header.capa .meta{margin-top:26px;font-family:'Segoe UI',system-ui,sans-serif;font-size:12.5px;color:#9dc4ae;display:flex;gap:24px;flex-wrap:wrap;
+  border-top:1px solid rgba(255,255,255,.14);padding-top:16px}
+.conteudo{padding:44px 54px 60px}
+h2{font-size:25px;font-weight:700;color:var(--verde-esc);margin:44px 0 6px;letter-spacing:-.3px}
+h2 .num{font-family:'Segoe UI',system-ui,sans-serif;font-size:13px;color:var(--ouro);display:block;letter-spacing:2px;margin-bottom:4px;font-weight:600}
+h3{font-family:'Segoe UI',system-ui,sans-serif;font-size:16.5px;font-weight:700;color:var(--verde);margin:26px 0 8px}
+h4{font-family:'Segoe UI',system-ui,sans-serif;font-size:14px;font-weight:700;color:var(--tinta);margin:18px 0 6px}
+p{margin-bottom:13px}
+ul,ol{margin:0 0 14px 22px}
+li{margin-bottom:7px}
+.fio{height:3px;width:64px;background:linear-gradient(90deg,var(--verde-medio),var(--ouro));border-radius:2px;margin-bottom:20px}
+.resumo{background:var(--verde-claro);border-left:4px solid var(--verde-medio);padding:20px 24px;border-radius:0 10px 10px 0;margin:22px 0}
+.resumo h3{margin-top:0}
+.destaque{background:var(--ouro-claro);border-left:4px solid var(--ouro);padding:18px 22px;border-radius:0 10px 10px 0;margin:20px 0}
+.alerta{background:#fdf0ee;border-left:4px solid var(--vermelho);padding:18px 22px;border-radius:0 10px 10px 0;margin:20px 0}
+table{width:100%;border-collapse:collapse;margin:16px 0 20px;font-family:'Segoe UI',system-ui,sans-serif;font-size:13.5px}
+th{background:var(--verde-esc);color:#fff;text-align:left;padding:10px 12px;font-weight:600;font-size:12.5px;letter-spacing:.3px}
+td{padding:10px 12px;border-bottom:1px solid var(--linha);vertical-align:top}
+tbody tr:nth-child(even){background:#fafcfb}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+.metrica{font-family:'Segoe UI',system-ui,sans-serif}
+.cartoes{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin:18px 0 22px}
+.cartao{border:1px solid var(--linha);border-radius:10px;padding:15px 16px;background:#fff}
+.cartao .rot{font-family:'Segoe UI',system-ui,sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.9px;color:var(--cinza);margin-bottom:5px}
+.cartao .val{font-family:'Segoe UI',system-ui,sans-serif;font-size:23px;font-weight:700;color:var(--verde-esc);line-height:1.15}
+.cartao .obs{font-family:'Segoe UI',system-ui,sans-serif;font-size:12px;color:var(--cinza);margin-top:5px}
+code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;background:var(--cinza-claro);padding:2px 6px;border-radius:4px;color:#1d4b2f}
+pre{background:#0d1f14;color:#d9ecdf;padding:16px 18px;border-radius:10px;overflow:auto;font-family:ui-monospace,Menlo,Consolas,monospace;
+  font-size:12.5px;line-height:1.6;margin:16px 0 20px}
+pre .cm{color:#6f9c7f}
+pre .kw{color:#e8c95a}
+pre .st{color:#9fd8b4}
+.fluxo{display:grid;gap:0;margin:22px 0;font-family:'Segoe UI',system-ui,sans-serif}
+.etapa{display:grid;grid-template-columns:64px 1fr;gap:16px;padding-bottom:18px;position:relative}
+.etapa:not(:last-child):before{content:'';position:absolute;left:31px;top:44px;bottom:0;width:2px;background:linear-gradient(180deg,var(--verde-medio),var(--linha))}
+.etapa .bolha{width:44px;height:44px;border-radius:50%;background:var(--verde-esc);color:#fff;display:grid;place-items:center;font-weight:700;font-size:15px}
+.etapa .corpo h4{margin:6px 0 4px;font-size:15px}
+.etapa .corpo p{font-size:13.5px;color:var(--cinza);margin:0;font-family:'Segoe UI',system-ui,sans-serif}
+.duas{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:18px 0}
+.bloco{border:1px solid var(--linha);border-radius:10px;padding:16px 18px}
+.bloco.verde{background:var(--verde-claro);border-color:#c2ddcd}
+.bloco.ouro{background:var(--ouro-claro);border-color:#e8dcb8}
+.nota-rodape{font-family:'Segoe UI',system-ui,sans-serif;font-size:12px;color:var(--cinza);line-height:1.6}
+footer{background:var(--verde-esc);color:#a8c9b5;padding:26px 54px;font-family:'Segoe UI',system-ui,sans-serif;font-size:12.5px;line-height:1.7}
+footer b{color:#fff}
+.mono{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px}
+.pill{display:inline-block;font-family:'Segoe UI',system-ui,sans-serif;font-size:11.5px;font-weight:600;padding:3px 10px;border-radius:999px;margin-right:6px}
+.pill.v{background:#dff0e6;color:#14603a}
+.pill.o{background:#fbf1d8;color:#8a6a12}
+.pill.r{background:#fbe4e0;color:#8f2b20}
+.pill.a{background:#e0eef8;color:#14567e}
+.pill.c{background:#eeeaf7;color:#4e3a80}
+svg{max-width:100%;height:auto}
+@media print{
+  body{background:#fff}.pagina{box-shadow:none;max-width:none}
+  h2{page-break-after:avoid}table{page-break-inside:avoid}.etapa{page-break-inside:avoid}
+  header.capa{padding:34px 30px}.conteudo{padding:26px 30px}
+}
+@media(max-width:720px){
+  header.capa,.conteudo,footer{padding-left:22px;padding-right:22px}
+  header.capa h1{font-size:28px}.duas{grid-template-columns:1fr}
+  table{font-size:12px}th,td{padding:8px 8px}
+}
+</style>
+</head>
+<body>
+<div class="pagina">
+
+<header class="capa">
+  <div class="selo">Documento técnico · versão 1.0</div>
+  <h1><b>AgroChain</b><br>Rastreabilidade de café e cacau<br>com blockchain e inteligência artificial</h1>
+  <p>Plataforma de consórcio para a cadeia produtiva de Rondônia: origem verificável do lote, previsão de safra e de preço, decisão de venda assistida por IA, pagamento em escrow e certificação auditável.</p>
+  <div class="meta">
+    <span>Projeto-piloto · Cacoal e Rolim de Moura / RO</span>
+    <span>Documento companheiro do protótipo funcional <span class="mono">AgroChain.html</span></span>
+    <span>Outubro de 2026</span>
+  </div>
+</header>
+
+<div class="conteudo">
+
+<!-- ====================== 1 ====================== -->
+<h2><span class="num">SEÇÃO 1</span>Resumo executivo</h2>
+<div class="fio"></div>
+
+<p>O produtor de café e cacau de Rondônia vende uma <em>commodity sem identidade</em>. O lote sai da propriedade sem comprovação de origem, sem laudo vinculado e sem preço de referência que ele possa conferir. Quem compra enfrenta o problema espelhado: paga por um produto que não consegue verificar.</p>
+
+<p>O AgroChain ataca as duas pontas ao mesmo tempo. Cada etapa da vida do lote — colheita, fermentação, secagem, classificação, transporte, recebimento — é registrada como um evento assinado e encadeado por hash, formando uma trilha que <b>ninguém consegue reescrever sozinho</b>. Sobre essa trilha confiável, a inteligência artificial faz o trabalho que hoje ninguém faz para o produtor: estimar quanto ele vai colher, dizer se é hora de vender ou de esperar, apontar qual praga está ganhando terreno e calcular o valor justo do lote dele em relação ao mercado.</p>
+
+<div class="resumo">
+  <h3>O que já está construído e funcionando</h3>
+  <ul>
+    <li><b>Protótipo navegável</b> em arquivo único, sem internet, com cinco perfis de usuário (produtor, cooperativa, indústria, certificadora e auditor), <b>doze áreas de operação</b> (incluindo o painel de IoT e sensores, o ERP agrícola e o modo imersivo de acompanhamento) e <b>221 verificações automatizadas aprovadas</b>.</li>
+    <li><b>Blockchain operante de verdade</b> dentro do sistema: SHA-256 validado contra implementação de referência, árvore de Merkle, prova de trabalho real com contador de tentativas ao vivo, verificação de integridade e demonstração de adulteração que a rede detecta.</li>
+    <li><b>Cinco módulos de IA</b> em execução: previsão de safra, previsão de preço, diagnóstico fitossanitário, score de qualidade do lote e recomendação de destino — todos explicáveis fator a fator.</li>
+    <li><b>Pipeline de aprendizado de máquina em Python</b> treinado e validado, com resultados medidos: R² de 0,96 na produtividade do café, MAPE de 5,4% na previsão de preço em 30 dias e 71,6% de acerto na direção do preço do cacau.</li>
+    <li><b>Camada de IoT em operação</b>: 13 dispositivos de 7 tipos (estação meteorológica, sonda de solo, fermentação, secagem, molhamento foliar, vazão e gateway), com controle de qualidade de dado por mediana e MAD, seis indicadores agronômicos com fórmula publicada e ancoragem por raiz de Merkle na cadeia — com prova de inclusão que detecta adulteração de leitura.</li>
+    <li><b>Contrato inteligente em Solidity</b> compilado sem erros nem avisos (solc 0.8.37), com 25 funções públicas e 12 eventos, pronto para implantação em rede de consórcio.</li>
+  </ul>
+</div>
+
+<h3>Retorno esperado para cada elo</h3>
+<table>
+  <thead><tr><th>Quem</th><th>O que ganha</th><th>Como isso aparece na prática</th></tr></thead>
+  <tbody>
+    <tr><td><b>Produtor</b></td><td>Poder de negociação e previsibilidade</td><td>Vê a cotação real, o prêmio que a qualidade do seu lote merece, o custo de esperar e o risco de doença antes de decidir</td></tr>
+    <tr><td><b>Cooperativa</b></td><td>Controle de qualidade e acesso a mercados exigentes</td><td>Recebe lote com histórico verificado, organiza a certificação e agrega volume com prova de origem</td></tr>
+    <tr><td><b>Indústria</b></td><td>Segurança de origem e conformidade</td><td>Confere o lote por QR Code, condiciona pagamento à conferência e comprova origem para o mercado europeu</td></tr>
+    <tr><td><b>Certificadora</b></td><td>Selo difícil de falsificar</td><td>Emite atestado vinculado ao laudo, com assinatura criptográfica e histórico público</td></tr>
+    <tr><td><b>Estado e auditoria</b></td><td>Fiscalização sobre dado primário</td><td>Acompanha a cadeia em tempo real e detecta divergência de peso, laudo sem lastro e trilha incompleta</td></tr>
+  </tbody>
+</table>
+
+<!-- ====================== 2 ====================== -->
+<h2><span class="num">SEÇÃO 2</span>O problema, com os números de 2026</h2>
+<div class="fio"></div>
+
+<h3>2.1 O mercado de café está em alta — e o produtor pode não capturar isso</h3>
+<p>Em 6 de outubro de 2026, o indicador Cepea/Esalq apontou a saca de 60 kg do café arábica a <b>R$ 1.568,95</b> e a do conilon a <b>R$ 976,94</b>. É um mercado aquecido. Mas o produtor que não acompanha a série diária negocia no escuro, e o que não tem laudo de qualidade vende o próprio café pelo preço do café alheio.</p>
+
+<h3>2.2 O cacau vive o ciclo oposto — e é onde a informação vale mais</h3>
+<p>Depois do pico histórico de 2024, quando a amêndoa chegou a ser negociada perto de <b>R$ 70 o quilo</b>, o cacau entrou em correção severa. No Pará, o custo de produzir um quilo de amêndoa seca ficou entre <b>R$ 18 e R$ 20</b> enquanto a venda caiu para cerca de <b>R$ 12</b>. No fim de 2025 a cotação internacional chegou a cair 85% desde o topo. Em 2026 o mercado ensaiou recuperação e voltou a cair.</p>
+
+<div class="alerta">
+  <b>Por que isso importa para o desenho do sistema:</b> em 2024, quem <em>segurou</em> o cacau ganhou; em 2026, quem segura perde. Uma ferramenta de apoio à decisão que apenas recomendasse "esperar por preço melhor" estaria dando o conselho errado. O protótipo foi calibrado com o cenário de 2026 justamente para recomendar liquidação quando o custo de carregamento não se paga — e a IA explica o motivo em cada caso.
+  <br><br>
+  <span class="nota-rodape">Referências: g1/PA (mar/2026) sobre custo de produção e queda do preço da amêndoa; série internacional do cacau (NYBOT); Agência de Notícias do Governo de Rondônia sobre a produção estadual.</span>
+</div>
+
+<h3>2.3 Rondônia tem ativo de origem que não está sendo cobrado</h3>
+<p>O estado reúne <b>2.342 propriedades</b> produtoras de cacau, é o <b>segundo maior produtor da região Norte</b> e o <b>quarto do país</b> — e, em boa parte, vende a produção para a Bahia. Desde novembro de 2023, o cacau de Rondônia tem <b>Indicação de Procedência</b> registrada no INPI, com sabor e gordura reconhecidos para chocolate de qualidade. É exatamente o tipo de atributo que o comprador internacional paga mais caro por ter comprovado — e que hoje se perde por falta de um mecanismo de prova.</p>
+
+<div class="cartoes">
+  <div class="cartao"><div class="rot">Café arábica (06/10/2026)</div><div class="val">R$ 1.568,95</div><div class="obs">por saca de 60 kg · Cepea/Esalq</div></div>
+  <div class="cartao"><div class="rot">Café conilon (06/10/2026)</div><div class="val">R$ 976,94</div><div class="obs">por saca de 60 kg · Cepea/Esalq</div></div>
+  <div class="cartao"><div class="rot">Cacau (referência RO)</div><div class="val">R$ 25,80</div><div class="obs">por kg, pós-correção de 2026</div></div>
+  <div class="cartao"><div class="rot">Propriedades com cacau em RO</div><div class="val">2.342</div><div class="obs">98% da produção sai para a Bahia</div></div>
+</div>
+
+<!-- ====================== 3 ====================== -->
+<h2><span class="num">SEÇÃO 3</span>Arquitetura em três camadas</h2>
+<div class="fio"></div>
+
+<p>O sistema é dividido por uma razão prática: cada camada resolve um tipo de confiança diferente. Se o dado não nasce correto no campo, nenhuma tecnologia acima salva o resultado; se a cadeia não é íntegra, a IA alimenta decisão com informação contaminada; se a IA não explica o que faz, o produtor não a utiliza — e é ele quem decide plantar, colher e vender.</p>
+
+<svg viewBox="0 0 860 340" role="img" aria-label="Diagrama de arquitetura em três camadas">
+  <defs>
+    <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#e8f3ec"/><stop offset="100%" stop-color="#d3e8dc"/></linearGradient>
+    <linearGradient id="g2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#fdf7e3"/><stop offset="100%" stop-color="#f6ecc9"/></linearGradient>
+    <linearGradient id="g3" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#e0eef8"/><stop offset="100%" stop-color="#cde2f3"/></linearGradient>
+  </defs>
+  <rect x="0" y="0" width="860" height="340" fill="#fbfdfb"/>
+  <text x="30" y="26" font-family="Segoe UI,sans-serif" font-size="12" fill="#5b6b60" letter-spacing="1.6">CAMADA DE CAMPO — ONDE O DADO NASCE</text>
+  <rect x="30" y="36" width="800" height="76" rx="10" fill="url(#g1)" stroke="#c2ddcd"/>
+  <g font-family="Segoe UI,sans-serif" font-size="12.5" fill="#16211a">
+    <rect x="48" y="52" width="170" height="44" rx="7" fill="#fff" stroke="#c2ddcd"/><text x="133" y="72" text-anchor="middle">📱 App do produtor</text><text x="133" y="87" text-anchor="middle" font-size="10.5" fill="#5b6b60">offline + sincroniza depois</text>
+    <rect x="234" y="52" width="170" height="44" rx="7" fill="#fff" stroke="#c2ddcd"/><text x="319" y="72" text-anchor="middle">⚖️ Balança e etiquetadora</text><text x="319" y="87" text-anchor="middle" font-size="10.5" fill="#5b6b60">peso e QR na saca</text>
+    <rect x="420" y="52" width="170" height="44" rx="7" fill="#fff" stroke="#c2ddcd"/><text x="505" y="72" text-anchor="middle">🌡️ Sensores de fermentação</text><text x="505" y="87" text-anchor="middle" font-size="10.5" fill="#5b6b60">curva térmica do cacau</text>
+    <rect x="606" y="52" width="206" height="44" rx="7" fill="#fff" stroke="#c2ddcd"/><text x="709" y="72" text-anchor="middle">🛰️ NDVI de satélite + clima</text><text x="709" y="87" text-anchor="middle" font-size="10.5" fill="#5b6b60">Sentinel-2 e estação local</text>
+  </g>
+
+  <text x="30" y="146" font-family="Segoe UI,sans-serif" font-size="12" fill="#5b6b60" letter-spacing="1.6">CAMADA DE CONFIANÇA — BLOCKCHAIN PERMISSIONADA</text>
+  <rect x="30" y="156" width="800" height="76" rx="10" fill="url(#g2)" stroke="#e8dcb8"/>
+  <g font-family="Segoe UI,sans-serif" font-size="12.5" fill="#16211a">
+    <rect x="48" y="172" width="180" height="44" rx="7" fill="#fff" stroke="#e8dcb8"/><text x="138" y="192" text-anchor="middle">⛓️ Nó da cooperativa</text><text x="138" y="207" text-anchor="middle" font-size="10.5" fill="#5b6b60">consenso por permissão</text>
+    <rect x="244" y="172" width="180" height="44" rx="7" fill="#fff" stroke="#e8dcb8"/><text x="334" y="192" text-anchor="middle">📜 Contrato inteligente</text><text x="334" y="207" text-anchor="middle" font-size="10.5" fill="#5b6b60">escrow e trava de peso</text>
+    <rect x="440" y="172" width="180" height="44" rx="7" fill="#fff" stroke="#e8dcb8"/><text x="530" y="192" text-anchor="middle">🔐 Identidade por papel</text><text x="530" y="207" text-anchor="middle" font-size="10.5" fill="#5b6b60">quem pode registrar o quê</text>
+    <rect x="636" y="172" width="176" height="44" rx="7" fill="#fff" stroke="#e8dcb8"/><text x="724" y="192" text-anchor="middle">🧾 Hash e Merkle</text><text x="724" y="207" text-anchor="middle" font-size="10.5" fill="#5b6b60">prova de integridade</text>
+  </g>
+
+  <text x="30" y="266" font-family="Segoe UI,sans-serif" font-size="12" fill="#5b6b60" letter-spacing="1.6">CAMADA DE INTELIGÊNCIA — MODELOS SOBRE DADO CONFIÁVEL</text>
+  <rect x="30" y="276" width="800" height="52" rx="10" fill="url(#g3)" stroke="#cde2f3"/>
+  <g font-family="Segoe UI,sans-serif" font-size="12.5" fill="#16211a">
+    <text x="52" y="300">Previsão de safra</text><text x="212" y="300">Previsão de preço</text><text x="372" y="300">Diagnóstico fitossanitário</text>
+    <text x="576" y="300">Score de qualidade</text><text x="722" y="300">Assistente</text>
+    <text x="52" y="317" font-size="10.5" fill="#5b6b60">4 safras + NDVI + clima</text><text x="212" y="317" font-size="10.5" fill="#5b6b60">momentum, sazonalidade, vol.</text><text x="372" y="317" font-size="10.5" fill="#5b6b60">pressão climática + limiares</text>
+    <text x="576" y="317" font-size="10.5" fill="#5b6b60">umidade, processo, laudo</text><text x="722" y="317" font-size="10.5" fill="#5b6b60">perguntas em linguagem natural</text>
+  </g>
+</svg>
+
+<h3>3.1 Camada de campo</h3>
+<p>É o ponto mais frágil de qualquer projeto de rastreabilidade e, por isso, o mais importante. O aplicativo funciona <b>sem internet</b>, guardando os registros localmente e sincronizando quando houver sinal — realidade de boa parte das propriedades rurais de Rondônia. Cada registro é assinado no dispositivo no momento em que ocorre, com data, hora e coordenada geográfica, para que ninguém possa "inventar" a origem depois.</p>
+
+<h3>3.2 Camada de confiança</h3>
+<p>Rede <b>permissionada de consórcio</b> — não uma blockchain pública. Cooperativa, indústria, certificadora e órgão de fiscalização mantêm um nó cada um. Isso muda três coisas na prática: as transações são baratas e rápidas (não dependem de mineração competitiva), a privacidade é preservada (dado comercial não fica exposto no mundo inteiro) e cada participante tem permissão definida para o que pode registrar.</p>
+
+<h3>3.3 Camada de inteligência</h3>
+<p>Os modelos operam sobre o dado que a cadeia tornou confiável. Previsão de produtividade, previsão de preço, diagnóstico fitossanitário, score de qualidade, recomendação de destino e assistente em linguagem natural. Detalhe de projeto que vale explicitar: <b>a IA roda no dispositivo, sem enviar dados para servidor de terceiros</b> — e todo parecer é registrado com o hash da entrada e da saída, para que o produtor possa contestar e a cooperativa auditar depois.</p>
+
+<!-- ====================== 4 ====================== -->
+<h2><span class="num">SEÇÃO 4</span>Como a blockchain funciona aqui — e o que foi realmente implementado</h2>
+<div class="fio"></div>
+
+<p>Blockchain, neste projeto, não é palavra de efeito: é o mecanismo que impede a fraude mais comum da cadeia agrícola — <b>a troca de origem do lote</b>. Quando a carga sai da fazenda e chega à indústria com o selo de outro produtor, ou quando um laudo é reemitido com resultado diferente, não há sistema de banco de dados tradicional que consiga provar a alteração, porque o administrador do banco pode mudar o passado. Na cadeia encadeada, <b>mudar o passado invalida o presente</b>.</p>
+
+<h3>4.1 O mecanismo, passo a passo</h3>
+<div class="fluxo">
+  <div class="etapa"><div class="bolha">1</div><div class="corpo"><h4>O evento é criado e assinado</h4><p>O produtor registra a colheita. O sistema gera um resumo do conteúdo em JSON determinístico e calcula seu hash SHA-256 — uma impressão digital de 64 caracteres que só aquele conteúdo produz. A assinatura vincula autor, data e conteúdo.</p></div></div>
+  <div class="etapa"><div class="bolha">2</div><div class="corpo"><h4>Os eventos entram na fila</h4><p>As transações aguardam na mempool, como num sistema financeiro. Cada uma carrega o usuário que a originou — e o sistema verifica se aquele perfil tem permissão para registrar aquele tipo de evento.</p></div></div>
+  <div class="etapa"><div class="bolha">3</div><div class="corpo"><h4>O bloco é montado com árvore de Merkle</h4><p>Os hashes das transações são combinados em pares até resultar em um único hash — a raiz de Merkle. É ela que resume o conteúdo do bloco: se uma única transação mudar, a raiz muda.</p></div></div>
+  <div class="etapa"><div class="bolha">4</div><div class="corpo"><h4>Prova de trabalho e encadeamento</h4><p>O nó procura um número (nonce) tal que o hash do bloco comece com três zeros hexadecimais. Encontrar esse número exige tentativa e erro — e o resultado só vale para aquele bloco com aquele timestamp. O bloco é então fechado apontando para o hash do bloco anterior.</p></div></div>
+  <div class="etapa"><div class="bolha">5</div><div class="corpo"><h4>Verificação a qualquer momento</h4><p>A função de verificação refaz todas as contas: recalcula o hash de cada bloco, reconstrói cada raiz de Merkle, confere o elo entre blocos e valida cada assinatura. Qualquer divergência aparece imediatamente.</p></div></div>
+</div>
+
+<div class="destaque">
+  <b>O teste que prova o argumento.</b> No autódromo do sistema existe o botão <b>"Simular fraude"</b>. Ele altera diretamente um registro já gravado — exatamente o que faria um fraudador com acesso ao banco de dados. O resultado, medido nos testes automatizados: a verificação acusa <b>duas inconsistências</b> na hora (transação alterada e assinatura inválida). Para esconder a fraude, seria preciso refazer o hash daquele bloco, sua prova de trabalho e a de <i>todos</i> os blocos seguintes, mais rápido que o resto do consórcio — inviável numa rede com nós independentes.
+</div>
+
+<h3>4.2 O que foi implementado no protótipo (e o que muda em produção)</h3>
+<table>
+  <thead><tr><th>Componente</th><th>No protótipo — funciona de verdade</th><th>Em produção</th></tr></thead>
+  <tbody>
+    <tr><td>Função de hash</td><td>SHA-256 implementado à mão e <b>validado contra a biblioteca de referência do Python</b> em sete vetores de teste, incluindo os casos-limite de 55, 56 e 64 bytes</td><td>Mesmo algoritmo, biblioteca auditada da plataforma</td></tr>
+    <tr><td>Blocos</td><td>Bloco gênese com as regras do consórcio, raiz de Merkle, nonce, elo anterior, minerador e dificuldade</td><td>Idêntico, com nós independentes por instituição</td></tr>
+    <tr><td>Prova de trabalho</td><td>Busca real de nonce com três zeros hexadecimais, com contador de tentativas exibido ao vivo e o nonce mostrado sendo o <b>nonce real do bloco finalizado</b></td><td>Ajustada por nó, ou substituída por consenso de autoridade (QBFT/IBFT)</td></tr>
+    <tr><td>Permissão</td><td>Matriz por papel testada: auditor e certificadora têm colheita rejeitada com motivo; produtor registra normalmente</td><td>Mesma regra imposta no contrato, com identidade institucional real</td></tr>
+    <tr><td>Contratos</td><td>escrow, trava automática por divergência de peso, emissão de selo condicionada a laudo</td><td><span class="mono">AgroChainRastreio.sol</span> compilado (solc 0.8.37, 0 erro, 0 aviso, 14.195 bytes)</td></tr>
+    <tr><td>Persistência</td><td>Estado em memória, reconstruído a partir dos eventos; botão de reinício com restauração da semente</td><td>Banco replicado + armazenamento de arquivos com hash na cadeia</td></tr>
+  </tbody>
+</table>
+
+<h3>4.3 Trechos do contrato de produção</h3>
+<pre><span class="cm">// O escrow que não depende de confiança entre as partes:</span>
+<span class="kw">function</span> conferirRecebimento(<span class="kw">bytes32</span> contratoId, <span class="kw">uint256</span> pesoConferido) <span class="kw">external</span> {
+    Contrato <span class="kw">storage</span> c = contratos[contratoId];
+    <span class="kw">require</span>(msg.sender == c.comprador, <span class="st">"AgroChain: apenas o comprador"</span>);
+
+    c.pesoConferido = pesoConferido;
+    <span class="kw">uint256</span> divergenciaBps = _divergenciaBps(c.pesoDeclarado, pesoConferido);
+
+    <span class="kw">if</span> (divergenciaBps &gt; c.toleranciaPesoBps) {
+        c.etapa = EtapaContrato.TRAVADO;          <span class="cm">// pagamento bloqueado por regra</span>
+        lotes[c.loteId].status = StatusLote.BLOQUEADO;
+        emit DivergenciaDetectada(contratoId, c.pesoDeclarado, pesoConferido, divergenciaBps);
+        <span class="kw">return</span>;                                <span class="cm">// o dinheiro NÃO sai</span>
+    }
+    c.etapa = EtapaContrato.RECEBIMENTO;
+}
+
+<span class="cm">// Selo só existe se houver laudo registrado — impede certificação de fachada:</span>
+<span class="kw">require</span>(_temEvento(loteId, <span class="st">"LAUDO"</span>) || _temEvento(loteId, <span class="st">"CLASSIFICACAO"</span>),
+        <span class="st">"AgroChain: lote sem laudo registrado"</span>);</pre>
+
+<p>Um segundo princípio de engenharia está no contrato e merece registro: <b>dado pesado não vai para a cadeia</b>. Fotos, laudos em PDF e coordenadas ficam em armazenamento comum; a cadeia guarda o hash do arquivo. Isso reduz o custo por transação de forma decisiva e mantém a propriedade do dado com quem o gerou.</p>
+
+<!-- ====================== 5 ====================== -->
+<h2><span class="num">SEÇÃO 5</span>A camada de campo: sensores que medem antes de alguém digitar</h2>
+<div class="fio"></div>
+
+<p>Uma cadeia de rastreabilidade só é tão boa quanto o dado que entra nela. Se a informação nasce digitada por quem tem interesse no resultado, a criptografia garante integridade — mas não garante verdade. A camada de campo resolve isso na origem: <b>quem mede não é quem informa</b>. A temperatura da massa de cacau, a umidade do grão no terreiro e as horas de folha molhada entram no sistema por medição, não por declaração.</p>
+
+<p>Este protótipo traz a camada construída e funcionando: <b>13 dispositivos de 7 tipos, em 6 talhões de Cacoal e Rolim de Moura</b>, com telemetria horária, controle de qualidade do dado, indicadores agronômicos derivados e ancoragem criptográfica na blockchain. São <b>816 leituras por dia</b> — cerca de 4.900 valores medidos — que hoje passam a ter trilha verificável.</p>
+
+<h3>5.1 O que está instalado</h3>
+
+<table>
+  <thead><tr><th>Dispositivo</th><th>Tipo e função</th><th>Rede e envio</th><th>Energia</th><th>Ponto de instalação</th></tr></thead>
+  <tbody>
+    <tr><td class="mono">EST-01<br>EST-02</td><td><b>Estação meteorológica</b> — chuva, temperatura, umidade, vento e radiação; é a base do cálculo de evapotranspiração e dos alertas de doença</td><td>LoRaWAN · 15 min</td><td>Solar + bateria <span class="mono">(87% · 93%)</span></td><td>Sítio Boa Esperança e Fazenda Santa Luzia</td></tr>
+    <tr><td class="mono">SOL-01<br>SOL-02<br>SOL-03</td><td><b>Sonda de umidade do solo</b> — água disponível a 10, 30 e 60 cm; é a medição que decide a hora de irrigar e confirma (ou desmente) o balanço hídrico calculado</td><td>LoRaWAN · 30 min</td><td>Bateria <span class="mono">(72% · 64% · 69%)</span></td><td>Talhão Alto (irrigado), Talhão Baixo (sequeiro) e Santa Luzia Norte (pivô)</td></tr>
+    <tr><td class="mono">FER-01<br>FER-02</td><td><b>Sensor de fermentação</b> — temperatura no interior da massa; define o índice de fermentação, o momento da viragem e a nota de qualidade prevista do lote</td><td>WiFi · 15 min</td><td>Bateria <span class="mono">(95% · 88%)</span></td><td>Casa de fermentação do Sítio Boa Esperança e da Santa Luzia</td></tr>
+    <tr><td class="mono">SEC-01<br>SEC-02<br>SEC-03</td><td><b>Sensor de secagem</b> — umidade do grão no terreiro ou secador; decide quando o lote está no ponto de estocagem e evita desconto por umidade na entrega</td><td>LoRaWAN e NB-IoT · 30 min</td><td>Bateria <span class="mono">(81% · 77% · 84%)</span></td><td>Terreiro suspenso, secador rotativo e terreiro novo</td></tr>
+    <tr><td class="mono">FOLHA-01</td><td><b>Molhamento foliar</b> — horas de folha molhada na faixa de temperatura favorável a fungos, medida dentro da copa, onde a estação meteorológica não alcança</td><td>LoRaWAN · 15 min</td><td>Bateria <span class="mono">(58%)</span></td><td>Cacau do Córrego</td></tr>
+    <tr><td class="mono">FLUX-01</td><td><b>Medidor de vazão</b> — lâmina de água efetivamente aplicada na irrigação; insumo da eficiência de bombeamento e do balanço hídrico</td><td>NB-IoT · 1 h</td><td>Bateria <span class="mono">(91%)</span></td><td>Talhão Alto (irrigado)</td></tr>
+    <tr><td class="mono">GATE-01</td><td><b>Gateway do consórcio</b> — concentra as transmissões LoRaWAN do setor e mede a saúde do enlace: pacotes recebidos, sensores conectados, latência e taxa de entrega</td><td>LoRaWAN (8 canais) · 1 h</td><td>Rede elétrica + nobreak</td><td>Armazém da COOPRON, em Cacoal</td></tr>
+  </tbody>
+</table>
+
+<p class="nota-rodape">Nem todo talhão tem sensor — e o sistema <b>diz isso</b>. Onde não há sonda de solo (T-03, T-04 e T-06), o indicador de estresse hídrico não é estimado: a resposta é “sem medição”, com recomendação de instalação. Onde não há sensor de molhamento foliar, o cálculo é apresentado como <b>estimativa</b> a partir da estação, com a fonte declarada na resposta. Um sistema que inventa indicador onde não mediu é pior que um sistema que admite o vazio.</p>
+
+<h3>5.2 O caminho do dado, do sensor ao bloco</h3>
+
+<svg viewBox="0 0 860 220" role="img" aria-label="Caminho do dado de sensor até a blockchain">
+  <rect width="860" height="220" fill="#fbfdfb"/>
+  <g font-family="Segoe UI,sans-serif" font-size="11" fill="#16211a">
+    <!-- caixas -->
+    <g>
+      <rect x="14" y="60" width="128" height="72" rx="9" fill="#e8f3ec" stroke="#bcd9c7"/>
+      <text x="78" y="83" text-anchor="middle" font-weight="700" font-size="12">1 · Sensor</text>
+      <text x="78" y="101" text-anchor="middle" font-size="10.5" fill="#5b6b60">mede a cada</text>
+      <text x="78" y="116" text-anchor="middle" font-size="10.5" fill="#5b6b60">15–60 minutos</text>
+
+      <rect x="160" y="60" width="128" height="72" rx="9" fill="#e8f3ec" stroke="#bcd9c7"/>
+      <text x="224" y="83" text-anchor="middle" font-weight="700" font-size="12">2 · Gateway</text>
+      <text x="224" y="101" text-anchor="middle" font-size="10.5" fill="#5b6b60">concentra, assina</text>
+      <text x="224" y="116" text-anchor="middle" font-size="10.5" fill="#5b6b60">e envia o pacote</text>
+
+      <rect x="306" y="60" width="140" height="72" rx="9" fill="#fdf7e3" stroke="#e8dcb8"/>
+      <text x="376" y="83" text-anchor="middle" font-weight="700" font-size="12">3 · Qualidade</text>
+      <text x="376" y="101" text-anchor="middle" font-size="10.5" fill="#5b6b60">rejeita valor</text>
+      <text x="376" y="116" text-anchor="middle" font-size="10.5" fill="#5b6b60">impossível e lacuna</text>
+
+      <rect x="464" y="60" width="140" height="72" rx="9" fill="#fdf7e3" stroke="#e8dcb8"/>
+      <text x="534" y="83" text-anchor="middle" font-weight="700" font-size="12">4 · Indicador</text>
+      <text x="534" y="101" text-anchor="middle" font-size="10.5" fill="#5b6b60">graus-dia, balanço,</text>
+      <text x="534" y="116" text-anchor="middle" font-size="10.5" fill="#5b6b60">fermentação, secagem</text>
+
+      <rect x="622" y="60" width="106" height="72" rx="9" fill="#e0eef8" stroke="#b6d3e8"/>
+      <text x="675" y="83" text-anchor="middle" font-weight="700" font-size="12">5 · Merkle</text>
+      <text x="675" y="101" text-anchor="middle" font-size="10.5" fill="#5b6b60">hashes →</text>
+      <text x="675" y="116" text-anchor="middle" font-size="10.5" fill="#5b6b60">uma raiz</text>
+
+      <rect x="746" y="60" width="100" height="72" rx="9" fill="#1d6b3c"/>
+      <text x="796" y="83" text-anchor="middle" font-weight="700" font-size="12" fill="#fff">6 · Bloco</text>
+      <text x="796" y="101" text-anchor="middle" font-size="10.5" fill="#b9dcc6">LEITURA_</text>
+      <text x="796" y="116" text-anchor="middle" font-size="10.5" fill="#b9dcc6">SENSOR</text>
+    </g>
+    <!-- setas -->
+    <g stroke="#9db8a7" stroke-width="2" fill="none">
+      <path d="M142,96 L160,96" marker-end="url(#seta)"/>
+      <path d="M288,96 L306,96" marker-end="url(#seta)"/>
+      <path d="M446,96 L464,96" marker-end="url(#seta)"/>
+      <path d="M604,96 L622,96" marker-end="url(#seta)"/>
+      <path d="M728,96 L746,96" marker-end="url(#seta)"/>
+    </g>
+    <defs><marker id="seta" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#9db8a7"/></marker></defs>
+    <!-- retorno -->
+    <path d="M796,140 C796,178 400,182 100,178 C60,177 78,140 78,132" fill="none" stroke="#c9a227" stroke-width="1.8" stroke-dasharray="6 4"/>
+    <text x="430" y="172" text-anchor="middle" font-size="10.5" fill="#8a6a12" font-weight="600">prova de inclusão: qualquer leitura é conferida contra a raiz gravada, sem revelar o resto da série</text>
+    <text x="430" y="196" text-anchor="middle" font-size="10.5" fill="#5b6b60">o comprador, a certificadora e a auditoria leem e conferem — não podem registrar nem alterar</text>
+  </g>
+</svg>
+
+<p>As três primeiras etapas acontecem no campo, sem internet garantida. A quarta roda no aplicativo e no servidor. A quinta e a sexta são criptografia: <b>256 bits que resumem milhares de medições</b>.</p>
+
+<h3>5.3 Controle de qualidade: o dado ruim existe, e chega</h3>
+
+<p>Sensor sujo, conector molhado, bateria fraca, obstrução no cabo: dado inválido entra no sistema todos os dias em qualquer rede de campo. Se ele virar decisão, o produtor perde dinheiro confiando no sistema. Por isso a rotina de qualidade roda <b>antes</b> do indicador e <b>antes</b> da ancoragem.</p>
+
+<p>A escolha do método não é acadêmica. Chuva e irrigação produzem séries naturalmente bimodais — zero na maior parte do tempo e um pulso alto em alguns momentos. Um detector que use <b>média e desvio-padrão</b> classificaria o pulso legítimo de irrigação como “outlier” e o descartaria: o sistema comeria justamente o dado que interessava. O protótipo usa <b>mediana e desvio absoluto mediano (MAD)</b>, robustos a esse tipo de distribuição, com um piso de desvio relativo para não confundir oscilação normal de série quase constante com falha.</p>
+
+<div class="duas">
+  <div class="bloco">
+    <h4>O que foi rejeitado no cenário em execução</h4>
+    <p class="nota-rodape" style="margin-bottom:8px">Uma sonda de solo reportou <span class="mono">121,53%</span> de umidade volumétrica a 10 cm — fisicamente impossível. O valor foi descartado, substituído por interpolação dos vizinhos e <b>mantido na trilha como suspeito</b>, com o motivo escrito.</p>
+    <p class="nota-rodape" style="margin-bottom:0">Um auditor não precisa saber apenas o que foi aceito; precisa poder ver <b>o que foi descartado e por quê</b>. Registro que esconde o dado ruim não é auditável.</p>
+  </div>
+  <div class="bloco">
+    <h4>O que é verificado, em cada leitura</h4>
+    <table style="margin:0">
+      <tbody>
+        <tr><td><b>Faixa física</b></td><td class="nota-rodape">Valor impossível para a grandeza (umidade acima de 100%, temperatura fora do plausível para a massa)</td></tr>
+        <tr><td><b>Desvio robusto</b></td><td class="nota-rodape">Z-score por MAD acima de 6 <i>e</i> desvio relativo mínimo, contra a mediana da janela</td></tr>
+        <tr><td><b>Lacuna de transmissão</b></td><td class="nota-rodape">Janela sem pacote recebido é declarada como lacuna — jamais preenchida em silêncio</td></tr>
+        <tr><td><b>Saúde do dispositivo</b></td><td class="nota-rodape">Bateria, sinal, tempo desde a calibração e leituras rejeitadas compõem a confiabilidade do sensor</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<p class="nota-rodape">Nenhum desses filtros apaga o dado original: cada leitura guarda o <b>valor bruto</b>, o <b>valor tratado</b> e o <b>motivo</b>. É essa separação que permite a um comprador reconstruir o que realmente aconteceu no campo — inclusive quando algo deu errado.</p>
+
+<h3>5.4 Do bruto ao indicador: seis números que mudam decisão</h3>
+
+<p>Nenhuma decisão sai de “temperatura = 31,2 °C”. Sai de indicador com fórmula publicada, para que o agrônomo possa discordar com argumento. Os seis indicadores rodam no protótipo com os valores abaixo, medidos no cenário em execução.</p>
+
+<table>
+  <thead><tr><th>Indicador</th><th>Como é calculado</th><th>Valor no cenário</th><th>Que decisão muda</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><b>Graus-dia acumulados</b></td>
+      <td>Soma de (temperatura média diária − temperatura base), base 10 °C para café e 12 °C para cacau, limitada entre a mínima e a máxima do dia</td>
+      <td class="mono">581 GD em 30 dias<br>(T-01, café)<br>3.191 GD no ciclo</td>
+      <td>Estádio fenológico e janela de colheita — em vez de contar meses no calendário</td>
+    </tr>
+    <tr>
+      <td><b>ET0 e ET real</b></td>
+      <td>ET0 por Hargreaves-Samani (FAO-56) com a latitude real do município; ET real = ET0 × Ks, o coeficiente de estresse hídrico</td>
+      <td class="mono">ET0 138,6 mm/30 dias<br>ET real 133,4 mm (T-01, irrigado)<br>ET real 86,1 mm (T-02, sequeiro)</td>
+      <td>Quanto e quando irrigar — e quanto a planta realmente consome quando a água falta</td>
+    </tr>
+    <tr>
+      <td><b>Balanço hídrico do solo</b></td>
+      <td>Chuva + irrigação − ET real, integrado sobre a capacidade de água disponível (CAD) do perfil de 0 a 40 cm, com drenagem e limite de murcha</td>
+      <td class="mono">T-01: +29,0 mm<br>“equilíbrio”, água em 100%<br>T-02: −13,7 mm, mínimo de 38% → “déficit moderado”</td>
+      <td>Distinguir “choveu pouco” de “a planta passou sede”: o saldo do mês não conta a história sozinho</td>
+    </tr>
+    <tr>
+      <td><b>Molhamento foliar</b></td>
+      <td>Horas com folha molhada e temperatura entre 18 e 25 °C para a ferrugem do café; horas com umidade acima de 90% para a vassoura-de-bruxa do cacau</td>
+      <td class="mono">23 h favoráveis em 7 dias<br>(café, T-05)<br>27 h em 7 dias (cacau, T-06)</td>
+      <td>Antecipar ou descartar pulverização com base em janela de infecção medida na copa, não em média regional</td>
+    </tr>
+    <tr>
+      <td><b>Índice de fermentação</b></td>
+      <td>Σ (T − 40 °C) por hora com a massa acima de 40 °C, com projeção pela curva térmica do cocho até o fim do período ativo (144 h). Faixa ideal: 150 a 400 °C·h</td>
+      <td class="mono">L-2026-0145: 122 °C·h acumulados<br>em 68 h → projeção 271 °C·h<br>(IDEAL, nota 100)</td>
+      <td>Virar a massa no momento certo e <b>ainda em tempo de corrigir</b> a trajetória — o valor projetado, não o de hoje</td>
+    </tr>
+    <tr>
+      <td><b>Secagem</b></td>
+      <td>Taxa de perda de umidade em %/dia e dias restantes até a umidade-alvo (7% para cacau, 12,5% para café)</td>
+      <td class="mono">L-2026-0095: 9,4% → 7%<br>2,8%/dia, 0,9 dia restante<br>L-2026-0139: no ponto</td>
+      <td>Quando encerrar a secagem, evitar mofo por excesso e desconto por umidade na entrega</td>
+    </tr>
+  </tbody>
+</table>
+
+<p class="nota-rodape">A projeção da fermentação merece destaque porque é o indicador que muda de natureza: para um lote em andamento, o número relevante não é o calor já acumulado — é <b>onde a curva vai chegar se ninguém mexer</b>. O sistema informa as duas coisas e a margem de calor ainda prevista, o que dá ao produtor a janela de ação. Para um lote já encerrado, o sistema avalia o <b>período ativo completo</b> e reporta o índice final, que é o número que sustenta o laudo: ler o passado como se fosse medição ao vivo produziria “0 °C·h, fermentação incompleta” para um lote que fermentou bem.</p>
+
+<h3>5.5 Ancoragem das leituras na cadeia</h3>
+
+<p>Gravar cada leitura na blockchain seria caro, lento e inútil: o valor de auditoria não está em cada pacote, e sim na <b>impossibilidade de reescrever a série depois</b>. O protótipo aplica o padrão oráculo, com árvore de Merkle:</p>
+
+<div class="fluxo" style="margin:16px 0 4px">
+  <div class="etapa"><div class="bolha">1</div><div class="corpo"><h4>Cada leitura vira um hash</h4><p>Com dispositivo, horário e valores. Duas leituras diferentes nunca produzem o mesmo hash.</p></div></div>
+  <div class="etapa"><div class="bolha">2</div><div class="corpo"><h4>Os hashes formam a árvore</h4><p>Par a par, até um único valor no topo. Na janela de 48 h da sonda SOL-01, <b>49 leituras</b> viram <b>uma raiz de Merkle</b> de 64 caracteres.</p></div></div>
+  <div class="etapa"><div class="bolha">3</div><div class="corpo"><h4>A raiz entra no bloco</h4><p>Uma transação <span class="mono">LEITURA_SENSOR</span> com dispositivo, janela, contagem e raiz — minerada como qualquer outra, com hash anterior e prova de trabalho.</p></div></div>
+  <div class="etapa"><div class="bolha">4</div><div class="corpo"><h4>Qualquer leitura é provada depois</h4><p>Com o caminho de Merkle (6 níveis no exemplo), a leitura individual reconstrói a raiz gravada. Quem confere <b>não precisa ver o resto da série</b> — só os hashes vizinhos do caminho.</p></div></div>
+</div>
+
+<div class="duas">
+  <div class="bloco verde">
+    <h4>O que fica na cadeia</h4>
+    <ul class="nota-rodape">
+      <li>Raiz de Merkle da janela ancorada</li>
+      <li>Identificador do dispositivo, tipo e intervalo de tempo</li>
+      <li>Número de leituras, contagem de rejeitadas e de lacunas</li>
+      <li>Autor do registro, com assinatura e carimbo de tempo</li>
+    </ul>
+  </div>
+  <div class="bloco ouro">
+    <h4>O que fica fora da cadeia</h4>
+    <ul class="nota-rodape">
+      <li>A série bruta de medições (volume e custo inviáveis)</li>
+      <li>Dado comercial e de produção do produtor</li>
+      <li>Calibrações, manutenção e notas de campo</li>
+    </ul>
+    <p class="nota-rodape" style="margin-bottom:0"><b>Quem ancora:</b> o produtor, para os sensores dele, e a cooperativa, para os gateways que agregam vários produtores. Indústria, certificadora e auditoria <b>não</b> ancoram — quem compra não deve poder mexer na medição. A regra está no contrato inteligente, não só na interface.</p>
+  </div>
+</div>
+
+<h3>5.6 A prova que se pode fazer na frente do comprador</h3>
+
+<p>O protótipo tem um botão que altera uma leitura já ancorada, do jeito que a fraude aconteceria na vida real: com um valor plausível, não absurdo — se fosse impossível, o controle de qualidade o descartaria sozinho e a lição se perderia. A leitura alterada muda o hash da folha, o hash sobe pela árvore e a raiz recalculada <b>deixa de coincidir</b> com a raiz gravada no bloco. A tela mostra as duas raízes lado a lado, diferentes, e conclui: dado alterado depois da ancoragem. Restaurado o valor original, a prova volta a conferir.</p>
+
+<div class="destaque">
+  <p style="margin-bottom:0"><b>Por que isso importa comercialmente.</b> A ancoragem não impede que alguém mude o dado no dispositivo — ela torna a mudança <b>detectável por qualquer terceiro</b>, sem depender da palavra de ninguém e sem precisar confiar no operador do sistema. É a diferença entre “acredite em mim” e “confira você mesmo”: no exemplo executado, a adulteração foi detectada em menos de um segundo por uma conta que qualquer auditor reproduz.</p>
+</div>
+
+<h3>5.7 O que a camada de campo muda na prática</h3>
+
+<table>
+  <thead><tr><th>Situação medida</th><th>Sem sensor</th><th>Com a camada de campo</th></tr></thead>
+  <tbody>
+    <tr><td><b>Ferrugem do café</b><br><span class="mono nota-rodape">23 h favoráveis em 7 dias</span></td><td>Pulverização por calendário, decidida por média regional e por hábito</td><td>Janela de infecção contada hora a hora no talhão; o alerta sobe quando o limiar é cruzado e a aplicação acontece no momento de maior retorno</td></tr>
+    <tr><td><b>Vassoura-de-bruxa no cacau</b><br><span class="mono nota-rodape">27 h em 7 dias</span></td><td>Percepção visual, quando a doença já está instalada</td><td>Umidade alta dentro da copa medida pelo sensor de molhamento; o produtor é avisado na véspera, não na vistoria seguinte</td></tr>
+    <tr><td><b>Fermentação conduzida</b><br><span class="mono nota-rodape">122 → 271 °C·h projetados</span></td><td>Decisão pelo cheiro, pelo tato e pela tradição; lote desclassificado depois de pronto</td><td>Índice com projeção, momento da viragem indicado e nota prevista <b>antes</b> de o lote perder valor</td></tr>
+    <tr><td><b>Umidade na entrega</b><br><span class="mono nota-rodape">9,4% medidos no terreiro</span></td><td>Discussão de desconto com base em medição do comprador</td><td>Curva de secagem do produtor ancorada na cadeia; divergência de peso por umidade passa a ser conferida contra dado registrado antes do transporte</td></tr>
+    <tr><td><b>Irrigação do Talhão Alto</b><br><span class="mono nota-rodape">90 mm aplicados, ET0 138,6 mm</span></td><td>Turno fixo de bombeamento, sem vínculo com a demanda da cultura</td><td>Balanço hídrico com o Ks da FAO-56 mostra o consumo real e ajusta a lâmina; a água é o insumo mais caro do sistema irrigado</td></tr>
+  </tbody>
+</table>
+
+<h3>5.8 O que ainda não é — e o que um piloto precisa</h3>
+
+<div class="alerta">
+  <p><b>Os sensores são simulados.</b> Não há hardware conectado a este protótipo: as séries são geradas por modelos físicos determinísticos (curva diurna de temperatura, balanço de água no solo com drenagem e limite de murcha, curva térmica de fermentação, curva de secagem), com ruído, falhas de leitura e lacunas injetadas de forma reprodutível. O que <b>não</b> é simulado é a matemática: ET0 é Hargreaves-Samani com as latitudes reais de Cacoal e Rolim de Moura; o balanço usa capacidade de campo e ponto de murcha por tipo de solo; a árvore de Merkle, a prova de inclusão e a detecção de adulteração são cálculo criptográfico real, executado sobre os dados simulados.</p>
+  <p style="margin-bottom:0"><b>O que um piloto real exige:</b> uma estação meteorológica e duas sondas de solo por propriedade-piloto; um gateway LoRaWAN por setor com visada (ou módulos NB-IoT, que dispensam gateway mas dependem de cobertura de celular); sensores de fermentação e secagem na casa de fermentação e no terreiro; e — o item que costuma ser esquecido no orçamento — <b>mão de obra de manutenção</b>: limpeza de sensor, troca de bateria e recalibração anual. É exatamente por isso que a bateria, o sinal e o tempo de calibração de cada dispositivo aparecem como alerta no painel: uma rede de sensores sem manutenção vira uma rede de dados falsos em poucos meses.</p>
+</div>
+
+<p>Com a camada de campo instalada, o dado que alimenta a inteligência artificial deixa de ser premissa e passa a ser medição — e é isso que torna defensável dizer a um comprador europeu que o lote tem origem verificada, manejo registrado e qualidade comprovada. A próxima seção mostra o que a IA faz com esse dado.</p>
+
+<!-- ====================== 6 ====================== -->
+<h2><span class="num">SEÇÃO 6</span>Inteligência artificial: seis decisões que o produtor precisa tomar</h2>
+<div class="fio"></div>
+
+<div class="duas">
+  <div class="bloco verde">
+    <h4>Decisão de projeto: explicar antes de acertar</h4>
+    <p class="nota-rodape">No campo, uma recomendação sem justificativa não é seguida. Por isso, os modelos do protótipo são <b>determinísticos e auditáveis</b>: cada previsão de safra mostra o efeito de cada fator (idade da lavoura, NDVI, chuva, sanidade, manejo), e cada recomendação de venda mostra as contas que a sustentam. Preferimos um modelo que o produtor consegue contestar a um modelo que ninguém entende.</p>
+  </div>
+  <div class="bloco ouro">
+    <h4>Decisão de projeto: rodar no dispositivo</h4>
+    <p class="nota-rodape">As previsões são calculadas localmente, sem enviar dado do produtor para servidor de terceiros. Isso resolve três problemas de uma vez: funciona <b>sem internet</b>, protege a informação comercial e elimina o custo recorrente de nuvem por consulta — item que inviabiliza muitos projetos no interior.</p>
+  </div>
+</div>
+
+<h3>5.1 Previsão de safra</h3>
+<p>Combina quatro anos de histórico do talhão com seis fatores de correção: curva de maturação da cultura, vigor vegetativo por NDVI, regime hídrico do trimestre, pressão fitossanitária, manejo declarado e idade da lavoura. Os fatores entram em <b>espaço logarítmico com amortecimento</b> — uma decisão técnica importante: multiplicar fatores diretamente puniria o produtor várias vezes pelo mesmo problema (uma seca afeta o NDVI, a sanidade e a produtividade), gerando previsões irreais. O modelo embutido devolve resultado com faixa de confiança e o peso de cada fator.</p>
+<table>
+  <thead><tr><th>Talhão (cenário da demonstração)</th><th class="num">Safra 2025</th><th class="num">Previsão 2026</th><th class="num">Variação</th><th class="num">Confiança</th><th>Fator dominante</th></tr></thead>
+  <tbody>
+    <tr><td>Talhão Alto — conilon irrigado, Cacoal</td><td class="num">60 sacas/ha</td><td class="num">52,9 sacas/ha</td><td class="num">−11,8%</td><td class="num">83%</td><td>Déficit hídrico (−6,0%)</td></tr>
+    <tr><td>Talhão Baixo — conilon sequeiro, Cacoal</td><td class="num">47 sacas/ha</td><td class="num">35,5 sacas/ha</td><td class="num">−24,5%</td><td class="num">79%</td><td>Déficit hídrico (−12,0%)</td></tr>
+    <tr><td>Cacau do Córrego — consórcio com seringueira</td><td class="num">860 kg/ha</td><td class="num">796 kg/ha</td><td class="num">−7,5%</td><td class="num">83%</td><td>Déficit hídrico (−12,0%)</td></tr>
+    <tr><td>Cacau Novo — pleno sol, 6 anos</td><td class="num">730 kg/ha</td><td class="num">521 kg/ha</td><td class="num">−28,6%</td><td class="num">79%</td><td>Idade + vigor + chuva</td></tr>
+  </tbody>
+</table>
+<p class="nota-rodape">O contraste entre o primeiro e o segundo talhão é o argumento comercial do sistema: a diferença de 11 pontos percentuais vem do sistema de irrigação. Sem o diagnóstico por talhão, o produtor veria apenas a queda média da propriedade — e não saberia onde investir o recurso limitado que tem.</p>
+
+<h3>5.2 Previsão de preço e decisão de venda</h3>
+<p>O modelo trabalha com tendência de curto prazo amortecida, reversão parcial à média móvel de 60 dias, sazonalidade do período e volatilidade histórica, gerando uma faixa de incerteza que cresce com a raiz do tempo. Sobre essa base, o sistema compara quatro caminhos e mostra o resultado financeiro de cada um, <b>já descontando armazenagem e o custo do capital de giro a 15% ao ano</b> — taxa que, em 2026, torna a retenção de café cara.</p>
+<table>
+  <thead><tr><th>Produto</th><th class="num">Preço hoje</th><th class="num">Projeção 30 dias</th><th class="num">Prob. de alta</th><th class="num">Volatilidade anualizada</th><th>Leitura da IA</th></tr></thead>
+  <tbody>
+    <tr><td>Café conilon</td><td class="num">R$ 976,94</td><td class="num">R$ 980,85 (+0,4%)</td><td class="num">53%</td><td class="num">24,4%</td><td>Ciclo de alta: ganho de esperar é pequeno frente ao custo de carregar</td></tr>
+    <tr><td>Café arábica</td><td class="num">R$ 1.568,95</td><td class="num">R$ 1.573,10 (+0,3%)</td><td class="num">52%</td><td class="num">27,9%</td><td>Mercado firme, sem prêmio relevante por retenção em 30 dias</td></tr>
+    <tr><td>Cacau</td><td class="num">R$ 25,80/kg</td><td class="num">R$ 25,28/kg (−2,0%)</td><td class="num">39%</td><td class="num">34,0%</td><td>Ciclo de correção: esperar significa perder receita</td></tr>
+  </tbody>
+</table>
+
+<h3>5.3 Diagnóstico fitossanitário</h3>
+<p>Cruza umidade relativa, chuva de 30 e 60 dias, temperatura, idade da lavoura e vigor com os limiares publicados para as doenças que realmente atacam cada cultura na região:</p>
+<div class="duas">
+  <div class="bloco"><h4>☕ Café</h4><p class="nota-rodape"><b>Ferrugem</b> (Hemileia vastatrix) — favorecida por umidade acima de 80% e temperatura entre 18 e 25 °C. <b>Broca</b> (Hypothenus hampei) — pressão maior com frutos maduros e calor. <b>Cercosporiose</b> — associada a deficiência nutricional e estresse hídrico. <b>Bicho-mineiro</b> — explosões em estiagem prolongada.</p></div>
+  <div class="bloco"><h4>🍫 Cacau</h4><p class="nota-rodape"><b>Vassoura-de-bruxa</b> (Moniliophthora perniciosa) — a principal doença da cultura, agravada por umidade alta. <b>Monilíase</b> (M. roreri) — quarentenária, de notificação obrigatória, com vigilância semanal. <b>Podridão-parda</b> (Phytophthora spp.) — ligada a excesso de chuva e drenagem deficiente.</p></div>
+</div>
+<p>O sistema devolve risco de 0 a 100 por doença, a janela de ação e o manejo recomendado — e é explícito quanto ao limite: <b>aponta onde olhar primeiro, não substitui a vistoria de campo</b>. A evolução natural é acoplar visão computacional treinada com fotos reais dos produtores.</p>
+
+<h3>5.4 Score de qualidade e recomendação de destino</h3>
+<p>Cada lote recebe nota de 0 a 100 em cinco dimensões ponderadas: umidade, processo pós-colheita (dias de fermentação ou secagem), classificação, rastreabilidade registrada e certificação. O score se converte em prêmio ou desconto de até 22% sobre a cotação-base — transformando qualidade em dinheiro, que é a única linguagem que muda comportamento no campo.</p>
+
+<h3>5.5 Detecção de anomalias na cadeia</h3>
+<p>Uma camada de auditoria automática verifica padrões de fraude: trilha incompleta para lote declarado, divergência entre peso e volume, certificação sem laudo que a sustente, eventos fora de ordem cronológica e discrepância de umidade entre colheita e recebimento. No cenário de demonstração, o sistema aponta dois achados e calcula um score de confiabilidade da base de 92/100.</p>
+
+<!-- ====================== 7 ====================== -->
+<h2><span class="num">SEÇÃO 7</span>Resultados medidos do pipeline de aprendizado de máquina</h2>
+<div class="fio"></div>
+
+<p>Além dos modelos explicáveis embutidos na aplicação, o projeto inclui um pipeline completo de aprendizado de máquina em Python, <b>executado e validado</b>: geração de atributos, treino, validação cruzada de 5 partições, métricas de erro, importância das variáveis e exportação do modelo. Os números abaixo são medições reais do script <span class="mono">ia/treinar_modelos.py</span>.</p>
+
+<div class="cartoes">
+  <div class="cartao"><div class="rot">Produtividade do café conilon</div><div class="val">R² 0,960</div><div class="obs">MAPE 4,81% · MAE 2,08 sacas/ha</div></div>
+  <div class="cartao"><div class="rot">Produtividade do cacau</div><div class="val">R² 0,956</div><div class="obs">MAPE 5,24% · MAE 37,8 kg/ha</div></div>
+  <div class="cartao"><div class="rot">Preço do conilon em 30 dias</div><div class="val">R² 0,936</div><div class="obs">MAPE 5,42% ≈ R$ 53 por saca</div></div>
+  <div class="cartao"><div class="rot">Direção do preço do cacau</div><div class="val">71,6%</div><div class="obs">acerto · AUC 0,792</div></div>
+</div>
+
+<table>
+  <thead><tr><th>Modelo</th><th>Algoritmo</th><th class="num">Registros</th><th class="num">R² / acurácia</th><th class="num">Erro médio</th><th>Variáveis mais decisivas</th></tr></thead>
+  <tbody>
+    <tr><td>Produtividade de café conilon</td><td>Gradient Boosting</td><td class="num">1.200</td><td class="num">0,9598</td><td class="num">MAPE 4,81%</td><td>Safra anterior (87%), idade da lavoura (7%), NDVI (4%)</td></tr>
+    <tr><td>Produtividade de cacaueiro</td><td>Gradient Boosting</td><td class="num">1.000</td><td class="num">0,9559</td><td class="num">MAPE 5,24%</td><td>Safra anterior (77%), idade (12%), NDVI (4%)</td></tr>
+    <tr><td>Preço do conilon em 30 dias</td><td>Random Forest</td><td class="num">3.000</td><td class="num">0,9363</td><td class="num">MAPE 5,42%</td><td>Preço atual (95%), retorno de 30 dias, média móvel de 60 dias</td></tr>
+    <tr><td>Direção do preço do cacau</td><td>Random Forest (classificação)</td><td class="num">6.000</td><td class="num">0,7163</td><td class="num">AUC 0,792</td><td>Preço atual (25%), médias móveis de 30 e 60 dias (36%)</td></tr>
+  </tbody>
+</table>
+
+<div class="alerta">
+  <b>Honestidade metodológica — leia antes de citar estes números.</b> Os dados de treino são <b>sintéticos</b>, produzidos por um simulador agronômico calibrado com parâmetros publicados e com as cotações reais de 06/10/2026. Portanto, as métricas medem a capacidade dos modelos de aprender a estrutura do simulador — <b>não são validação em campo</b>. O que está entregue é o encanamento completo e testado: ao chegar o dado real da cooperativa (histórico de balança, laudos, NDVI de satélite, estação meteorológica), basta trocar a fonte de dados e rodar de novo. O restante do pipeline não muda.
+  <br><br>
+  Uma segunda limitação, que aparece na tabela de importância: o <i>histórico da safra anterior</i> domina os modelos de produtividade. Isso é realista — produtividade agrícola é fortemente autocorrelacionada — mas significa que o modelo é melhor para <b>projetar a próxima safra de um talhão conhecido</b> do que para prever a primeira safra de uma área nova.
+</div>
+
+<h3>6.1 Convergência entre as duas abordagens</h3>
+<p>Aplicando o modelo Python ao mesmo cenário do Talhão T-01 usado na demonstração, a previsão foi de <b>53,0 sacas/ha</b>, contra <b>52,9 sacas/ha</b> do motor explicável embutido na aplicação — duas metodologias independentes convergindo para o mesmo patamar. A convergência não é garantia de acerto em campo, mas indica que a modelagem agronômica e o modelo estatístico estão lendo o mesmo fenômeno.</p>
+
+<!-- ====================== 8 ====================== -->
+<h2><span class="num">SEÇÃO 8</span>Fluxo operacional completo</h2>
+<div class="fio"></div>
+
+<svg viewBox="0 0 860 250" role="img" aria-label="Fluxo operacional da cadeia">
+  <rect width="860" height="250" fill="#fbfdfb"/>
+  <g font-family="Segoe UI,sans-serif" font-size="11.5" fill="#16211a">
+    <!-- linha -->
+    <line x1="60" y1="70" x2="800" y2="70" stroke="#d5ded8" stroke-width="3"/>
+    <g fill="#1d6b3c">
+      <circle cx="60" cy="70" r="14"/><circle cx="208" cy="70" r="14"/><circle cx="356" cy="70" r="14"/>
+      <circle cx="504" cy="70" r="14"/><circle cx="652" cy="70" r="14"/><circle cx="800" cy="70" r="14"/>
+    </g>
+    <g fill="#fff" font-size="12" font-weight="700" text-anchor="middle">
+      <text x="60" y="75">1</text><text x="208" y="75">2</text><text x="356" y="75">3</text>
+      <text x="504" y="75">4</text><text x="652" y="75">5</text><text x="800" y="75">6</text>
+    </g>
+    <g text-anchor="middle">
+      <text x="60" y="46" font-weight="700">Colheita</text><text x="60" y="108" font-size="10.5" fill="#5b6b60">app offline</text><text x="60" y="123" font-size="10.5" fill="#5b6b60">+ geolocalização</text>
+      <text x="208" y="46" font-weight="700">Pós-colheita</text><text x="208" y="108" font-size="10.5" fill="#5b6b60">fermentação</text><text x="208" y="123" font-size="10.5" fill="#5b6b60">e secagem</text>
+      <text x="356" y="46" font-weight="700">Classificação</text><text x="356" y="108" font-size="10.5" fill="#5b6b60">laudo +</text><text x="356" y="123" font-size="10.5" fill="#5b6b60">score de IA</text>
+      <text x="504" y="46" font-weight="700">Selo e QR</text><text x="504" y="108" font-size="10.5" fill="#5b6b60">hash do lote</text><text x="504" y="123" font-size="10.5" fill="#5b6b60">impresso na saca</text>
+      <text x="652" y="46" font-weight="700">Venda em escrow</text><text x="652" y="108" font-size="10.5" fill="#5b6b60">garantia retida</text><text x="652" y="123" font-size="10.5" fill="#5b6b60">conferência de peso</text>
+      <text x="800" y="46" font-weight="700">Pagamento</text><text x="800" y="108" font-size="10.5" fill="#5b6b60">liberação por</text><text x="800" y="123" font-size="10.5" fill="#5b6b60">regra do contrato</text>
+    </g>
+    <!-- ramos -->
+    <path d="M356,84 C356,140 250,150 250,186" fill="none" stroke="#a8841a" stroke-width="2" stroke-dasharray="5 4"/>
+    <rect x="130" y="186" width="240" height="46" rx="8" fill="#fdf7e3" stroke="#e8dcb8"/>
+    <text x="250" y="205" text-anchor="middle" font-size="11" fill="#8a6a12" font-weight="700">Desvio: consumo próprio</text>
+    <text x="250" y="221" text-anchor="middle" font-size="10.5" fill="#5b6b60">industrialização artesanal, sem sair da cadeia</text>
+    <path d="M504,84 C504,150 620,160 620,186" fill="none" stroke="#b03a2e" stroke-width="2" stroke-dasharray="5 4"/>
+    <rect x="500" y="186" width="300" height="46" rx="8" fill="#fdf0ee" stroke="#f0c8c1"/>
+    <text x="650" y="205" text-anchor="middle" font-size="11" fill="#8f2b20" font-weight="700">Trava: divergência de peso</text>
+    <text x="650" y="221" text-anchor="middle" font-size="10.5" fill="#5b6b60">escrow bloqueado, laudo de recontagem exigido</text>
+  </g>
+</svg>
+
+<p>Dois desvios do fluxo principal estão desenhados porque ambos existem na prática e precisam de tratamento explícito. O primeiro é o <b>consumo próprio</b>: o produtor que transforma o próprio cacau em chocolate ou torra o próprio café não sai da cadeia — ele muda de papel, passa a ser também indústria, e isso é registrado. O segundo é a <b>divergência de peso</b>: o trajeto que, num sistema tradicional, termina em telefone, discussão e desconto arbitrário, e aqui termina em contrato travado por regra, com exigência de laudo de recontagem.</p>
+
+<!-- ====================== 9 antigo (agora 10) ====================== -->
+<!-- ====================== 9 ====================== -->
+<h2><span class="num">SEÇÃO 9</span>O ERP integrado: a contabilidade que enxerga a lavoura</h2>
+<div class="fio"></div>
+
+<p>Rastreabilidade sem gestão vira obrigação contábil: o produtor registra eventos, cumpre auditoria e continua sem saber se ganhou dinheiro. Por isso o protótipo ganhou um <b>ERP agrícola completo</b>, e não um relatório a mais: financeiro, estoques, custos por talhão e por safra, compras e fornecedores, vendas e pedidos, pessoas e maquinário — tudo apurado sobre os mesmos dados que alimentam a cadeia e a inteligência artificial.</p>
+
+<div class="duas">
+  <div class="bloco verde">
+    <h4>A diferença central: o custo por saca usa a previsão da IA</h4>
+    <p class="nota-rodape">Em um ERP comum, o custo por unidade só existe depois da colheita, dividindo o gasto pelo volume que apareceu. Aqui o denominador é a <b>produtividade prevista pelo modelo de IA</b> para aquele talhão. Se a lavoura deve render menos, o custo por saca sobe <i>antes</i> da colheita — e o produtor descobre o problema a tempo de reagir, não no dia da venda.</p>
+  </div>
+  <div class="bloco ouro">
+    <h4>Nenhum número vem de fora do sistema</h4>
+    <p class="nota-rodape">Consumo de insumo sai do estoque e entra no custo do talhão; a colheita registrada na cadeia define o volume produzido; a leitura do sensor justifica (ou contesta) cada aplicação; o escrow do contrato vira conta a receber; e o fechamento do mês é ancorado na blockchain. É a mesma base de dados, vista de quatro ângulos.</p>
+  </div>
+</div>
+
+<h3>9.1 O que o ERP cobre</h3>
+<table>
+  <thead><tr><th>Módulo</th><th>O que entrega</th><th>De onde vem o dado</th></tr></thead>
+  <tbody>
+    <tr><td><b>Financeiro</b></td><td>Contas a receber e a pagar com composição, fluxo de caixa de 12 meses, projeção de 90 dias, DRE com cascata, ponto de equilíbrio, orçado × realizado, índices de liquidez e endividamento</td><td>1.124 lançamentos contábeis gerados a partir de 87 títulos, folha, patrimônio e planos de venda do cenário</td></tr>
+    <tr><td><b>Estoques</b></td><td>19 itens entre insumos e produto acabado, custo médio ponderado, mínimo de segurança, ponto de reposição e rastreio do lote até o talhão</td><td>572 movimentações de entrada e saída, ligadas às compras, às aplicações e às vendas</td></tr>
+    <tr><td><b>Custos</b></td><td>Custo direto e rateio da estrutura por talhão, custo por hectare, custo por saca ou arroba, margem contra o preço de mercado e contra o preço do lote rastreado, fechamento de safra</td><td>Lançamentos com centro de custo por talhão + baixas de estoque + previsão de safra da IA</td></tr>
+    <tr><td><b>Operações</b></td><td>Compra de insumo com recálculo do custo médio, aplicação no talhão com baixa de estoque, venda com baixa do lote, liquidação de título, sincronização do escrow</td><td>Ações do próprio usuário, gravadas em lançamento, movimentação, título e transação na cadeia</td></tr>
+    <tr><td><b>Pessoas e máquinas</b></td><td>Folha de 12 competências com encargos, equipes de diaristas de colheita, conformidade de NR-31 por pessoa, custo por hora de 9 ativos com depreciação, manutenção, combustível e operador</td><td>Cadastro de patrimônio do cenário, com horas de uso medidas e depreciação linear pelo valor de reposição</td></tr>
+    <tr><td><b>Fechamento</b></td><td>Balancete do mês com um hash por conta, raiz de Merkle, ancoragem na blockchain e prova de inclusão de qualquer conta</td><td>Os lançamentos do período, recalculados na hora da conferência</td></tr>
+  </tbody>
+</table>
+
+<h3>9.2 A integração com IA, sensores e blockchain</h3>
+<p>Cinco ligações fazem o ERP deixar de ser um sistema isolado. Todas funcionam no protótipo e podem ser acionadas na demonstração:</p>
+<table>
+  <thead><tr><th>Ligação</th><th>Como funciona na prática</th></tr></thead>
+  <tbody>
+    <tr><td><b>IA → custo</b></td><td>O denominador do custo por unidade é a previsão de safra do talhão. Para o Talhão Alto, a IA prevê 52,9 sacas/ha em 3,2 ha (169,4 sacas) e o custo projetado fica em R$ 518,62 por saca — usado em toda a apuração de margem, antes de a colheita terminar.</td></tr>
+    <tr><td><b>Estoque → custo</b></td><td>Ao lançar uma aplicação, o insumo é baixado do estoque pelo custo médio e o valor entra direto como custo direto daquele talhão, com o documento da operação. Aplicar 0,5 L do defensivo baixa o saldo na hora e altera o custo por saca do talhão.</td></tr>
+    <tr><td><b>Sensor → evidência</b></td><td>Cada aplicação é confrontada com a medição de campo: horas de molhamento foliar na faixa de infecção (ferrugem no café, vassoura-de-bruxa no cacau) ou a janela climática de chuva e umidade relativa anterior à data. O sistema diz, sem rodeio, se o gasto tinha base medida — e o mesmo vale para a energia da irrigação, comparada à lâmina aplicada contra a ET0.</td></tr>
+    <tr><td><b>Escrow → contas a receber</b></td><td>Contrato em escrow gera o título a receber no escopo de quem vende e a obrigação a pagar no escopo de quem compra, com as cinco etapas do contrato na composição do título. Quando a etapa de liberação é concluída na cadeia, a sincronização quita o título — sem digitação e sem conciliação.</td></tr>
+    <tr><td><b>Operação → bloco</b></td><td>Compra, aplicação, venda e fechamento geram eventos assinados (<span class="mono">COMPRA_INSUMO</span>, <span class="mono">APLICACAO_INSUMO</span>, <span class="mono">VENDA</span>, <span class="mono">FECHAMENTO_CONTABIL</span>) com permissão conferida por papel. O auditor não registra nada; o produtor registra o que é dele.</td></tr>
+  </tbody>
+</table>
+
+<h3>9.3 Os números do cenário (propriedade de Cacoal, safra 2026)</h3>
+<table>
+  <thead><tr><th>Indicador</th><th class="num">Valor</th><th>Leitura</th></tr></thead>
+  <tbody>
+    <tr><td>Receita líquida do período</td><td class="num">R$ 503.218,93</td><td>Sobre receita bruta de R$ 513.368,32 e R$ 10.149,39 de tributos</td></tr>
+    <tr><td>Custo de produção</td><td class="num">R$ 264.296,79</td><td>Consome R$ 0,53 de cada real de receita</td></tr>
+    <tr><td>Resultado do período</td><td class="num">R$ 119.770,13</td><td><b>Margem líquida de 23,8%</b> em 12 meses de apuração</td></tr>
+    <tr><td>Caixa</td><td class="num">R$ 167.993,27</td><td>Partiu de R$ 96.000,00; a receber de R$ 75.568,90</td></tr>
+    <tr><td>Estoque</td><td class="num">R$ 158.022,28</td><td>Insumos e produto; ao preço ajustado pela qualidade, R$ 145.952 disponíveis para venda</td></tr>
+    <tr><td>Custo por hectare</td><td class="num">R$ 24.774,33</td><td>Média dos 4 talhões, já com o rateio da estrutura</td></tr>
+    <tr><td>Ponto de equilíbrio</td><td class="num">107% de cobertura</td><td>A receita do período cobre os custos fixos dos últimos 12 meses</td></tr>
+    <tr><td>Endividamento</td><td class="num">0% do patrimônio</td><td>O custeio do cenário foi quitado dentro da safra</td></tr>
+    <tr><td>Exercício orçamentário</td><td class="num">76% decorrido</td><td>Receita em 57% do orçado (abaixo do ritmo), custos em 85%, investimentos em 0% — o alerta aponta os três</td></tr>
+  </tbody>
+</table>
+
+<p><b>Custo por talhão — onde o dinheiro se perde e onde se ganha.</b> O mesmo sistema, no mesmo dia, mostra quatro realidades diferentes:</p>
+<table>
+  <thead><tr><th>Talhão</th><th>Cultura</th><th class="num">Custo por unidade</th><th class="num">Preço de mercado</th><th class="num">Margem</th><th>Leitura</th></tr></thead>
+  <tbody>
+    <tr><td>Talhão Alto</td><td>Conilon irrigado</td><td class="num">R$ 518,62/saca</td><td class="num">R$ 976,94</td><td class="num">+46,9%</td><td>O lote rastreado da IA chega a R$ 989,15 (+1,25%)</td></tr>
+    <tr><td>Talhão Baixo</td><td>Conilon sequeiro</td><td class="num">R$ 720,03/saca</td><td class="num">R$ 976,94</td><td class="num">+26,3%</td><td>Sem irrigação, o custo por saca é 39% maior</td></tr>
+    <tr><td>Cacau do Córrego</td><td>Cacau consorciado</td><td class="num">R$ 451,50/@</td><td class="num">R$ 387,00</td><td class="num">−16,7%</td><td>Preço em correção: alerta crítico, com ação sugerida</td></tr>
+    <tr><td>Cacau Novo</td><td>Cacau pleno sol</td><td class="num">R$ 656,42/@</td><td class="num">R$ 387,00</td><td class="num">−69,6%</td><td>Lavoura de 6 anos em formação: manter e revisar investimento</td></tr>
+  </tbody>
+</table>
+<p class="nota-rodape">É essa a diferença entre registrar e gerir: a queda média da propriedade esconderia dois talhões saudáveis e dois no vermelho. Com o custo por unidade previsto, a decisão de onde cortar deixa de ser intuição.</p>
+
+<h3>9.4 Gráficos: biblioteca própria, sem dependência externa</h3>
+<p>Todo o desenho é feito em <b>SVG escrito à mão</b>, dentro de um arquivo único que funciona sem internet — requisito do projeto, não preferência estética. A biblioteca cobre nove tipos, com tooltip por elemento, paleta definida no sistema de design — em tokens, para o mesmo gráfico funcionar no plano claro e no escopo escuro, como descreve a §9.8 — e animação respeitando a preferência do sistema por menos movimento:</p>
+<table>
+  <thead><tr><th>Gráfico</th><th>Onde aparece</th></tr></thead>
+  <tbody>
+    <tr><td>Linha e área</td><td>Saldo projetado, resultado acumulado, curvas de temperatura e umidade do lote, séries de preço</td></tr>
+    <tr><td>Barras (simples, agrupadas, empilhadas e horizontais)</td><td>Receita × custo por mês, custo × preço por talhão, folha por competência, tonelagem por safra</td></tr>
+    <tr><td>Cascata</td><td>DRE: da receita bruta até o resultado, mostrando cada subtração</td></tr>
+    <tr><td>Rosca e anel</td><td>Composição do custo direto, composição do custo por hora do maquinário, margem por talhão</td></tr>
+    <tr><td>Medidor</td><td>Endividamento, cobertura do ponto de equilíbrio</td></tr>
+    <tr><td>Heatmap</td><td>Custo por hectare de cada talhão mês a mês</td></tr>
+    <tr><td>Sparkline</td><td>Cotação das últimas 60 sessões em cada cartão de mercado</td></tr>
+  </tbody>
+</table>
+
+<h3>9.5 Modo imersivo: a propriedade em uma tela</h3>
+<p>Um painel de tela cheia, pensado para ficar aberto no escritório da cooperativa ou na parede da sala de classificação: quatro indicadores em corpo grande (resultado, receita líquida, caixa e estoque valorizado pela qualidade), resultado acumulado da safra, entradas e saídas mês a mês, custo × preço por talhão, margem com anel de progresso, o <b>que o campo está medindo agora</b> — água disponível no solo, balanço hídrico de 30 dias, graus-dia, molhamento foliar, temperatura da massa de cacau em fermentação e umidade do grão em secagem —, cotações com o mercado do dia, o estado da cadeia com o hash do encadeamento e a faixa de alertas. O relógio corre a cada segundo e os blocos de campo se recompõem a cada cinco segundos; <b>Esc</b> fecha. Não há etapa de configuração: qualquer perfil abre o mesmo painel com os dados do seu escopo.</p>
+
+<h3>9.8 A interface: sistema de design próprio, escrito antes do código</h3>
+<p>Antes de desenhar a primeira tela desta versão, o sistema de design foi
+especificado por escrito em <span class="mono">design.md</span> — paleta, tipografia,
+espaçamento, componentes, movimento, acessibilidade e as regras de uso de cor,
+gráfico e ícone. O protótipo não tem biblioteca de componentes nem tema de
+terceiros: o documento é o contrato, e a folha de estilo única do arquivo
+<span class="mono">template.html</span> implementa exatamente o que ele descreve. Toda
+tela nova entra primeiro no documento (anatomia, estados, quando usar) e só depois
+no CSS.</p>
+<p>A decisão central é de <b>plano</b>: o sistema tem dois, e cada um é declarado
+redefinindo os mesmos nomes de token — nenhum componente sabe em qual está.</p>
+<ul>
+  <li><b>Plano claro, editorial</b> (painéis, ERP, gráficos, tabelas): papel kraft
+  <span class="mono">#f5f1e7</span>, cartões <span class="mono">#fffdf8</span>, tinta
+  <span class="mono">#1e2a22</span>, verde-floresta <span class="mono">#1f6440</span> para
+  ação e ouro <span class="mono">#b8912a</span> para atenção. É o plano de quem passa o
+  dia lendo DRE, ficha de talhão e lista de contas.</li>
+  <li><b>Escopo escuro de campo e vitrine</b> (topo do app, mapa de sensores,
+  terminal da cadeia, avisos e o modo imersivo): verde profundo
+  <span class="mono">#0b1d12</span> sobre <span class="mono">#102519</span>. É onde o
+  app é exibido — monitor na parede do galpão, tela de classificação, uso noturno no
+  campo — e onde o brilho alto cansa menos.</li>
+</ul>
+<p>Duas consequências práticas que o protótipo testa de verdade: as cores
+semânticas são recalibradas por plano (o vermelho <span class="mono">#a83226</span>
+não se lê sobre verde-escuro; ali vira <span class="mono">#ff9c8c</span>, com o mesmo
+significado), e os gráficos não têm cor de grade nem de rótulo fixa — a grade sai de
+<span class="mono">var(--grade)</span> e o texto de <span class="mono">var(--texto-1)</span>,
+de modo que o mesmo gráfico desenhado no painel claro continua legível dentro do modo
+imersivo escuro, sem segunda implementação.</p>
+<p>A identificação visual também ganhou uma camada própria: <b>ícones SVG desenhados à
+mão</b> (traço único de 1,7 px, 24×24, herdando a cor do texto) substituíram os emoji
+do protótipo anterior. Emoji em sistema de gestão é ruído, e em ambiente Linux sem
+fonte de emoji vira quadradinho ilegível — defeito reproduzido em captura de tela antes
+da correção. O que permanece são glifos de texto que existem em qualquer sistema
+(<span class="mono">→ ✓ ✗ ⚠</span>). A biblioteca é curta de propósito e obedece a uma
+regra explícita: <b>ícone ajuda a achar, não ajuda a ler</b> — ícone em navegação,
+identidade, dispositivo de campo e ação; título de cartão não leva ícone. As capturas
+de referência das dezesseis telas ficam em
+<span class="mono">prototipo-agrochain/design/</span>.</p>
+
+<h3>9.6 Fechamento ancorado: a contabilidade assinada por bloco</h3>
+<p>O fechamento do mês percorre quatro passos visíveis na tela: (1) cada conta com movimento gera um <b>hash de 256 bits</b>; (2) os hashes formam a <b>árvore de Merkle</b> e a raiz é gravada em uma transação <span class="mono">FECHAMENTO_CONTABIL</span>; (3) o bloco é minerado com prova de trabalho e o registro guarda bloco, hash e raiz; (4) a conferência recalcula a raiz subindo o caminho de prova a partir de qualquer conta. No cenário, o fechamento de setembro de 2026 reúne <b>19 contas</b>, resulta em R$ 26.271,42 e sua raiz <span class="mono">99933964c295…</span> foi ancorada no bloco <b>#3</b>, com prova de inclusão de 5 níveis conferindo contra a raiz gravada. Se um único valor do período for alterado depois do fechamento, as raízes divergem — auditoria de livro-caixa sem abrir o livro-caixa.</p>
+
+<h3>9.7 O que o ERP ainda não é</h3>
+<ul>
+  <li><b>Não é sistema fiscal.</b> O protótipo não emite nota fiscal, não apura tributo por regime nem assina SPED. A estrutura de contas já segue um plano de contas agrícola, para que a integração com o sistema fiscal seja trabalho de mapeamento, não de remodelagem.</li>
+  <li><b>Não tem folha legal nem eSocial.</b> A folha apura custo de mão de obra e conformidade de NR-31; encargos são aplicados em alíquota única declarada.</li>
+  <li><b>Não integra bancos.</b> Conciliação bancária e liquidação financeira de títulos são registradas manualmente na demonstração; em produção, entram por API do banking-as-a-service da cooperativa.</li>
+  <li><b>Não substitui contador.</b> O fechamento ancorado é evidência de integridade, não peça contábil assinada por profissional habilitado.</li>
+</ul>
+
+<h2><span class="num">SEÇÃO 10</span>O que o protótipo prova — e o que ainda não é</h2>
+<div class="fio"></div>
+
+<div class="duas">
+  <div class="bloco verde">
+    <h4>Prova, com evidência verificável</h4>
+    <ul class="nota-rodape">
+      <li><b>221 verificações automatizadas aprovadas</b>, cobrindo as doze telas nos cinco perfis, as seis abas de IA, as cinco abas do painel de IoT, as <b>seis abas do ERP</b>, <b>toda a biblioteca de gráficos</b> (barras, linha, área, cascata, rosca, medidor, heatmap, sparkline, anel e estado vazio), a <b>identidade contábil</b> (a DRE fecha, o caixa encadeia, o estoque soma, o custo por unidade é o custo dividido pela produção prevista pela IA), o rateio da estrutura, a folha com encargos, o custo por hora do maquinário, a projeção de caixa, o <b>fechamento com raiz de Merkle, ancoragem e prova de inclusão</b>, o <b>modo imersivo</b> em todos os perfis, o determinismo e a independência de fuso das séries de sensores, o controle de qualidade do dado, a prova de inclusão de leitura de sensor com adulteração e restauração, as permissões de rede e de ancoragem, escrow com e sem fraude de peso, emissão de selo e detecção de adulteração da cadeia.</li>
+      <li><b>Criptografia conferida contra referência externa:</b> o SHA-256 do sistema bate com a biblioteca padrão do Python nos sete vetores de teste.</li>
+      <li><b>QR Code próprio validado por leitor real:</b> símbolos gerados nas versões 1 a 9 foram decodificados corretamente por leitor independente; o limite de capacidade é tratado com erro explícito, não com falha silenciosa.</li>
+      <li><b>Prova de trabalho genuína:</b> o nonce exibido na interface é exatamente o nonce do bloco finalizado — verificado por recálculo do hash.</li>
+      <li><b>Contrato Solidity compilado</b> sem erro nem aviso pela versão 0.8.37 do compilador.</li>
+      <li><b>Aplicação sem nenhuma dependência externa:</b> arquivo único de 625 KB, inclusive o gerador de QR Code e a biblioteca de gráficos em SVG, funcionando sem rede.</li>
+    </ul>
+  </div>
+  <div class="bloco ouro">
+    <h4>Não é — e precisa ser dito com clareza</h4>
+    <ul class="nota-rodape">
+      <li><b>Não é rede distribuída real.</b> A cadeia roda em um único ambiente, com a mesma estrutura criptográfica, mas sem os nós independentes que caracterizam consenso entre instituições.</li>
+      <li><b>Não é diagnóstico por imagem.</b> A sanidade usa indicadores climáticos e limiares publicados; não há visão computacional treinada com fotos de campo.</li>
+      <li><b>Não são dados reais de produção.</b> As propriedades e os produtores são fictícios; a geografia, as culturas, as cotações e o cenário de mercado de 2026 são reais.</li>
+      <li><b>Não é modelo validado em campo.</b> As métricas de aprendizado de máquina e as séries de sensores vêm de dados sintéticos, como explicado nas Seções 5 e 7.</li>
+      <li><b>Não substitui assistência técnica.</b> Nenhuma recomendação de manejo dispensa agrônomo, receituário ou vistoria.</li>
+    </ul>
+  </div>
+</div>
+
+<h3>8.1 Riscos do projeto e como cada um é tratado</h3>
+<table>
+  <thead><tr><th>Risco</th><th>Por que importa</th><th>Tratamento previsto</th></tr></thead>
+  <tbody>
+    <tr><td><b>Adesão do produtor</b></td><td>Sem registro na origem, não existe cadeia</td><td>Interface em linguagem simples, funcionamento offline, feedback imediato de valor (preço justo e alerta de doença). Quem ganha na primeira safra continua usando</td></tr>
+    <tr><td><b>Dado falso na entrada</b></td><td>A cadeia garante integridade, não veracidade</td><td>Cruzar fontes independentes: balança da cooperativa, NDVI de satélite, sensor de fermentação e detecção de anomalias por IA</td></tr>
+    <tr><td><b>Custo e complexidade de TI</b></td><td>Cooperativa não tem equipe de blockchain</td><td>Nós mantidos por parceiros de infraestrutura; cooperativa opera por interface web, sem tocar em chave criptográfica</td></tr>
+    <tr><td><b>Soberania do dado</b></td><td>Produtor teme que a informação seja usada contra ele</td><td>Dado comercial nunca vai para a cadeia (só hash); produtor decide o que compartilha; IA roda no dispositivo</td></tr>
+    <tr><td><b>Dependência de conectividade</b></td><td>Interior com sinal instável</td><td>Modo offline com fila local e sincronização posterior — requisito de projeto, não recurso opcional</td></tr>
+    <tr><td><b>Rede de sensores sem manutenção</b></td><td>Sensor descalibrado produz dado errado com aparência de dado bom — pior que não medir</td><td>Bateria, sinal e tempo de calibração monitorados por dispositivo; confiabilidade calculada e exibida no inventário; a âncora registra quantas leituras foram rejeitadas e quantas janelas faltaram</td></tr>
+    <tr><td><b>Volatilidade do cacau</b></td><td>Preço em correção afeta a confiança na ferramenta</td><td>O sistema é explícito sobre o ciclo de baixa e recomenda liquidação quando é o caso. Ferramenta honesta em cenário ruim constrói mais confiança que promessa de alta</td></tr>
+  </tbody>
+</table>
+
+<!-- ====================== 10 ====================== -->
+<h2><span class="num">SEÇÃO 11</span>Plano de implantação</h2>
+<div class="fio"></div>
+
+<table>
+  <thead><tr><th>Fase</th><th>Prazo</th><th>Escopo</th><th>Entregável de verificação</th></tr></thead>
+  <tbody>
+    <tr><td><b>Fase 0</b><br>Protótipo</td><td>Concluída</td><td>Aplicação navegável, blockchain local, IA explicável, contrato Solidity, pipeline de ML</td><td>Sistema demonstrável e 103 testes aprovados</td></tr>
+    <tr><td><b>Fase 1</b><br>Piloto assistido</td><td>3 a 4 meses</td><td>1 cooperativa, 20 a 30 produtores, 2 safras de café e 1 de cacau. Rede permissionada com nó da cooperativa e da indústria parceira</td><td>Selos emitidos e conferidos por comprador real; série de dados coletada em campo</td></tr>
+    <tr><td><b>Fase 2</b><br>Primeiros contratos comerciais</td><td>6 meses</td><td>Escrow em produção com uma indústria âncora; prêmio de preço por qualidade documentado em contrato</td><td>Primeiro pagamento liberado por contrato inteligente com prêmio de qualidade comprovado</td></tr>
+    <tr><td><b>Fase 3</b><br>Treino com dado real</td><td>8 a 12 meses</td><td>Substituir o simulador por histórico real: balança, laudo, NDVI de satélite e estação meteorológica. Visão computacional com fotos de campo</td><td>Métricas de modelo validadas em talhões que ficaram fora do treino</td></tr>
+    <tr><td><b>Fase 4</b><br>Expansão regional</td><td>12 a 24 meses</td><td>Outros municípios e culturas; integração com certificadoras e com exigências de comprovação ambiental do mercado europeu</td><td>Cadeia de Rondônia reconhecida como origem verificável no mercado externo</td></tr>
+  </tbody>
+</table>
+
+<h3>10.1 Como apresentar o protótipo em cinco minutos</h3>
+<ol>
+  <li><b>Painel do produtor</b> — mostrar o alerta de ferrugem no talhão e a previsão de safra com os fatores explicados.</li>
+  <li><b>Registrar uma colheita</b> ao vivo: os eventos são criados, a IA dá o score de qualidade e o lote é ancorado na blockchain diante do público.</li>
+  <li><b>Abrir a rastreabilidade do lote</b> — trilha completa, hash, bloco e o QR Code que o comprador leria.</li>
+  <li><b>Explorador da blockchain</b> — minerar um bloco ao vivo, mostrando as tentativas reais de nonce.</li>
+  <li><b>Simular fraude</b> — alterar um registro e mostrar a verificação acusando a adulteração. É o momento que convence auditores e compradores.</li>
+  <li><b>Mercado e contratos</b> — avançar um contrato com divergência de peso dentro e fora da tolerância, mostrando o escrow travando sozinho.</li>
+  <li><b>Assistente</b> — perguntar "quando devo vender o cacau?" e destacar que a resposta cita as fontes dos próprios dados.</li>
+  <li><b>ERP agro</b> — abrir a aba de custos e mostrar que o custo por saca do Talhão Alto usa a produtividade que a IA previu; lançar uma aplicação de insumo e ver o custo do talhão mudar na mesma tela, com a leitura de campo justificando ou contestando o gasto.</li>
+  <li><b>Fechamento ancorado</b> — preparar o fechamento do mês, mostrar os hashes conta a conta, ancorar a raiz na blockchain e conferir a prova de inclusão. É o passo que fecha o argumento com quem cuida do dinheiro.</li>
+  <li><b>Modo imersivo</b> — deixar o painel de tela cheia aberto como pano de fundo: resultado, caixa, estoque ao preço da qualidade, custo por talhão, o que o campo está medindo agora e o estado da cadeia, atualizando sozinho.</li>
+</ol>
+
+<!-- ====================== 11 ====================== -->
+<h2><span class="num">SEÇÃO 12</span>Anexos técnicos</h2>
+<div class="fio"></div>
+
+<h3>12.1 Arquivos entregues</h3>
+<p>Aplicação em arquivo único (13 módulos embutidos por <span class="mono">construir.py</span>): dados do cenário, biblioteca de gráficos, IA, criptografia, QR Code, IoT, blockchain, ERP, interface principal, interface de IA e mercado, painel de IoT, interface do ERP e modo imersivo.</p>
+<table>
+  <thead><tr><th>Arquivo</th><th>Conteúdo</th></tr></thead>
+  <tbody>
+    <tr><td class="mono">prototipo-agrochain/AgroChain.html</td><td>Aplicação completa em arquivo único (625 KB), sem dependência externa. <b>É o protótipo.</b></td></tr>
+    <tr><td class="mono">design.md</td><td>Sistema de design v3.0 — a fonte da verdade do layout: tokens de cor por plano, tipografia, componentes, regras de gráfico, ícone, movimento e acessibilidade</td></tr>
+    <tr><td class="mono">prototipo-agrochain/design/</td><td>Dezesseis capturas de referência das telas (painel, ERP nas seis abas, IoT, blockchain, mercado, imersivo) e o script <span class="mono">capturar.js</span> que as gera</td></tr>
+    <tr><td class="mono">prototipo-agrochain/src/12_icones.js</td><td>Conjunto de ícones SVG do produto (traço único, herdam a cor do texto) — nenhuma fonte de ícone, nenhum emoji</td></tr>
+    <tr><td class="mono">prototipo-agrochain/src/*.js</td><td>Código-fonte modular: dados, IA, criptografia, gerador de QR Code, <b>camada de IoT</b> (45_iot.js: sensores, controle de qualidade, indicadores derivados, ancoragem e prova de inclusão), ledger blockchain e interface (incluindo o painel de IoT em 80_iot_ui.js)</td></tr>
+    <tr><td class="mono">prototipo-agrochain/testes/teste_app.js</td><td>Bateria de 221 verificações automatizadas, incluindo as 26 do painel de IoT, as 30 do ERP, as 12 da biblioteca de gráficos e as 4 do modo imersivo</td></tr>
+    <tr><td class="mono">prototipo-agrochain/construir.py</td><td>Script de build do arquivo único e conferência de ausência de dependências externas</td></tr>
+    <tr><td class="mono">blockchain/contracts/AgroChainRastreio.sol</td><td>Contrato de produção: lotes, eventos, certificação, escrow e registro de parecer de IA</td></tr>
+    <tr><td class="mono">blockchain/build/</td><td>ABI e bytecode compilados (solc 0.8.37, 14.397 bytes)</td></tr>
+    <tr><td class="mono">ia/treinar_modelos.py</td><td>Pipeline de aprendizado de máquina com validação cruzada e relatório de métricas</td></tr>
+    <tr><td class="mono">ia/modelos.json · ia/relatorio_ml.txt</td><td>Resultados medidos do treinamento</td></tr>
+  </tbody>
+</table>
+
+<h3>12.2 Modelo de dados registrado na cadeia</h3>
+<pre><span class="cm">// Estrutura de cada transação (idêntica em JS no protótipo e em Solidity na produção)</span>
+{
+  <span class="st">"id"</span>:         <span class="st">"TX-8F395E4403"</span>,          <span class="cm">// derivado do conteúdo</span>
+  <span class="st">"tipo"</span>:       <span class="st">"COLHEITA"</span>,                <span class="cm">// define a permissão exigida</span>
+  <span class="st">"autor"</span>:      <span class="st">"U-01"</span>,                    <span class="cm">// quem assina</span>
+  <span class="st">"payload"</span>:    { <span class="st">"lote"</span>: <span class="st">"L-2026-0142"</span>, <span class="st">"descricao"</span>: <span class="st">"..."</span>, <span class="st">"local"</span>: <span class="st">"..."</span> },
+  <span class="st">"timestamp"</span>:  <span class="st">"2026-09-12T09:20:00-04:00"</span>,
+  <span class="st">"assinatura"</span>: <span class="st">"a3f1...32 caracteres"</span>,   <span class="cm">// autor + data + conteúdo</span>
+  <span class="st">"hash"</span>:       <span class="st">"9e80...64 caracteres"</span>,   <span class="cm">// SHA-256 canônico</span>
+  <span class="st">"bloco"</span>:      1,                          <span class="cm">// onde foi confirmada</span>
+  <span class="st">"status"</span>:     <span class="st">"CONFIRMADA"</span>
+}</pre>
+
+<h3>12.3 Fontes dos dados de mercado e referências agronômicas</h3>
+<ul>
+  <li><b>Café arábica e conilon:</b> indicador Cepea/Esalq de 06/10/2026 — R$ 1.568,95 e R$ 976,94 por saca de 60 kg.</li>
+  <li><b>Cacau:</b> referência regional de Rondônia após a correção de 2026, com histórico do pico de aproximadamente R$ 70/kg em 2024 e cotação internacional em queda; custo de produção de R$ 18 a R$ 20 por quilo contra preço de venda próximo de R$ 12 em parte do país (levantamento de março de 2026 na região da Transamazônica e Xingu).</li>
+  <li><b>Rondônia:</b> 2.342 propriedades produtoras de cacau, segundo maior produtor da região Norte e quarto do país, com Indicação de Procedência registrada no INPI desde novembro de 2023.</li>
+  <li><b>Fitopatologia:</b> limiares de ferrugem, broca, cercosporiose e bicho-mineiro no café; vassoura-de-bruxa, monilíase e podridão-parda no cacau, conforme literatura da Embrapa e da Ceplac.</li>
+  <li><b>Taxa de juros:</b> 15% ao ano como referência de custo de capital de giro no período analisado.</li>
+</ul>
+
+<h3>12.4 Glossário</h3>
+<table>
+  <thead><tr><th>Termo</th><th>Significado no contexto deste projeto</th></tr></thead>
+  <tbody>
+    <tr><td><b>Hash</b></td><td>Impressão digital de um conteúdo: um número de 64 caracteres que muda por completo se um único caractere do dado mudar</td></tr>
+    <tr><td><b>Bloco</b></td><td>Conjunto de transações agrupadas, resumidas por um hash e ligadas ao bloco anterior</td></tr>
+    <tr><td><b>Raiz de Merkle</b></td><td>Resumo de todos os hashes de um bloco em um único valor; permite provar que uma transação específica pertence ao bloco</td></tr>
+    <tr><td><b>Prova de trabalho</b></td><td>Esforço computacional verificável que torna caro reescrever o histórico</td></tr>
+    <tr><td><b>Escrow</b></td><td>Conta de garantia: o dinheiro fica retido e só é liberado quando as condições do contrato se cumprem</td></tr>
+    <tr><td><b>NDVI</b></td><td>Índice de vegetação obtido por satélite; mede o vigor da lavoura e antecipa queda de produtividade</td></tr>
+    <tr><td><b>EUDR</b></td><td>Regulamento europeu que exige comprovação de origem e de não desmatamento para importação de commodities agrícolas</td></tr>
+    <tr><td><b>Prova de inclusão</b></td><td>Demonstração de que uma leitura específica pertence à raiz de Merkle gravada na blockchain, usando apenas os hashes vizinhos do caminho na árvore — sem revelar o restante da série</td></tr>
+    <tr><td><b>Padrão oráculo</b></td><td>Forma de levar dado do mundo físico para a blockchain: o dado bruto fica fora da cadeia e o que entra é o resumo criptográfico que o torna impossível de reescrever</td></tr>
+    <tr><td><b>MAD (desvio absoluto mediano)</b></td><td>Medida de dispersão resistente a valores extremos; usada no controle de qualidade das leituras de sensor, no lugar do desvio-padrão, para não descartar pulsos legítimos de chuva e irrigação</td></tr>
+    <tr><td><b>ET0 e Ks</b></td><td>Evapotranspiração de referência (quanto a atmosfera pede) e coeficiente de estresse hídrico (quanto a planta consegue transpirar). ET real = ET0 × Ks, conforme a FAO-56</td></tr>
+    <tr><td><b>Graus-dia (GD)</b></td><td>Soma do calor útil acima da temperatura base da cultura; indica o estádio fenológico e antecipa a janela de colheita melhor que o calendário</td></tr>
+    <tr><td><b>Molhamento foliar</b></td><td>Horas em que a folha permanece molhada na faixa de temperatura favorável a fungos; é a condição de infecção da ferrugem do café e da vassoura-de-bruxa do cacau</td></tr>
+    <tr><td><b>Índice de fermentação</b></td><td>Calor acumulado pela massa de cacau acima de 40 °C, em °C·h. Faixa ideal de 150 a 400 °C·h; abaixo disso falta precursor de aroma, acima há risco de amargor</td></tr>
+    <tr><td><b>Indicação de Procedência</b></td><td>Selo do INPI que reconhece a origem geográfica de um produto com características próprias — no caso, o cacau de Rondônia</td></tr>
+  </tbody>
+</table>
+
+<div class="resumo">
+  <h3>Conclusão</h3>
+  <p>O protótipo demonstra que a combinação funciona tecnicamente, e demonstra com evidência: a criptografia foi conferida contra implementação de referência, o gerador de QR Code foi validado por leitor real, a adulteração é detectada na prática — tanto na cadeia quanto na leitura de sensor ancorada —, o contrato compila sem avisos, o pipeline de aprendizado de máquina roda e mede resultado e a camada de campo transforma medição em indicador auditável.</p>
+  <p style="margin-bottom:0">O caminho daqui é conhecido e não depende de tecnologia nova: colocar o registro na mão do produtor de forma que ele ganhe na primeira safra, substituir o simulador por dado real de balança, satélite e estação meteorológica, e fechar o primeiro contrato comercial em que a rastreabilidade seja remunerada com prêmio de preço. Quando esse contrato existir, o incentivo deixa de ser tecnológico e passa a ser econômico — e é aí que a cadeia muda de patamar.</p>
+</div>
+
+</div><!-- /conteudo -->
+
+<footer>
+  <b>AgroChain</b> · Protótipo de rastreabilidade de café e cacau com blockchain e inteligência artificial<br>
+  Documento técnico versão 1.1 · Outubro de 2026 · Cenário-piloto: Cacoal e Rolim de Moura, Rondônia<br>
+  <span style="color:#7fa88c">Documento companheiro do protótipo funcional <span class="mono">AgroChain.html</span>, que executa localmente, sem internet, todas as funcionalidades aqui descritas.</span>
+</footer>
+
+</div><!-- /pagina -->
+</body>
+</html>
