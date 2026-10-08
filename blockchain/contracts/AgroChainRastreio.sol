@@ -97,12 +97,17 @@ contract AgroChainRastreio {
     mapping(bytes32 => Certificacao) private certificacoes;
     mapping(bytes32 => Evento[]) private eventosDoLote;
     mapping(bytes32 => bytes32[]) private certificacoesDoLote;
+    mapping(bytes32 => bool) public certificacoesComProvaZK;
+
+    address public moduloCertificacaoZK;
 
     uint256 public totalLotes;
     uint256 public totalEventos;
     uint256 public totalContratos;
 
     string public versaoModeloIA = "AgroYield-RO 1.0.0";
+    uint256 public constant BN254_ESCALAR =
+        21888242871839275222246405745257275088548364400416034343698204186575808495617;
 
     // =====================================================================
     // EVENTOS
@@ -113,6 +118,19 @@ contract AgroChainRastreio {
     event EventoCadeiaRegistrado(bytes32 indexed loteId, uint256 id, string tipo, address indexed autor, bytes32 hashDocumento);
     event CertificacaoEmitida(bytes32 indexed certificacaoId, bytes32 indexed loteId, address certificadora, string tipo, bytes32 hashLaudo);
     event CertificacaoRevogada(bytes32 indexed certificacaoId, string motivo);
+    event ModuloCertificacaoZKConfigurado(address indexed modulo);
+    event CertificacaoZKRegistrada(
+        bytes32 indexed certificacaoId,
+        bytes32 indexed loteId,
+        bytes32 compromissoScore,
+        uint8 notaMinima,
+        address titular
+    );
+    event CertificacaoZKRevogada(
+        bytes32 indexed certificacaoId,
+        address indexed responsavel,
+        bytes32 motivoHash
+    );
     event ContratoCriado(bytes32 indexed contratoId, bytes32 indexed loteId, address vendedor, address comprador, uint256 valor);
     event GarantiaDepositada(bytes32 indexed contratoId, uint256 valor);
     event EtapaAvancada(bytes32 indexed contratoId, EtapaContrato etapa);
@@ -276,6 +294,7 @@ contract AgroChainRastreio {
         bytes32 hashLaudo,
         uint256 validoAte
     ) external apenasPapel(Papel.CERTIFICADORA) loteExiste(loteId) {
+        require(certificacoes[certificacaoId].certificadora == address(0), "AgroChain: certificacao ja registrada");
         require(_temEvento(loteId, "LAUDO") || _temEvento(loteId, "CLASSIFICACAO"), "AgroChain: lote sem laudo registrado");
         require(validoAte > block.timestamp, "AgroChain: validade invalida");
 
@@ -287,6 +306,72 @@ contract AgroChainRastreio {
         lotes[loteId].certificado = true;
 
         emit CertificacaoEmitida(certificacaoId, loteId, msg.sender, tipo, hashLaudo);
+    }
+
+    /// @notice Liga o módulo de emissão ZK ao cadastro de lotes desta rede.
+    ///         O administrador pode substituir o módulo durante uma atualização.
+    function configurarModuloCertificacaoZK(address modulo) external {
+        require(msg.sender == admin, "AgroChain: apenas o admin");
+        require(modulo != address(0), "AgroChain: modulo invalido");
+        moduloCertificacaoZK = modulo;
+        emit ModuloCertificacaoZKConfigurado(modulo);
+    }
+
+    /// @notice Chamado pelo módulo somente após verificar a prova ZK e antes
+    ///         de cunhar o NFT; o cadastro do lote e o laudo são revalidados aqui.
+    function registrarCertificacaoZK(
+        bytes32 certificacaoId,
+        bytes32 loteId,
+        string calldata tipo,
+        bytes32 hashLaudo,
+        uint256 validoAte,
+        bytes32 compromissoScore,
+        uint8 notaMinima,
+        address titular,
+        address emissor
+    ) external {
+        require(msg.sender == moduloCertificacaoZK && msg.sender != address(0), "AgroChain: modulo ZK nao autorizado");
+        require(papeis[emissor] == Papel.CERTIFICADORA, "AgroChain: emissor sem papel de certificadora");
+        require(lotes[loteId].produtor != address(0), "AgroChain: lote inexistente");
+        require(certificacoes[certificacaoId].certificadora == address(0), "AgroChain: certificacao ja registrada");
+        require(
+            _temLaudoComHash(loteId, hashLaudo),
+            "AgroChain: hash do laudo nao consta na trilha do lote"
+        );
+        require(validoAte > block.timestamp && notaMinima <= 100, "AgroChain: parametros de certificacao invalidos");
+        require(titular != address(0) && compromissoScore != bytes32(0) && bytes(tipo).length > 0, "AgroChain: dados de certificacao invalidos");
+
+        certificacoes[certificacaoId] = Certificacao({
+            id: certificacaoId,
+            loteId: loteId,
+            certificadora: emissor,
+            tipo: tipo,
+            hashLaudo: hashLaudo,
+            validoAte: validoAte,
+            ativa: true
+        });
+        certificacoesDoLote[loteId].push(certificacaoId);
+        certificacoesComProvaZK[certificacaoId] = true;
+        lotes[loteId].certificado = true;
+
+        emit CertificacaoEmitida(certificacaoId, loteId, emissor, tipo, hashLaudo);
+        emit CertificacaoZKRegistrada(certificacaoId, loteId, compromissoScore, notaMinima, titular);
+    }
+
+    /// @notice Mantém a validade do cadastro de lotes sincronizada quando o
+    ///         certificado on-chain associado ao NFT é revogado.
+    function revogarCertificacaoZK(bytes32 certificacaoId, bytes32 motivoHash, address responsavel) external {
+        require(msg.sender == moduloCertificacaoZK && msg.sender != address(0), "AgroChain: modulo ZK nao autorizado");
+        Certificacao storage c = certificacoes[certificacaoId];
+        require(certificacoesComProvaZK[certificacaoId] && c.ativa, "AgroChain: certificacao ZK inativa");
+        require(
+            responsavel == c.certificadora || responsavel == admin,
+            "AgroChain: apenas emissor ou admin revoga"
+        );
+        c.ativa = false;
+        lotes[c.loteId].certificado = _possuiCertificacaoAtiva(c.loteId);
+        emit CertificacaoZKRevogada(certificacaoId, responsavel, motivoHash);
+        emit CertificacaoRevogada(certificacaoId, string(abi.encodePacked("motivoHash:", _hex32(motivoHash))));
     }
 
     function revogarCertificacao(bytes32 certificacaoId, string calldata motivo)
@@ -305,6 +390,36 @@ contract AgroChainRastreio {
             if (keccak256(bytes(evs[i].tipo)) == keccak256(bytes(tipo))) return true;
         }
         return false;
+    }
+
+    function _temLaudoComHash(bytes32 loteId, bytes32 hashLaudo) private view returns (bool) {
+        Evento[] storage evs = eventosDoLote[loteId];
+        for (uint256 i = 0; i < evs.length; i++) {
+            bytes32 tipo = keccak256(bytes(evs[i].tipo));
+            if (
+                (tipo == keccak256("LAUDO") || tipo == keccak256("CLASSIFICACAO")) &&
+                evs[i].hashDocumento == hashLaudo
+            ) return true;
+        }
+        return false;
+    }
+
+    function _possuiCertificacaoAtiva(bytes32 loteId) private view returns (bool) {
+        bytes32[] storage ids = certificacoesDoLote[loteId];
+        for (uint256 i = 0; i < ids.length; i++) {
+            if (certificacoes[ids[i]].ativa) return true;
+        }
+        return false;
+    }
+
+    function _hex32(bytes32 value) private pure returns (string memory) {
+        bytes16 alphabet = "0123456789abcdef";
+        bytes memory output = new bytes(64);
+        for (uint256 i = 0; i < 32; i++) {
+            output[i * 2] = alphabet[uint8(value[i] >> 4)];
+            output[i * 2 + 1] = alphabet[uint8(value[i] & 0x0f)];
+        }
+        return string(output);
     }
 
     // =====================================================================

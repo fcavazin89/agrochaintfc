@@ -1,0 +1,14 @@
+# Node-based blockchain development dependencies
+node_modules/
+
+# Hardhat build products
+blockchain/artifacts/
+blockchain/cache/
+
+# Locally generated circuit, trusted-setup and proof files
+blockchain/build/zk/
+blockchain/keys/
+blockchain/witness.private.json
+blockchain/proof.json
+blockchain/certificate-public-inputs.json
+blockchain/contracts/AgroChainGroth16Verifier.sol
