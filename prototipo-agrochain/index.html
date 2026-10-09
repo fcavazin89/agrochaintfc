@@ -2,6 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta http-equiv="refresh" content="0; url=AgroChain.html">
 <title>AgroChain — abrindo o protótipo</title>
 <style>body{background:#0b1a12;color:#d9e6dd;font-family:system-ui,sans-serif;display:grid;place-items:center;height:100vh;margin:0}
@@ -12,5 +13,14 @@ a{color:#7fe0a4}</style>
   <p>Abrindo o protótipo do AgroChain…</p>
   <p><a href="AgroChain.html">Abrir AgroChain.html</a></p>
 </div>
+
+<!-- Capacitor Core (apenas em ambiente nativo) -->
+<script type="module">
+  if (window.Capacitor) {
+    import('https://cdn.jsdelivr.net/npm/@capacitor/core@6.0.0/dist/index.js').then(module => {
+      console.log('Capacitor carregado');
+    });
+  }
+</script>
 </body>
 </html>

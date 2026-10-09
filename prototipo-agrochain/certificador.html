@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AgroChain • Certificador</title>
+  <style>
+    :root {
+      --fundo: #f5f1e7;
+      --sup-1: #fffdf8;
+      --sup-2: #f2ecdd;
+      --sup-3: #e8e0cd;
+      --linha: #e6ddc9;
+      --linha-forte: #d6c9b0;
+      --texto-1: #1e2a22;
+      --texto-2: #495649;
+      --texto-3: #7c867a;
+      --verde-700: #195236;
+      --verde-600: #1f6440;
+      --verde-500: #2f8f52;
+      --ouro: #b8912a;
+      --especial: #5f4aa0;
+      --critico: #a83226;
+      
+      --t-xl: 21px;
+      --t-lg: 15.5px;
+      --t-md: 13.5px;
+      --t-sm: 12px;
+      --t-xs: 10.5px;
+      
+      --e-1: 4px;
+      --e-2: 8px;
+      --e-3: 12px;
+      --e-4: 16px;
+      --e-5: 24px;
+      --e-6: 32px;
+      
+      --raio-sm: 10px;
+      --raio: 16px;
+      
+      --t-rapida: 120ms;
+      --t-media: 220ms;
+      --curva: cubic-bezier(.2,.7,.3,1);
+      
+      --sombra: 0 1px 2px rgba(31,42,34,.06);
+      --sombra-2: 0 1px 2px rgba(31,42,34,.05), 0 12px 28px -20px rgba(19,66,44,.35);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background-color: var(--fundo);
+      color: var(--texto-1);
+      line-height: 1.5;
+      height: 100%;
+    }
+
+    .container {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      height: 100vh;
+      gap: 0;
+    }
+
+    .topo {
+      grid-column: 1 / -1;
+      height: 56px;
+      background: linear-gradient(180deg, #102519 0%, #0b2216 100%);
+      display: flex;
+      align-items: center;
+      padding: 0 var(--e-4);
+      gap: var(--e-5);
+      color: #f3f7f2;
+      border-bottom: 1px solid rgba(184,145,42,.35);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .marca {
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: -0.5px;
+    }
+
+    .status-rede {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: var(--e-2);
+      font-size: var(--t-sm);
+    }
+
+    .pulso {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: #2f8f52;
+      animation: pulsar 2s infinite;
+    }
+
+    @keyframes pulsar {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .pulso.erro {
+      background-color: var(--critico);
+    }
+
+    .btn-conectar {
+      background-color: var(--verde-600);
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: var(--raio-sm);
+      font-size: var(--t-sm);
+      cursor: pointer;
+      transition: background-color var(--t-rapida) var(--curva);
+    }
+
+    .btn-conectar:hover {
+      background-color: var(--verde-700);
+    }
+
+    .menu {
+      padding: var(--e-5) 0;
+      border-right: 1px solid var(--linha);
+      background-color: var(--sup-1);
+    }
+
+    .menu-item {
+      padding: 12px var(--e-4);
+      cursor: pointer;
+      border-left: 2px solid transparent;
+      font-size: var(--t-md);
+      color: var(--texto-2);
+      transition: all var(--t-rapida) var(--curva);
+    }
+
+    .menu-item:hover {
+      background-color: var(--sup-2);
+      color: var(--texto-1);
+    }
+
+    .menu-item.ativo {
+      background-color: rgba(47,143,82,.1);
+      color: var(--verde-700);
+      border-left-color: var(--verde-600);
+    }
+
+    .conteudo {
+      overflow-y: auto;
+      padding: var(--e-6);
+      background-color: var(--fundo);
+    }
+
+    .tela-titulo {
+      font-size: var(--t-xl);
+      font-weight: 600;
+      margin-bottom: var(--e-2);
+      color: var(--verde-700);
+    }
+
+    .tela-subtitulo {
+      font-size: var(--t-sm);
+      color: var(--texto-2);
+      margin-bottom: var(--e-5);
+    }
+
+    .grade {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: var(--e-5);
+      margin-bottom: var(--e-5);
+    }
+
+    .cartao {
+      background-color: var(--sup-1);
+      border-radius: var(--raio);
+      padding: var(--e-4);
+      box-shadow: var(--sombra-2);
+      border: 1px solid var(--linha);
+    }
+
+    .cartao-titulo {
+      font-size: var(--t-lg);
+      font-weight: 600;
+      margin-bottom: var(--e-3);
+      color: var(--texto-1);
+    }
+
+    .campo {
+      margin-bottom: var(--e-3);
+    }
+
+    .campo-label {
+      display: block;
+      font-size: var(--t-sm);
+      font-weight: 500;
+      margin-bottom: var(--e-1);
+      color: var(--texto-1);
+    }
+
+    .campo-input,
+    .campo-select,
+    .campo-textarea {
+      width: 100%;
+      padding: 10px var(--e-2);
+      border: 1px solid var(--linha-forte);
+      border-radius: var(--raio-sm);
+      font-size: var(--t-md);
+      font-family: inherit;
+      color: var(--texto-1);
+      background-color: var(--sup-2);
+      transition: border-color var(--t-rapida);
+    }
+
+    .campo-input:focus,
+    .campo-select:focus,
+    .campo-textarea:focus {
+      outline: none;
+      border-color: var(--verde-600);
+      background-color: var(--sup-1);
+    }
+
+    .campo-nota {
+      font-size: var(--t-sm);
+      color: var(--texto-3);
+      margin-top: 4px;
+    }
+
+    .campo-erro {
+      border-color: var(--critico) !important;
+    }
+
+    .campo-erro-msg {
+      font-size: var(--t-sm);
+      color: var(--critico);
+      margin-top: 4px;
+    }
+
+    .grupo-campos {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--e-3);
+    }
+
+    .btn-primary {
+      background-color: var(--verde-600);
+      color: white;
+      border: none;
+      padding: 12px var(--e-4);
+      border-radius: var(--raio-sm);
+      font-size: var(--t-md);
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color var(--t-rapida), transform var(--t-rapida);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background-color: var(--verde-700);
+      transform: translateY(-1px);
+    }
+
+    .btn-primary:disabled {
+      background-color: var(--texto-3);
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-secondary {
+      background-color: var(--sup-2);
+      color: var(--texto-1);
+      border: 1px solid var(--linha-forte);
+      padding: 12px var(--e-4);
+      border-radius: var(--raio-sm);
+      font-size: var(--t-md);
+      cursor: pointer;
+      transition: background-color var(--t-rapida);
+    }
+
+    .btn-secondary:hover {
+      background-color: var(--sup-3);
+    }
+
+    .btn-group {
+      display: flex;
+      gap: var(--e-3);
+      margin-top: var(--e-4);
+    }
+
+    .caixa-msg {
+      padding: var(--e-3);
+      border-radius: var(--raio-sm);
+      margin-bottom: var(--e-4);
+      font-size: var(--t-sm);
+      border-left: 3px solid;
+      display: none;
+    }
+
+    .caixa-msg.visivel {
+      display: block;
+      animation: slideDown var(--t-media) var(--curva);
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .caixa-sucesso {
+      background-color: rgba(47,143,82,.1);
+      border-left-color: var(--verde-600);
+      color: var(--verde-700);
+    }
+
+    .caixa-erro {
+      background-color: rgba(168,50,38,.1);
+      border-left-color: var(--critico);
+      color: var(--critico);
+    }
+
+    .caixa-info {
+      background-color: rgba(95,74,160,.1);
+      border-left-color: var(--especial);
+      color: var(--especial);
+    }
+
+    .carregando {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(31,42,34,.2);
+      border-top-color: var(--verde-600);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-right: var(--e-2);
+      vertical-align: -2px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .detalhes-certificacao {
+      margin-top: var(--e-5);
+      padding-top: var(--e-4);
+      border-top: 1px solid var(--linha);
+    }
+
+    .par-detalhes {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: var(--e-2);
+      font-size: var(--t-md);
+    }
+
+    .par-label {
+      color: var(--texto-2);
+      font-weight: 500;
+    }
+
+    .par-valor {
+      color: var(--texto-1);
+      font-family: 'Courier New', monospace;
+      word-break: break-all;
+    }
+
+    .hash-curto {
+      font-size: var(--t-sm);
+      color: var(--texto-3);
+      display: inline-block;
+      padding: 4px 8px;
+      background-color: var(--sup-2);
+      border-radius: 4px;
+      font-family: monospace;
+    }
+
+    .link-externo {
+      color: var(--verde-600);
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .link-externo:hover {
+      text-decoration: underline;
+    }
+
+    .lista-certificacoes {
+      margin-top: var(--e-5);
+    }
+
+    .cert-item {
+      background-color: var(--sup-2);
+      padding: var(--e-3);
+      border-radius: var(--raio-sm);
+      margin-bottom: var(--e-2);
+      border-left: 3px solid var(--verde-600);
+    }
+
+    .cert-item-titulo {
+      font-weight: 500;
+      color: var(--texto-1);
+      margin-bottom: 4px;
+    }
+
+    .cert-item-detalhes {
+      font-size: var(--t-sm);
+      color: var(--texto-2);
+    }
+
+    .tab-nav {
+      display: flex;
+      border-bottom: 1px solid var(--linha);
+      margin-bottom: var(--e-4);
+    }
+
+    .tab-item {
+      padding: var(--e-3) var(--e-4);
+      cursor: pointer;
+      color: var(--texto-2);
+      border-bottom: 2px solid transparent;
+      transition: all var(--t-rapida);
+    }
+
+    .tab-item:hover {
+      color: var(--texto-1);
+    }
+
+    .tab-item.ativo {
+      color: var(--verde-700);
+      border-bottom-color: var(--verde-600);
+    }
+
+    .tab-conteudo {
+      display: none;
+    }
+
+    .tab-conteudo.ativo {
+      display: block;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        grid-template-columns: 1fr;
+      }
+
+      .menu {
+        display: none;
+      }
+
+      .grupo-campos {
+        grid-template-columns: 1fr;
+      }
+
+      .grade {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="topo">
+      <div class="marca">🌱 AgroChain</div>
+      <div class="status-rede">
+        <span id="statusRede">Detectando...</span>
+        <div id="pulsoRede" class="pulso erro"></div>
+      </div>
+      <button class="btn-conectar" id="btnConectar" onclick="conectarWallet()">
+        Conectar
+      </button>
+    </div>
+
+    <div class="menu">
+      <div class="menu-item ativo" onclick="mudarAba('emissao')">
+        Emissão de Certificação
+      </div>
+      <div class="menu-item" onclick="mudarAba('consulta')">
+        Consultar Certificações
+      </div>
+      <div class="menu-item" onclick="mudarAba('configuracao')">
+        Configuração
+      </div>
+    </div>
+
+    <div class="conteudo">
+      <!-- ABA DE EMISSÃO -->
+      <div id="abaEmissao" class="tab-conteudo ativo">
+        <div class="tela-titulo">Emissão de Certificação Web3</div>
+        <div class="tela-subtitulo">
+          Gere prova de zero-knowledge, emita NFT soulbound e distribua tokens AGRO
+        </div>
+
+        <div id="msgErro" class="caixa-msg"></div>
+        <div id="msgSucesso" class="caixa-msg"></div>
+        <div id="msgInfo" class="caixa-msg"></div>
+
+        <div class="grade">
+          <!-- Seção: Dados do Lote -->
+          <div class="cartao">
+            <div class="cartao-titulo">Dados do Lote</div>
+
+            <div class="campo">
+              <label class="campo-label">ID do Lote (hash SHA-256)</label>
+              <input type="text" class="campo-input" id="inputLoteId" 
+                     placeholder="0x..." />
+              <div class="campo-nota">Identifica unicamente o lote certificado</div>
+            </div>
+
+            <div class="campo">
+              <label class="campo-label">Padrão de Qualidade (hash)</label>
+              <input type="text" class="campo-input" id="inputPadraoHash" 
+                     placeholder="0x..." />
+              <div class="campo-nota">Standard contra o qual foi avaliado</div>
+            </div>
+
+            <div class="campo">
+              <label class="campo-label">Laudo Técnico (hash)</label>
+              <input type="text" class="campo-input" id="inputHashLaudo" 
+                     placeholder="0x..." />
+              <div class="campo-nota">Hash do documento de análise</div>
+            </div>
+
+            <div class="grupo-campos">
+              <div class="campo">
+                <label class="campo-label">Tipo de Produto</label>
+                <input type="text" class="campo-input" id="inputTipo" 
+                       value="Café Arabica Premium" />
+              </div>
+
+              <div class="campo">
+                <label class="campo-label">Nota Mínima (0-100)</label>
+                <input type="number" class="campo-input" id="inputNotaMinima" 
+                       min="0" max="100" value="80" />
+              </div>
+            </div>
+
+            <div class="campo">
+              <label class="campo-label">Válido Até (data)</label>
+              <input type="date" class="campo-input" id="inputValidoAte" />
+            </div>
+          </div>
+
+          <!-- Seção: Prova ZK -->
+          <div class="cartao">
+            <div class="cartao-titulo">Prova de Conhecimento Zero</div>
+
+            <div class="campo">
+              <label class="campo-label">Score de Qualidade Privado (0-100)</label>
+              <input type="number" class="campo-input" id="inputScore" 
+                     min="0" max="100" value="85" />
+              <div class="campo-nota">Valor privado que prova score >= nota mínima</div>
+            </div>
+
+            <div class="campo">
+              <label class="campo-label">Sal para Commitment (número aleatório)</label>
+              <input type="number" class="campo-input" id="inputSal" 
+                     value="12345" />
+              <div class="campo-nota">Randomness privado para vincular compromise</div>
+            </div>
+
+            <button class="btn-primary" id="btnGerarProva" onclick="gerarProva()" 
+                    style="width: 100%; margin-top: var(--e-4);">
+              Gerar Prova ZK
+            </button>
+
+            <div id="provaStatus" class="campo-nota" style="margin-top: var(--e-3); color: var(--texto-2);"></div>
+          </div>
+
+          <!-- Seção: Endereços -->
+          <div class="cartao">
+            <div class="cartao-titulo">Destinatário & Metadados</div>
+
+            <div class="campo">
+              <label class="campo-label">Endereço do Titular (Carteira)</label>
+              <input type="text" class="campo-input" id="inputTitular" 
+                     placeholder="0x..." />
+              <div class="campo-nota">Quem receberá o NFT e tokens AGRO</div>
+            </div>
+
+            <div class="campo">
+              <label class="campo-label">Metadados (IPFS URI)</label>
+              <input type="text" class="campo-input" id="inputTokenUri" 
+                     value="ipfs://Qm..." placeholder="ipfs://..." />
+              <div class="campo-nota">Link para metadados do certificado (JSON)</div>
+            </div>
+
+            <div class="btn-group">
+              <button class="btn-primary" id="btnEmitir" onclick="emitirCertificacao()" 
+                      style="flex: 1;">
+                Emitir Certificação
+              </button>
+              <button class="btn-secondary" id="btnEstimar" onclick="estimarGas()">
+                Estimar Taxa
+              </button>
+            </div>
+          </div>
+
+          <!-- Resultado -->
+          <div id="sectionResultado" style="display: none;">
+            <div class="cartao">
+              <div class="cartao-titulo">✓ Certificação Emitida</div>
+              <div class="detalhes-certificacao">
+                <div class="par-detalhes">
+                  <span class="par-label">Hash da Transação:</span>
+                  <span class="par-valor">
+                    <a id="txHash" class="link-externo" target="_blank">Ver no Sepolia Scan</a>
+                  </span>
+                </div>
+                <div class="par-detalhes">
+                  <span class="par-label">NFT ID:</span>
+                  <span class="par-valor" id="nftId"></span>
+                </div>
+                <div class="par-detalhes">
+                  <span class="par-label">Tokens AGRO Recebidos:</span>
+                  <span class="par-valor" id="agroRecebido"></span>
+                </div>
+                <div class="par-detalhes">
+                  <span class="par-label">Bloco:</span>
+                  <span class="par-valor" id="blockNumber"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ABA DE CONSULTA -->
+      <div id="abaConsulta" class="tab-conteudo">
+        <div class="tela-titulo">Consultar Certificações</div>
+        <div class="tela-subtitulo">
+          Verifique o status e validade de certificações emitidas
+        </div>
+
+        <div class="cartao">
+          <div class="campo">
+            <label class="campo-label">ID da Certificação (hash)</label>
+            <input type="text" class="campo-input" id="inputConsultaId" 
+                   placeholder="0x..." />
+          </div>
+
+          <div class="btn-group">
+            <button class="btn-primary" onclick="consultarCertificacao()">
+              Consultar
+            </button>
+          </div>
+
+          <div id="resultadoConsulta" style="margin-top: var(--e-4); display: none;">
+            <div class="cert-item">
+              <div class="cert-item-titulo" id="consultaTitulo"></div>
+              <div class="cert-item-detalhes" id="consultaDetalhes"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="lista-certificacoes" id="listaCertificacoes"></div>
+      </div>
+
+      <!-- ABA DE CONFIGURAÇÃO -->
+      <div id="abaConfiguracao" class="tab-conteudo">
+        <div class="tela-titulo">Configuração</div>
+        <div class="tela-subtitulo">
+          Parâmetros da rede e endereço do contrato
+        </div>
+
+        <div class="cartao">
+          <div class="campo">
+            <label class="campo-label">Rede Blockchain</label>
+            <div class="par-detalhes" style="margin-top: var(--e-2);">
+              <span id="configRede">Detectando...</span>
+            </div>
+          </div>
+
+          <div class="campo">
+            <label class="campo-label">Carteira Conectada</label>
+            <div class="par-detalhes" style="margin-top: var(--e-2); word-break: break-all;">
+              <span id="configCarteira">Não conectada</span>
+            </div>
+          </div>
+
+          <div class="campo">
+            <label class="campo-label">Endereço do Contrato</label>
+            <input type="text" class="campo-input" id="inputEnderecoContrato" 
+                   placeholder="0x..." />
+            <button class="btn-secondary" onclick="salvarEnderecoContrato()" 
+                    style="margin-top: var(--e-2); width: 100%;">
+              Salvar
+            </button>
+          </div>
+
+          <div class="campo">
+            <label class="campo-label">Saldo de Tokens AGRO</label>
+            <div class="par-detalhes" style="margin-top: var(--e-2);">
+              <span id="configSaldoAgro">-</span>
+            </div>
+          </div>
+
+          <button class="btn-secondary" onclick="mudarParaSepolia()" 
+                  style="width: 100%; margin-top: var(--e-4);">
+            Mudar para Sepolia
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="11_web3.js" type="module"></script>
+  <script>
+    import Web3 from './11_web3.js';
+
+    // Estado da aplicação
+    let estadoApp = {
+      web3Conectado: false,
+      enderecoContrato: localStorage.getItem('enderecoContrato'),
+      provaGerada: null,
+      carregando: false,
+    };
+
+    // Inicializar
+    window.addEventListener('load', async () => {
+      console.log('Carregando AgroChain Certificador...');
+      
+      // Tentar conectar automaticamente
+      await verificarConexaoWeb3();
+      
+      // Carregar endereço do contrato salvo
+      if (estadoApp.enderecoContrato) {
+        document.getElementById('inputEnderecoContrato').value = 
+          estadoApp.enderecoContrato;
+      }
+      
+      // Definir data padrão como hoje + 1 ano
+      const dataPadrao = new Date();
+      dataPadrao.setFullYear(dataPadrao.getFullYear() + 1);
+      document.getElementById('inputValidoAte').valueAsDate = dataPadrao;
+      
+      // Gerar IDs de exemplo
+      gerarIdsExemplo();
+      
+      // Monitorar eventos de Web3
+      window.addEventListener('web3:connected', atualizarStatusWeb3);
+      window.addEventListener('web3:disconnected', atualizarStatusWeb3);
+    });
+
+    async function verificarConexaoWeb3() {
+      try {
+        await Web3.init();
+        atualizarStatusWeb3();
+      } catch (error) {
+        console.error('Erro ao inicializar Web3:', error);
+        mostrarMensagem('Web3 não inicializado', 'erro');
+      }
+    }
+
+    function atualizarStatusWeb3() {
+      const status = Web3.currentAccount ? 'Conectado' : 'Desconectado';
+      const pulso = document.getElementById('pulsoRede');
+      const statusSpan = document.getElementById('statusRede');
+      
+      if (Web3.currentAccount) {
+        pulso.classList.remove('erro');
+        statusSpan.textContent = `Sepolia • ${Web3.currentAccount.slice(0, 6)}...${Web3.currentAccount.slice(-4)}`;
+        document.getElementById('configCarteira').textContent = Web3.currentAccount;
+        estadoApp.web3Conectado = true;
+        atualizarSaldoAgro();
+      } else {
+        pulso.classList.add('erro');
+        statusSpan.textContent = 'Desconectado';
+        document.getElementById('configCarteira').textContent = 'Não conectada';
+        estadoApp.web3Conectado = false;
+      }
+    }
+
+    async function conectarWallet() {
+      try {
+        await Web3.conectar();
+        await Web3.mudarParaSepolia();
+      } catch (error) {
+        mostrarMensagem('Erro ao conectar: ' + error.message, 'erro');
+      }
+    }
+
+    async function mudarParaSepolia() {
+      try {
+        const success = await Web3.mudarParaSepolia();
+        if (success) {
+          mostrarMensagem('Switched to Sepolia', 'sucesso');
+        }
+      } catch (error) {
+        mostrarMensagem('Erro: ' + error.message, 'erro');
+      }
+    }
+
+    function gerarIdsExemplo() {
+      // Gerar IDs aleatórios para demonstração
+      const gerarHash = () => '0x' + Array.from({length: 64}, () => 
+        Math.floor(Math.random() * 16).toString(16)).join('');
+      
+      if (!document.getElementById('inputLoteId').value) {
+        document.getElementById('inputLoteId').value = gerarHash();
+      }
+      if (!document.getElementById('inputPadraoHash').value) {
+        document.getElementById('inputPadraoHash').value = gerarHash();
+      }
+      if (!document.getElementById('inputHashLaudo').value) {
+        document.getElementById('inputHashLaudo').value = gerarHash();
+      }
+    }
+
+    async function gerarProva() {
+      try {
+        const score = parseInt(document.getElementById('inputScore').value);
+        const notaMinima = parseInt(document.getElementById('inputNotaMinima').value);
+        
+        if (score < notaMinima) {
+          mostrarMensagem(
+            `Score privado (${score}) deve ser >= nota mínima (${notaMinima})`, 
+            'erro'
+          );
+          return;
+        }
+        
+        const provaStatus = document.getElementById('provaStatus');
+        provaStatus.textContent = 'Gerando prova ZK...';
+        provaStatus.style.color = 'var(--especial)';
+        
+        // Simulação: em produção, chamar snarkjs
+        await new Promise(r => setTimeout(r, 2000));
+        
+        estadoApp.provaGerada = {
+          a: [
+            '18829982177676234826872850762208638486324023945313654395844934025887607968245',
+            '7999922891700869408821211969851944662202897149297662301929814068286221949769'
+          ],
+          b: [
+            ['12904929353254609961525891066607254797813607256906046752906131226555435705488', 
+             '17589937779149687900129638408131303387779208948859597661844848372844146851814'],
+            ['20854305319234502433950239761695944076050065346309625755019889159637699149869',
+             '13131762976395589905862739816262653597046393929638087055159689555476838797933']
+          ],
+          c: [
+            '9207835018649485826700849933062761203895263997926050754936356763820801316707',
+            '14769857509267297797268816848873932223937305717152405754155485346606088087618'
+          ]
+        };
+        
+        provaStatus.textContent = '✓ Prova gerada com sucesso!';
+        provaStatus.style.color = 'var(--verde-600)';
+        
+        mostrarMensagem('Prova ZK gerada (simulada para demo)', 'info');
+      } catch (error) {
+        mostrarMensagem('Erro ao gerar prova: ' + error.message, 'erro');
+      }
+    }
+
+    async function emitirCertificacao() {
+      try {
+        if (!estadoApp.web3Conectado) {
+          mostrarMensagem('Conecte a wallet primeiro', 'erro');
+          return;
+        }
+        
+        if (!estadoApp.provaGerada) {
+          mostrarMensagem('Gere a prova ZK primeiro', 'erro');
+          return;
+        }
+        
+        const enderecoContrato = document.getElementById('inputEnderecoContrato').value;
+        if (!enderecoContrato) {
+          mostrarMensagem('Configure o endereço do contrato', 'erro');
+          return;
+        }
+        
+        estadoApp.carregando = true;
+        atualizarBotoesUI();
+        
+        // Carregar contrato (simulado)
+        mostrarMensagem('Enviando transação...', 'info');
+        
+        const resultado = {
+          txHash: '0x' + Array.from({length: 64}, () => 
+            Math.floor(Math.random() * 16).toString(16)).join(''),
+          blockNumber: Math.floor(Math.random() * 5000000) + 5000000,
+          nftId: Math.floor(Math.random() * 1000),
+          gasUsed: '125430',
+        };
+        
+        // Simular delay
+        await new Promise(r => setTimeout(r, 3000));
+        
+        mostrarResultado(resultado);
+        
+        estadoApp.carregando = false;
+        atualizarBotoesUI();
+      } catch (error) {
+        mostrarMensagem('Erro ao emitir: ' + error.message, 'erro');
+        estadoApp.carregando = false;
+        atualizarBotoesUI();
+      }
+    }
+
+    async function estimarGas() {
+      mostrarMensagem(
+        'Gás estimado: ~125,000 gas (≈ $5 USD em Sepolia)', 
+        'info'
+      );
+    }
+
+    function mostrarResultado(resultado) {
+      const section = document.getElementById('sectionResultado');
+      document.getElementById('txHash').href = 
+        `https://sepolia.etherscan.io/tx/${resultado.txHash}`;
+      document.getElementById('txHash').textContent = resultado.txHash.slice(0, 10) + '...';
+      document.getElementById('nftId').textContent = resultado.nftId;
+      document.getElementById('agroRecebido').textContent = '1000 AGRO';
+      document.getElementById('blockNumber').textContent = resultado.blockNumber;
+      section.style.display = 'block';
+      
+      mostrarMensagem('Certificação emitida com sucesso!', 'sucesso');
+    }
+
+    function mostrarMensagem(msg, tipo = 'info') {
+      const boxes = {
+        sucesso: document.getElementById('msgSucesso'),
+        erro: document.getElementById('msgErro'),
+        info: document.getElementById('msgInfo'),
+      };
+      
+      Object.values(boxes).forEach(b => {
+        b.classList.remove('visivel');
+        b.innerHTML = '';
+      });
+      
+      const box = boxes[tipo];
+      if (box) {
+        box.innerHTML = msg;
+        box.className = `caixa-msg caixa-${tipo} visivel`;
+      }
+    }
+
+    async function consultarCertificacao() {
+      const id = document.getElementById('inputConsultaId').value;
+      if (!id) {
+        mostrarMensagem('Informe o ID da certificação', 'erro');
+        return;
+      }
+      
+      // Simulado
+      document.getElementById('resultadoConsulta').style.display = 'block';
+      document.getElementById('consultaTitulo').textContent = 'Certificação Válida';
+      document.getElementById('consultaDetalhes').textContent = 
+        `ID: ${id}\nStatus: Ativo • Válido até: 2025-12-31 • NFT: #42 • AGRO: 1000`;
+    }
+
+    function salvarEnderecoContrato() {
+      const endereco = document.getElementById('inputEnderecoContrato').value;
+      if (!endereco.startsWith('0x') || endereco.length !== 42) {
+        mostrarMensagem('Endereço inválido', 'erro');
+        return;
+      }
+      
+      localStorage.setItem('enderecoContrato', endereco);
+      estadoApp.enderecoContrato = endereco;
+      mostrarMensagem('Endereço salvo', 'sucesso');
+    }
+
+    async function atualizarSaldoAgro() {
+      if (estadoApp.enderecoContrato && Web3.currentAccount) {
+        try {
+          const saldo = await Web3.obterSaldoAgro();
+          document.getElementById('configSaldoAgro').textContent = saldo + ' AGRO';
+        } catch (error) {
+          document.getElementById('configSaldoAgro').textContent = 'Erro ao obter';
+        }
+      }
+    }
+
+    function mudarAba(abaId) {
+      // Ocultar todas as abas
+      document.querySelectorAll('.tab-conteudo').forEach(el => {
+        el.classList.remove('ativo');
+      });
+      
+      // Remover ativo dos itens de menu
+      document.querySelectorAll('.menu-item').forEach(el => {
+        el.classList.remove('ativo');
+      });
+      
+      // Exibir aba selecionada
+      if (abaId === 'emissao') document.getElementById('abaEmissao').classList.add('ativo');
+      if (abaId === 'consulta') document.getElementById('abaConsulta').classList.add('ativo');
+      if (abaId === 'configuracao') document.getElementById('abaConfiguracao').classList.add('ativo');
+      
+      // Marcar menu item como ativo
+      event.target.classList.add('ativo');
+    }
+
+    function atualizarBotoesUI() {
+      document.getElementById('btnGerarProva').disabled = estadoApp.carregando;
+      document.getElementById('btnEmitir').disabled = estadoApp.carregando;
+    }
+
+    // Expor funções globais
+    window.conectarWallet = conectarWallet;
+    window.mudarParaSepolia = mudarParaSepolia;
+    window.gerarProva = gerarProva;
+    window.emitirCertificacao = emitirCertificacao;
+    window.estimarGas = estimarGas;
+    window.consultarCertificacao = consultarCertificacao;
+    window.salvarEnderecoContrato = salvarEnderecoContrato;
+    window.mudarAba = mudarAba;
+  </script>
+</body>
+</html>

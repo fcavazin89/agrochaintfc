@@ -1,0 +1,29 @@
+﻿# Netlify deploy — arquivos ignorados no deploy
+# (estes ficam no repo mas NAO vao para a CDN)
+
+# Ferramentas de desenvolvimento blockchain
+blockchain/
+node_modules/
+android/
+
+# Configurações internas
+.replit
+replit.md
+.sudo_as_admin_successful
+zipFile.zip
+
+# Scripts de build/patch que nao sao parte do site
+prototipo-agrochain/construir.py
+prototipo-agrochain/testes/
+prototipo-agrochain/*.py
+
+# Documentacao interna (nao precisa no deploy)
+BUILD-APK.md
+README-APK.md
+QUICKSTART-WEB3.md
+IMPLEMENTACAO-RESUMIDA.md
+ARQUITETURA-WEB3.md
+CERTIFICADOR-WEB3.md
+README-WEB3.md
+build-apk.ps1
+capacitor.config.json
