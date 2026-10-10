@@ -3,6 +3,7 @@ pragma solidity ^0.8.37;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import "./CoffeeCacaoSwapPool.sol";
 
 /// @title CoffeeCacaoSwapFactory
 /// @notice Factory contract for creating CoffeeCacaoSwap liquidity pools with Coffee/Cacao batch certification verification
@@ -120,16 +121,9 @@ contract CoffeeCacaoSwapFactory is Ownable, ReentrancyGuard {
         // Check if pool already exists
         if (getPool[token0][token1] != address(0)) revert PairExists();
         
-        // Create pool with CREATE2 for deterministic address
-        bytes memory bytecode = type(CoffeeCacaoSwapPool).creationCode;
+        // Deploy pool using CREATE2 for deterministic address
         bytes32 salt = keccak256(abi.encodePacked(token0, token1));
-        
-        assembly {
-            pool := create2(0, add(bytecode, 32), mload(bytecode), salt)
-        }
-        
-        // Initialize the pool
-        CoffeeCacaoSwapPool(pool).initialize(token0, token1);
+        pool = address(new CoffeeCacaoSwapPool{salt: salt}(token0, token1));
         
         // Store the pool address in both directions
         getPool[token0][token1] = pool;
@@ -159,6 +153,13 @@ contract CoffeeCacaoSwapFactory is Ownable, ReentrancyGuard {
     function isCertifiedCoffeeOrCacao(address token) public view returns (bool) {
         return coffeeTokens[token] || cacaoTokens[token];
     }
+
+    /// @notice Alias for isCertifiedCoffeeOrCacao — used by the router for certification checks
+    /// @param token The token address to check
+    /// @return True if token is a certified Coffee or Cacao token
+    function isCertifiedToken(address token) external view returns (bool) {
+        return coffeeTokens[token] || cacaoTokens[token];
+    }
     
     /// @notice Returns the token type (COFFEE or CACAO) for a whitelisted token
     /// @param token The token address to check
@@ -167,35 +168,6 @@ contract CoffeeCacaoSwapFactory is Ownable, ReentrancyGuard {
         if (coffeeTokens[token]) return TokenType.COFFEE;
         if (cacaoTokens[token]) return TokenType.CACAO;
         revert InvalidToken();
-    }
-}
-
-/// @title CoffeeCacaoSwapPool
-/// @notice Constant product AMM pool for Coffee/Cacao token pairs (placeholder for FEAT-002)
-/// @dev This is a minimal placeholder implementation for FEAT-001
-contract CoffeeCacaoSwapPool {
-    address public factory;
-    address public token0;
-    address public token1;
-    
-    error AlreadyInitialized();
-    error Forbidden();
-    
-    constructor() {
-        factory = msg.sender;
-    }
-    
-    /// @notice Initializes the pool with token addresses (called by factory)
-    function initialize(address _token0, address _token1) external {
-        if (msg.sender != factory) revert Forbidden();
-        if (token0 != address(0)) revert AlreadyInitialized();
-        token0 = _token0;
-        token1 = _token1;
-    }
-    
-    /// @notice Placeholder function for pool functionality (to be implemented in FEAT-002)
-    function placeholder() external pure returns (string memory) {
-        return "CoffeeCacaoSwapPool placeholder for FEAT-001, full implementation in FEAT-002";
     }
 }
 

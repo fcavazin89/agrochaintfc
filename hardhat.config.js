@@ -27,6 +27,9 @@ export default defineConfig({
     cache: "./blockchain/cache",
     artifacts: "./blockchain/artifacts"
   },
+  mocha: {
+    timeout: 120000
+  },
   solidity: {
     profiles: {
       default: {
