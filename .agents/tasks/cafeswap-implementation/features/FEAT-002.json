@@ -1,0 +1,32 @@
+{
+  "id": "FEAT-002",
+  "type": "feat",
+  "description": "Implement Coffee/Cacao AMM core (CoffeeCacaoSwapPool + CoffeeCacaoSwapRouter) with constant product formula, LP tokens, multi-hop routing, and TWAP oracle. Pool handles x*y=k invariant with 0.3% fees for Coffee/Cacao pairs ONLY. Router manages liquidity operations and multi-hop swaps with canonical token ordering to prevent pool lookup failures.",
+  "status": "done",
+  "steps": [
+    "Implement CoffeeCacaoSwapPool.sol: ERC20 for LP tokens with Coffee/Cacao naming (e.g., COFFEE-CACAO-LP), uint112 reserve0/reserve1/blockTimestampLast packed in single slot, mint() with MINIMUM_LIQUIDITY = 1000 burned on first deposit and proportional liquidity = min(amount0*totalSupply/reserve0, amount1*totalSupply/reserve1) for subsequent, burn() returns proportional amounts, swap() validates k-invariant with 0.3% fee (amountInWithFee = amountIn * 997, balance0*balance1*1000000 >= reserve0*reserve1*1000000 after adjusting for fee), getCurrentTWAP(uint32 windowSize) returns time-weighted average prices for Coffee/Cacao price discovery, emergencyWithdraw(address token, address to) onlyFactory for stuck tokens where token != token0 && token != token1, sync() updates reserves to actual balances, ReentrancyGuard on all state-changing functions",
+    "Implement CoffeeCacaoSwapRouter.sol: addLiquidity() for Coffee/Cacao pairs calculates optimal amounts maintaining pool ratio using quote(), calls pool.mint(), removeLiquidity() burns LP tokens and returns both Coffee/Cacao tokens, swap() canonicalizes token order BEFORE querying pool: (token0, token1) = path[i] < path[i+1] ? (path[i], path[i+1]) : (path[i+1], path[i]), then pool = factory.getPool(token0, token1), determines output direction based on original path order, supports multi-hop Coffee→Cacao swaps, getAmountsOut() and getAmountsIn() for Coffee/Cacao price calculations with 997/1000 fee factor, deadline modifier on all user-facing functions, Pausable for emergency pause controlled by governance",
+    "Write blockchain/tests/CoffeeCacaoSwapPool.test.js: test first mint burns MINIMUM_LIQUIDITY, subsequent mints use proportional formula, burn returns correct Coffee/Cacao amounts including fees, swap maintains constant product k after fee adjustment for Coffee/Cacao pairs, 0.3% fee calculation, sync handles direct transfers, getCurrentTWAP returns correct Coffee/Cacao price average, emergencyWithdraw works for non-pool tokens and reverts for Coffee/Cacao pool tokens",
+    "Write blockchain/tests/CoffeeCacaoSwapRouter.test.js: test addLiquidity calculates optimal amounts for Coffee/Cacao pairs, removeLiquidity returns proportional Coffee/Cacao tokens, single-hop swap works for Coffee→Cacao, multi-hop swap through path [CoffeeArabica, CoffeeRobusta, CacaoTrinitario] executes correctly with canonical ordering, getAmountsOut matches actual execution for Coffee/Cacao paths, slippage protection (amountOutMin) reverts when not met, deadline enforcement, pause blocks Coffee/Cacao swaps but allows withdrawals",
+    "Write blockchain/tests/coffee-cacao-integration.test.js: test full flow: addCertifiedCoffeeToken → addCertifiedCacaoToken → createPool(Coffee/Cacao) → addLiquidity → swap Coffee→Cacao → removeLiquidity, multi-hop routing with 3 Coffee/Cacao pools, fee accumulation in Coffee/Cacao reserves",
+    "Commit: 'feat: implement CoffeeCacaoSwapPool and CoffeeCacaoSwapRouter with Coffee/Cacao multi-hop AMM and TWAP oracle'"
+  ],
+  "acceptance_criteria": [
+    "Pool mint() burns 1000 wei on first deposit and uses proportional formula for subsequent deposits",
+    "Pool swap() maintains constant product invariant: (reserve0 + amountIn*0.997) * (reserve1 - amountOut) >= reserve0 * reserve1",
+    "Pool getCurrentTWAP() returns time-weighted average price over specified window",
+    "Router swap() canonicalizes token pairs before pool lookup to prevent 'Pool does not exist' errors",
+    "Router multi-hop swaps execute atomically through intermediate pools",
+    "Router getAmountsOut() calculations match actual swap execution within rounding tolerance",
+    "Emergency withdraw extracts stuck tokens but cannot withdraw pool's own token0/token1",
+    "All integration tests pass showing end-to-end swap flow works correctly"
+  ],
+  "verification": [
+    "npm run blockchain:compile completes without errors",
+    "npx hardhat test blockchain/tests/CoffeeCacaoSwapPool.test.js --network hardhatMainnet passes all tests",
+    "npx hardhat test blockchain/tests/CoffeeCacaoSwapRouter.test.js --network hardhatMainnet passes all tests",
+    "npx hardhat test blockchain/tests/coffee-cacao-integration.test.js --network hardhatMainnet passes all tests"
+  ],
+  "blocked_reason": null,
+  "findings": ""
+}
