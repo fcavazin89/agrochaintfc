@@ -1,4 +1,6 @@
 import hardhatEthers from "@nomicfoundation/hardhat-ethers";
+import hardhatMocha from "@nomicfoundation/hardhat-mocha";
+import hardhatEthersChaiMatchers from "@nomicfoundation/hardhat-ethers-chai-matchers";
 import { defineConfig } from "hardhat/config";
 
 const networks = {
@@ -17,7 +19,7 @@ if (process.env.POLYGON_AMOY_RPC_URL) {
 }
 
 export default defineConfig({
-  plugins: [hardhatEthers],
+  plugins: [hardhatEthers, hardhatMocha, hardhatEthersChaiMatchers],
   defaultNetwork: "hardhatMainnet",
   paths: {
     sources: "./blockchain/contracts",
