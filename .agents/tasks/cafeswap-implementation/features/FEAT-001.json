@@ -1,0 +1,32 @@
+{
+  "id": "FEAT-001",
+  "type": "feat",
+  "description": "Implement core token contracts (CafeToken + CoffeeCacaoSwapFactory) with governance features and Coffee/Cacao certification verification. CafeToken is ERC20Votes with 100M fixed supply, minting restricted to MasterChef. Factory uses CREATE2 for deterministic pool deployment and integrates with AgroChainCoffeeCacaoTraceability.isBatchCertified(bytes32 batchId, bool isCoffee) for Coffee/Cacao token whitelisting ONLY.",
+  "status": "done",
+  "steps": [
+    "Create blockchain/contracts/cafeswap/ directory structure",
+    "Implement CafeToken.sol: ERC20 + ERC20Votes + ERC20Permit from OpenZeppelin 5.6.1, 100M MAX_SUPPLY constant, mint() restricted to masterChef address via AccessControl MINTER_ROLE, custom errors, 18 decimals",
+    "Implement CoffeeCacaoSwapFactory.sol: mapping(address => bytes32) tokenToBatchId, mapping(address => bool) coffeeTokens, mapping(address => bool) cacaoTokens, mapping(address => mapping(address => address)) getPair, enum TokenType { COFFEE, CACAO }, addCertifiedCoffeeToken(address token, bytes32 batchId) onlyOwner calls AgroChainCoffeeCacaoTraceability(traceabilityContract).isBatchCertified(batchId, true) before whitelisting, addCertifiedCacaoToken(address token, bytes32 batchId) onlyOwner calls isBatchCertified(batchId, false), createPool(tokenA, tokenB) checks (coffeeTokens[tokenA] || cacaoTokens[tokenA]) && (coffeeTokens[tokenB] || cacaoTokens[tokenB]) - ONLY Coffee/Cacao allowed, uses CREATE2 with salt = keccak256(abi.encodePacked(token0, token1)) where token0 < token1",
+    "Create blockchain/tests/ directory",
+    "Write blockchain/tests/CafeToken.test.js: test mint with supply cap, transfer updates voting power, delegation works, getVotes at past block returns snapshot, permit signature verification, revert when non-minter calls mint",
+    "Write blockchain/tests/CoffeeCacaoSwapFactory.test.js: test addCertifiedCoffeeToken verifies Coffee batch certification, addCertifiedCacaoToken verifies Cacao batch certification, createPool accepts Coffee/Coffee pairs, createPool accepts Coffee/Cacao pairs, createPool accepts Cacao/Cacao pairs, createPool reverts for non-Coffee/Cacao tokens, CREATE2 produces deterministic addresses, getPair returns correct pool address, duplicate pool creation reverts",
+    "Commit: 'feat: implement CafeToken and CoffeeCacaoSwapFactory with Coffee/Cacao certification verification'"
+  ],
+  "acceptance_criteria": [
+    "CafeToken implements ERC20Votes with voting power equal to balance and delegation support",
+    "CafeToken enforces 100M supply cap and only allows MasterChef to mint",
+    "Factory addCertifiedCoffeeToken() calls AgroChainCoffeeCacaoTraceability.isBatchCertified(batchId, true) and reverts if invalid",
+    "Factory addCertifiedCacaoToken() calls AgroChainCoffeeCacaoTraceability.isBatchCertified(batchId, false) and reverts if invalid",
+    "Factory createPool() reverts when either token is NOT Coffee or Cacao certified",
+    "Factory createPool() accepts Coffee/Coffee, Coffee/Cacao, and Cacao/Cacao pairs ONLY",
+    "CREATE2 deployment produces identical pool addresses for same Coffee/Cacao token pairs",
+    "All unit tests pass: npx hardhat test blockchain/tests/CafeToken.test.js blockchain/tests/CoffeeCacaoSwapFactory.test.js"
+  ],
+  "verification": [
+    "npm run blockchain:compile completes without errors",
+    "npx hardhat test blockchain/tests/CafeToken.test.js --network hardhatMainnet passes all tests",
+    "npx hardhat test blockchain/tests/CoffeeCacaoSwapFactory.test.js --network hardhatMainnet passes all tests"
+  ],
+  "blocked_reason": null,
+  "findings": ""
+}
