@@ -48,6 +48,8 @@ const navSections = [
     items: [
       { href: '/producer', label: 'Produtor', icon: '🌾' },
       { href: '/mercado', label: 'Marketplace', icon: '🛒' },
+      { href: '/marketplace', label: 'Listagens', icon: '📋' },
+      { href: '/marketplace/my-listings', label: 'Minhas Vendas', icon: '💼' },
     ]
   },
 ];
@@ -59,7 +61,7 @@ function shouldSectionBeExpanded(sectionLabel: string, pathname: string): boolea
     RASTREIO: ['/lote', '/rastreio', '/certificacao', '/zk-standalone'],
     DEX: ['/dex', '/compliance'],
     MONITORAMENTO: ['/iot', '/assistente', '/auditoria', '/imersivo'],
-    EXTRAS: ['/producer', '/mercado'],
+    EXTRAS: ['/producer', '/mercado', '/marketplace'],
     PLATAFORMA: ['/'],
   };
 

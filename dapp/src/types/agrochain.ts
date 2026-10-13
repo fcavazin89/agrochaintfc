@@ -114,3 +114,66 @@ export interface Lot {
   eventos: LotEvent[];
   status: LotStatus;
 }
+
+// =====================================================================
+// MARKETPLACE TYPES
+// =====================================================================
+
+export enum MarketplaceListingStatus {
+  Active = 'Active',
+  Sold = 'Sold',
+  Cancelled = 'Cancelled',
+}
+
+export enum MarketplaceOfferStatus {
+  Pending = 'Pending',
+  Accepted = 'Accepted',
+  Rejected = 'Rejected',
+  Cancelled = 'Cancelled',
+  Expired = 'Expired',
+}
+
+export interface MarketplaceListing {
+  listingId: string;
+  seller: string;
+  lotId: string;
+  batchType: BatchType;
+  weightKg: number;
+  weightAvailableKg: number; // weightKg - weightSoldKg
+  pricePerKg: number;
+  tokenAddress: string;
+  status: MarketplaceListingStatus;
+  createdAt: number;
+  updatedAt: number;
+  origin: string;
+  safra: string;
+  sellerName?: string; // truncated address ou nome
+}
+
+export interface MarketplaceOffer {
+  offerId: string;
+  listingId: string;
+  buyer: string;
+  quantityKg: number;
+  pricePerKg: number;
+  totalPrice: number; // quantityKg * pricePerKg
+  status: MarketplaceOfferStatus;
+  createdAt: number;
+  expiresAt: number;
+  orderId?: string; // quando aceito, referência a Order em AgroChainPayments
+}
+
+export interface MarketplaceFilter {
+  batchType?: BatchType;
+  minPrice?: number;
+  maxPrice?: number;
+  sortBy?: 'price-asc' | 'price-desc' | 'recent' | 'oldest';
+  searchSeller?: string; // address ou nome
+}
+
+export interface MarketplaceStats {
+  totalListings: number;
+  totalSold: number;
+  averagePrice: number;
+  mostCommon: BatchType;
+}
