@@ -665,7 +665,7 @@ export default function BuyerOrdersPage() {
                       display: 'inline-block',
                       background: 'var(--verde-100)',
                       color: 'var(--verde-600)',
-                      border: '1px solid #d1e4d8',
+                      border: '1px solid var(--verde-100)',
                       padding: 'var(--e-2) var(--e-3)',
                       borderRadius: 'var(--raio-xs)',
                       cursor: 'pointer',
@@ -675,7 +675,7 @@ export default function BuyerOrdersPage() {
                       transition: 'all var(--t-rapida)',
                     }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.background = '#d1e4d8';
+                      e.currentTarget.style.background = 'var(--verde-300)';
                     }}
                     onMouseLeave={(e) => {
                       e.currentTarget.style.background = 'var(--verde-100)';

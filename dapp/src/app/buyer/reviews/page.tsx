@@ -136,7 +136,7 @@ export default function ReviewsPage() {
                 borderRadius: 'var(--raio-sm)',
                 fontSize: '13px',
                 color: 'var(--texto-1)',
-                background: '#fff',
+                background: 'var(--sup-1)',
                 fontFamily: 'var(--fonte)',
                 cursor: 'pointer',
               }}
@@ -195,7 +195,7 @@ export default function ReviewsPage() {
               borderRadius: 'var(--raio-sm)',
               fontSize: '13px',
               color: 'var(--texto-1)',
-              background: '#fff',
+              background: 'var(--sup-1)',
               fontFamily: 'var(--fonte)',
               resize: 'vertical',
               boxSizing: 'border-box',
@@ -320,7 +320,7 @@ export default function ReviewsPage() {
                   width: '100%',
                   background: expandedProducer === producer.produtor ? 'var(--verde-100)' : 'var(--sup-2)',
                   color: expandedProducer === producer.produtor ? 'var(--verde-600)' : 'var(--texto-2)',
-                  border: `1px solid ${expandedProducer === producer.produtor ? '#d1e4d8' : 'var(--linha-forte)'}`,
+                  border: `1px solid ${expandedProducer === producer.produtor ? 'var(--verde-100)' : 'var(--linha-forte)'}`,
                   padding: '10px 16px',
                   borderRadius: 'var(--raio-sm)',
                   cursor: 'pointer',
@@ -330,7 +330,7 @@ export default function ReviewsPage() {
                 }}
                 onMouseEnter={(e) => {
                   if (expandedProducer === producer.produtor) {
-                    e.currentTarget.style.background = '#d1e4d8';
+                    e.currentTarget.style.background = 'var(--verde-300)';
                   } else {
                     e.currentTarget.style.background = 'var(--sup-3)';
                   }
