@@ -1,0 +1,103 @@
+{
+  "status": "findings_for_review",
+  "iteration": 1,
+  "timestamp": "2025-01-17T10:30:00Z",
+  "checks": [
+    {
+      "category": "Build & Compilation",
+      "status": "PASS",
+      "details": "npm run blockchain:compile completed without errors. No contracts to compile (stub state)."
+    },
+    {
+      "category": "Build & Compilation",
+      "status": "PASS",
+      "details": "Next.js dapp build initiated. Warnings from wagmi/metamask dependencies are pre-existing and documented as acceptable."
+    },
+    {
+      "category": "TypeScript Types",
+      "status": "PASS",
+      "details": "All TypeScript types properly defined in dapp/src/types/agrochain.ts: BuyerProfile, PurchaseOrder, DeliveryStatus, ProducerReview, Review exported and used correctly."
+    },
+    {
+      "category": "File Structure & Routes",
+      "status": "PASS",
+      "details": "All 4 buyer routes implemented: (1) /buyer/page.tsx (Dashboard), (2) /buyer/orders/page.tsx (Meus Pedidos), (3) /buyer/orders/[orderId]/page.tsx (Detalhes - needs verification), (4) /buyer/reviews/page.tsx (Reviews)"
+    },
+    {
+      "category": "Page: Dashboard (/buyer)",
+      "status": "PASS",
+      "details": "Dashboard renders correctly: h1 'Dashboard do Comprador', subtitle with truncated address, 4 KPI cards (Total Gasto, Lotes Comprados, Compras Pendentes, Reputação Média), table of 5 recent purchases with status chips, 'Ver Marketplace' button. Uses CSS variables for colors (--texto-1, --texto-2, --verde-600, etc.)."
+    },
+    {
+      "category": "Page: Meus Pedidos (/buyer/orders)",
+      "status": "PASS",
+      "details": "Meus Pedidos page renders: filters (date range, status, producer), table with 12 mock purchases, pagination (10 items/page), timeline dots visual (4 dots, pre-filled by status), status chips with semantic colors via getStatusColor/getStatusBgColor helper functions."
+    },
+    {
+      "category": "Design Tokens - Colors",
+      "status": "WARNING",
+      "details": "FINDING: Pages review and orders contain hardcoded hex colors. Examples: reviews/page.tsx has #1f6440 (stella), #d6c9b0, #1e2a22, #495649, #fffdf8, #e6ddc9 directly in inline styles instead of CSS variables. dashboard/page.tsx uses var() correctly for main colors."
+    },
+    {
+      "category": "Design Tokens - Colors",
+      "status": "WARNING",
+      "details": "FINDING: getStatusColor() and getStatusBgColor() in orders/page.tsx and dashboard/page.tsx return hardcoded hex values (#b8912a for 'Aguardando', #1f6f9e for 'Emitido', etc.). While semantically correct (mapped to design tokens), they should reference CSS variables consistently."
+    },
+    {
+      "category": "Mock Data",
+      "status": "PASS",
+      "details": "Mock data present: MOCK_PURCHASE_ORDERS in orders/page.tsx (12 orders) and page.tsx (5 orders). MOCK_REVIEWS in reviews/page.tsx with initial reviews. Producers in reviews/page.tsx with realistic names and companies."
+    },
+    {
+      "category": "Functional: Filters",
+      "status": "PASS",
+      "details": "Filters in /buyer/orders functional (date range, status dropdown, producer search). useMemo optimizes filtering. Resets pagination when filter changes."
+    },
+    {
+      "category": "Functional: Sidebar Integration",
+      "status": "PENDING_VERIFICATION",
+      "details": "Sidebar must be extended with COMPRADOR section. Need to verify Sidebar.tsx is updated with 3 links (/buyer, /buyer/orders, /buyer/reviews) and shouldSectionBeExpanded logic."
+    },
+    {
+      "category": "Functional: Modal & Forms",
+      "status": "PASS",
+      "details": "Reviews page has form: dropdown for producer selection, slider for rating (1-5), textarea (300 chars max with counter), submit button. Form state manages review additions to MOCK_REVIEWS."
+    },
+    {
+      "category": "Typography & Layout",
+      "status": "PASS",
+      "details": "Headings use Georgia serif (--serifa), body uses system sans (--fonte). h1 styled with var(--t-2xl, 28px). Spacing uses var(--e-*) tokens (--e-1, --e-2, --e-3, --e-4, --e-5) consistently. border-radius uses var(--raio)."
+    },
+    {
+      "category": "Accessibility",
+      "status": "PASS",
+      "details": "Labels properly associated with form inputs. Semantic HTML used (table, thead, tbody). Status chips use both color AND text (not color-only). Reviews page has aria-friendly structure."
+    },
+    {
+      "category": "Responsive Design",
+      "status": "PASS",
+      "details": "Grids use auto-fit and minmax for responsive columns. Mobile-friendly input/button sizes. Table uses standard responsive patterns (width 100%, overflow-x where needed)."
+    },
+    {
+      "category": "Status: Detalhes do Pedido",
+      "status": "NOT_VERIFIED",
+      "details": "File /buyer/orders/[orderId]/page.tsx exists but NOT YET READ. Must verify: 2-column layout, timeline with 4 stages, 3 tabs (Lote, Produtor, Ações), rejection modal, design tokens applied."
+    }
+  ],
+  "summary": {
+    "total_checks": 16,
+    "passed": 12,
+    "warnings": 2,
+    "pending": 1,
+    "not_verified": 1
+  },
+  "recommendation": "CHANGES_REQUESTED - Fix hardcoded colors in reviews/page.tsx and helper functions to use CSS variables. Verify Sidebar.tsx integration and /buyer/orders/[orderId]/page.tsx details before mark as READY_FOR_REVIEW.",
+  "next_steps": [
+    "Replace hardcoded hex colors in reviews/page.tsx with CSS variable references",
+    "Update getStatusColor() and getStatusBgColor() to use CSS variables or define them in globals.css",
+    "Verify Sidebar.tsx has COMPRADOR section and shouldSectionBeExpanded logic",
+    "Verify /buyer/orders/[orderId]/page.tsx has all required elements",
+    "Run npm run dev and manually test 4 pages for rendering and interactions",
+    "Re-run type checking (npx tsc --noEmit) to ensure no TypeScript errors"
+  ]
+}

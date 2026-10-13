@@ -1,0 +1,24 @@
+{
+  "id": "FEAT-003",
+  "type": "feat",
+  "description": "Reviews: página de reviews de produtores, listar histórico, adicionar novo review (rating + texto). Depende de FEAT-001 (tipos+utils). Separável de Dashboard/Orders.",
+  "status": "completed",
+  "steps": [
+    "Criar dapp/src/app/buyer/reviews/page.tsx: cabeçalho h1 'Reviews & Reputação', subtitle. Seção superior: formulário para novo review (select dropdown de produtores, slider rating 1-5 com labels, textarea até 300 chars, botão Enviar). Seção inferior: lista de produtores (cards com foto placeholder, nome, empresa, reputação em stars, total transações, rating médio de reviews). Por produtor, expandível para mostrar reviews enviados por comprador (data, rating, texto, status 'Enviado'). Mock data: 3-4 produtores conhecidos de MOCK_PURCHASE_ORDERS. Histórico de reviews em-memória (sessionStorage ou state, simples por agora). Aplicar design tokens.",
+    "Implementar helpers em buyer.ts se necessário (getProducersByBuyer, addReviewToBuyer, getReviewsByProducer).",
+    "Verificar: abrir /buyer/reviews, adicionar review, confirmar que lista e histórico atualizam, design tokens aplicados."
+  ],
+  "acceptance_criteria": [
+    "✓ Página renderiza com formulário novo review (dropdown produtores, slider rating, textarea) e botão Enviar",
+    "✓ Página lista 3-4 produtores com cards mostrando reputação média e transações totais",
+    "✓ Adicionar review atualiza lista de reviews enviados (aparece no histórico do produtor)",
+    "✓ Design tokens aplicados (cores, tipografia, espaçamento)"
+  ],
+  "verification": [
+    "✓ npm run dev e navegar /buyer/reviews - página renderiza corretamente",
+    "✓ Adicionar review e confirmar que aparece no histórico - funciona via state",
+    "✓ npm run build — compila com sucesso (warnings de wagmi são pre-existentes)"
+  ],
+  "blocked_reason": null,
+  "findings": "Implementação completada com sucesso. Página inclui: (1) Formulário para novo review com dropdown de produtores, slider de rating (1-5), textarea (300 caracteres), botão Enviar; (2) Cards de produtores com nome, empresa, reputação em %, transações totais, rating médio em stars; (3) Seção expandível mostrando histórico de reviews com data, rating, texto e status; (4) Mock data com 8+ produtores de MOCK_PURCHASE_ORDERS e 5 reviews iniciais; (5) Histórico gerenciado em state React; (6) Design tokens aplicados (cores verde-600, tipografia serif para títulos, espaçamento via --e-* tokens, border-radius --raio); (7) Helpers implementados: getProducersByBuyer, addReviewToBuyer, getReviewsByProducer, calculateAverageRating, ratingToReputation, groupReviewsByProducer com mapas de nomes/empresas. Build completa com sucesso. Commit: feat: FEAT-003 reviews page and helpers"
+}

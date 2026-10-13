@@ -1,0 +1,11 @@
+{
+  "task_id": "task-buyer-panel",
+  "task_description": "Implementar Buyer Panel completo do AgroChain: tipos TypeScript expandidos, contrato AgroChainBuyer, Dashboard de Comprador, Meus Pedidos com filtros, Detalhes de Pedido com timeline, Reviews de Produtores, integração Sidebar. Tech stack: Next.js 14, TypeScript, MetaMask, Sepolia. Seguir rigorosamente design system (design.md).",
+  "status": "pending",
+  "feature_order": [
+    "FEAT-001",
+    "FEAT-002",
+    "FEAT-003"
+  ],
+  "blocked_reason": null
+}

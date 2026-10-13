@@ -60,7 +60,7 @@ export default function ReviewsPage() {
     const stars = [];
     for (let i = 1; i <= 5; i++) {
       stars.push(
-        <span key={i} style={{ fontSize: `${size}px`, color: i <= rating ? '#1f6440' : '#d6c9b0' }}>
+        <span key={i} style={{ fontSize: `${size}px`, color: i <= rating ? 'var(--verde-600)' : 'var(--linha-forte)' }}>
           ★
         </span>
       );
@@ -79,9 +79,9 @@ export default function ReviewsPage() {
       <h1
         style={{
           margin: '0 0 8px',
-          fontFamily: 'Georgia, serif',
+          fontFamily: 'var(--serifa)',
           fontSize: '28px',
-          color: '#1e2a22',
+          color: 'var(--texto-1)',
           fontWeight: 600,
         }}
       >
@@ -90,7 +90,7 @@ export default function ReviewsPage() {
       <p
         style={{
           margin: '0 0 24px',
-          color: '#495649',
+          color: 'var(--texto-2)',
           fontSize: '14px',
         }}
       >
@@ -100,20 +100,20 @@ export default function ReviewsPage() {
       {/* Seção de Novo Review */}
       <section
         style={{
-          background: '#fffdf8',
-          border: '1px solid #e6ddc9',
-          borderRadius: '16px',
-          padding: '24px',
-          marginBottom: '32px',
-          boxShadow: '0 1px 2px rgba(31,42,34,.06)',
+          background: 'var(--sup-1)',
+          border: '1px solid var(--linha)',
+          borderRadius: 'var(--raio)',
+          padding: 'var(--e-5)',
+          marginBottom: 'var(--e-6)',
+          boxShadow: 'var(--sombra)',
         }}
       >
         <h2
           style={{
             margin: '0 0 16px',
-            fontFamily: 'Georgia, serif',
+            fontFamily: 'var(--serifa)',
             fontSize: '18px',
-            color: '#1e2a22',
+            color: 'var(--texto-1)',
             fontWeight: 600,
           }}
         >
@@ -123,7 +123,7 @@ export default function ReviewsPage() {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
           {/* Select Produtor */}
           <div>
-            <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: 600, color: '#1e2a22' }}>
+            <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: 600, color: 'var(--texto-1)' }}>
               Selecione o Produtor
             </label>
             <select
@@ -132,10 +132,10 @@ export default function ReviewsPage() {
               style={{
                 width: '100%',
                 padding: '10px 12px',
-                border: '1px solid #d6c9b0',
-                borderRadius: '10px',
+                border: '1px solid var(--linha-forte)',
+                borderRadius: 'var(--raio-sm)',
                 fontSize: '13px',
-                color: '#1e2a22',
+                color: 'var(--texto-1)',
                 background: '#fff',
                 fontFamily: 'var(--fonte)',
                 cursor: 'pointer',
@@ -151,7 +151,7 @@ export default function ReviewsPage() {
 
           {/* Slider Rating */}
           <div>
-            <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: 600, color: '#1e2a22' }}>
+            <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: 600, color: 'var(--texto-1)' }}>
               Rating: {rating} ⭐
             </label>
             <input
@@ -164,13 +164,13 @@ export default function ReviewsPage() {
                 width: '100%',
                 height: '6px',
                 borderRadius: '3px',
-                background: '#d6c9b0',
+                background: 'var(--linha-forte)',
                 outline: 'none',
-                accentColor: '#1f6440',
+                accentColor: 'var(--verde-600)',
                 cursor: 'pointer',
               }}
             />
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '4px', fontSize: '11px', color: '#7c867a' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '4px', fontSize: '11px', color: 'var(--texto-3)' }}>
               <span>Péssimo</span>
               <span>Excelente</span>
             </div>
@@ -179,7 +179,7 @@ export default function ReviewsPage() {
 
         {/* Textarea */}
         <div style={{ marginBottom: '16px' }}>
-          <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: 600, color: '#1e2a22' }}>
+          <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: 600, color: 'var(--texto-1)' }}>
             Review ({reviewText.length}/300 caracteres)
           </label>
           <textarea
@@ -191,10 +191,10 @@ export default function ReviewsPage() {
               width: '100%',
               minHeight: '100px',
               padding: '12px',
-              border: '1px solid #d6c9b0',
-              borderRadius: '10px',
+              border: '1px solid var(--linha-forte)',
+              borderRadius: 'var(--raio-sm)',
               fontSize: '13px',
-              color: '#1e2a22',
+              color: 'var(--texto-1)',
               background: '#fff',
               fontFamily: 'var(--fonte)',
               resize: 'vertical',
@@ -207,19 +207,19 @@ export default function ReviewsPage() {
         <button
           onClick={handleAddReview}
           style={{
-            background: 'linear-gradient(180deg, #1f6440 0%, #195236 100%)',
+            background: 'linear-gradient(180deg, var(--verde-600) 0%, var(--verde-700) 100%)',
             color: '#fff',
             border: 'none',
             padding: '12px 24px',
-            borderRadius: '10px',
+            borderRadius: 'var(--raio-sm)',
             cursor: 'pointer',
             fontWeight: '600',
             fontSize: '14px',
-            transition: 'all 120ms cubic-bezier(.2,.7,.3,1)',
+            transition: 'all var(--t-rapida)',
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.transform = 'translateY(-2px)';
-            e.currentTarget.style.boxShadow = '0 1px 2px rgba(31,42,34,.06), 0 12px 28px -20px rgba(19,66,44,.35)';
+            e.currentTarget.style.boxShadow = 'var(--sombra-2)';
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.transform = 'translateY(0)';
@@ -235,9 +235,9 @@ export default function ReviewsPage() {
         <h2
           style={{
             margin: '0 0 16px',
-            fontFamily: 'Georgia, serif',
+            fontFamily: 'var(--serifa)',
             fontSize: '18px',
-            color: '#1e2a22',
+            color: 'var(--texto-1)',
             fontWeight: 600,
           }}
         >
@@ -249,42 +249,42 @@ export default function ReviewsPage() {
             <div
               key={producer.produtor}
               style={{
-                background: '#fffdf8',
-                border: '1px solid #e6ddc9',
-                borderRadius: '16px',
-                padding: '20px',
-                boxShadow: '0 1px 2px rgba(31,42,34,.06)',
-                transition: 'all 120ms cubic-bezier(.2,.7,.3,1)',
+                background: 'var(--sup-1)',
+                border: '1px solid var(--linha)',
+                borderRadius: 'var(--raio)',
+                padding: 'var(--e-5)',
+                boxShadow: 'var(--sombra)',
+                transition: 'all var(--t-rapida)',
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.boxShadow = '0 1px 2px rgba(31,42,34,.05), 0 12px 28px -20px rgba(19,66,44,.35)';
+                e.currentTarget.style.boxShadow = 'var(--sombra-2)';
                 e.currentTarget.style.transform = 'translateY(-4px)';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.boxShadow = '0 1px 2px rgba(31,42,34,.06)';
+                e.currentTarget.style.boxShadow = 'var(--sombra)';
                 e.currentTarget.style.transform = 'translateY(0)';
               }}
             >
               {/* Cabeçalho do Card */}
-              <div style={{ marginBottom: '16px', paddingBottom: '16px', borderBottom: '1px solid #e6ddc9' }}>
+              <div style={{ marginBottom: '16px', paddingBottom: '16px', borderBottom: '1px solid var(--linha)' }}>
                 <h3
                   style={{
                     margin: '0 0 4px',
-                    fontFamily: 'Georgia, serif',
+                    fontFamily: 'var(--serifa)',
                     fontSize: '15px',
-                    color: '#1e2a22',
+                    color: 'var(--texto-1)',
                     fontWeight: 600,
                   }}
                 >
                   {producer.nome}
                 </h3>
-                <p style={{ margin: '0 0 8px', fontSize: '12px', color: '#495649' }}>
+                <p style={{ margin: '0 0 8px', fontSize: '12px', color: 'var(--texto-2)' }}>
                   {producer.empresa}
                 </p>
                 <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
                   {renderStars(Math.round(producer.ratingMedio), 14)}
                 </div>
-                <p style={{ margin: '0', fontSize: '12px', color: '#7c867a', fontWeight: 500 }}>
+                <p style={{ margin: '0', fontSize: '12px', color: 'var(--texto-3)', fontWeight: 500 }}>
                   {producer.ratingMedio > 0 ? `${producer.ratingMedio.toFixed(1)}/5.0` : 'Sem reviews'}
                 </p>
               </div>
@@ -292,18 +292,18 @@ export default function ReviewsPage() {
               {/* Estatísticas */}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '16px' }}>
                 <div>
-                  <p style={{ margin: '0 0 4px', fontSize: '11px', color: '#7c867a', textTransform: 'uppercase', letterSpacing: '0.5px', fontWeight: 600 }}>
+                  <p style={{ margin: '0 0 4px', fontSize: '11px', color: 'var(--texto-3)', textTransform: 'uppercase', letterSpacing: '0.5px', fontWeight: 600 }}>
                     Reputação
                   </p>
-                  <p style={{ margin: '0', fontSize: '18px', fontWeight: 600, color: '#1f6440' }}>
+                  <p style={{ margin: '0', fontSize: '18px', fontWeight: 600, color: 'var(--verde-600)' }}>
                     {producer.reputacao}%
                   </p>
                 </div>
                 <div>
-                  <p style={{ margin: '0 0 4px', fontSize: '11px', color: '#7c867a', textTransform: 'uppercase', letterSpacing: '0.5px', fontWeight: 600 }}>
+                  <p style={{ margin: '0 0 4px', fontSize: '11px', color: 'var(--texto-3)', textTransform: 'uppercase', letterSpacing: '0.5px', fontWeight: 600 }}>
                     Transações
                   </p>
-                  <p style={{ margin: '0', fontSize: '18px', fontWeight: 600, color: '#1f6440' }}>
+                  <p style={{ margin: '0', fontSize: '18px', fontWeight: 600, color: 'var(--verde-600)' }}>
                     {producer.totalTransacoes}
                   </p>
                 </div>
@@ -318,28 +318,28 @@ export default function ReviewsPage() {
                 }
                 style={{
                   width: '100%',
-                  background: expandedProducer === producer.produtor ? '#e8f2ea' : '#f2ecdd',
-                  color: expandedProducer === producer.produtor ? '#1f6440' : '#495649',
-                  border: `1px solid ${expandedProducer === producer.produtor ? '#d1e4d8' : '#d6c9b0'}`,
+                  background: expandedProducer === producer.produtor ? 'var(--verde-100)' : 'var(--sup-2)',
+                  color: expandedProducer === producer.produtor ? 'var(--verde-600)' : 'var(--texto-2)',
+                  border: `1px solid ${expandedProducer === producer.produtor ? '#d1e4d8' : 'var(--linha-forte)'}`,
                   padding: '10px 16px',
-                  borderRadius: '10px',
+                  borderRadius: 'var(--raio-sm)',
                   cursor: 'pointer',
                   fontWeight: '600',
                   fontSize: '13px',
-                  transition: 'all 120ms cubic-bezier(.2,.7,.3,1)',
+                  transition: 'all var(--t-rapida)',
                 }}
                 onMouseEnter={(e) => {
                   if (expandedProducer === producer.produtor) {
                     e.currentTarget.style.background = '#d1e4d8';
                   } else {
-                    e.currentTarget.style.background = '#e8e0cd';
+                    e.currentTarget.style.background = 'var(--sup-3)';
                   }
                 }}
                 onMouseLeave={(e) => {
                   if (expandedProducer === producer.produtor) {
-                    e.currentTarget.style.background = '#e8f2ea';
+                    e.currentTarget.style.background = 'var(--verde-100)';
                   } else {
-                    e.currentTarget.style.background = '#f2ecdd';
+                    e.currentTarget.style.background = 'var(--sup-2)';
                   }
                 }}
               >
@@ -348,9 +348,9 @@ export default function ReviewsPage() {
 
               {/* Reviews Expandidos */}
               {expandedProducer === producer.produtor && (
-                <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid #e6ddc9' }}>
+                <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid var(--linha)' }}>
                   {producer.reviews.length === 0 ? (
-                    <p style={{ margin: '0', fontSize: '12px', color: '#7c867a', fontStyle: 'italic' }}>
+                    <p style={{ margin: '0', fontSize: '12px', color: 'var(--texto-3)', fontStyle: 'italic' }}>
                       Nenhum review enviado para este produtor
                     </p>
                   ) : (
@@ -359,9 +359,9 @@ export default function ReviewsPage() {
                         <div
                           key={review.id}
                           style={{
-                            background: '#f5f1e7',
-                            border: '1px solid #e8e0cd',
-                            borderRadius: '8px',
+                            background: 'var(--fundo)',
+                            border: '1px solid var(--sup-2)',
+                            borderRadius: 'var(--raio-xs)',
                             padding: '12px',
                           }}
                         >
@@ -373,19 +373,19 @@ export default function ReviewsPage() {
                               style={{
                                 fontSize: '11px',
                                 fontWeight: 600,
-                                color: '#1f6440',
-                                background: '#e8f2ea',
+                                color: 'var(--verde-600)',
+                                background: 'var(--verde-100)',
                                 padding: '2px 8px',
-                                borderRadius: '4px',
+                                borderRadius: 'var(--raio-xs)',
                               }}
                             >
                               {review.status}
                             </span>
                           </div>
-                          <p style={{ margin: '0 0 6px', fontSize: '12px', color: '#1e2a22', lineHeight: '1.4' }}>
+                          <p style={{ margin: '0 0 6px', fontSize: '12px', color: 'var(--texto-1)', lineHeight: '1.4' }}>
                             {review.texto}
                           </p>
-                          <p style={{ margin: '0', fontSize: '11px', color: '#7c867a' }}>
+                          <p style={{ margin: '0', fontSize: '11px', color: 'var(--texto-3)' }}>
                             {formatDate(review.dataEnvio)}
                           </p>
                         </div>
@@ -400,8 +400,8 @@ export default function ReviewsPage() {
       </section>
 
       {/* Rodapé */}
-      <div style={{ marginTop: '32px', paddingTop: '16px', borderTop: '1px solid #e6ddc9' }}>
-        <p style={{ margin: '0', fontSize: '11px', color: '#7c867a' }}>
+      <div style={{ marginTop: '32px', paddingTop: '16px', borderTop: '1px solid var(--linha)' }}>
+        <p style={{ margin: '0', fontSize: '11px', color: 'var(--texto-3)' }}>
           <strong>Dados mockados · Integração Sepolia</strong> · AgroChain v2.0 · Reviews Page
         </p>
       </div>

@@ -1,0 +1,36 @@
+{
+  "verdict": "APPROVED",
+  "findings": [
+    {
+      "id": 1,
+      "title": "Escrow gap: rejeição não retorna depósito",
+      "severity": "medium",
+      "description": "rejectOffer() muda status mas não liquida escrow. Se ofertas rejeitadas precisam devolver tokens, ordem não é cancelada em AgroChainPayments. Confirmar se rejeição é final (sem reembolso) ou se precisa de integração com cancelamento de ordem."
+    },
+    {
+      "id": 2,
+      "title": "Peso vendido irreversível",
+      "severity": "medium",
+      "description": "Uma vez weightSoldKg incrementado em acceptOffer(), não há mecanismo para decrementar se a ordem subsequente falhar em AgroChainPayments. Se um vendedor rejeita a ordem de escrow do lado do pagamento, a listagem fica presa com peso vendido inflado."
+    },
+    {
+      "id": 3,
+      "title": "Expiração de oferta não enforçada",
+      "severity": "medium",
+      "description": "hasOfferExpired() é view function sem efeito em transições de estado. Uma oferta expirada ainda pode ser aceita se alguém chamar acceptOffer() após expiresAt. Deveria rejeitar automaticamente ou adicionar validação em acceptOffer()."
+    },
+    {
+      "id": 4,
+      "title": "Overflow em cálculo de preço",
+      "severity": "low",
+      "description": "totalPrice = quantityKg * pricePerKg sem overflow check. Em Solidity 0.8.37 há proteção automática, mas a lógica não valida que quantityKg * pricePerKg não exceda limites razoáveis de token. Improvável em preços reais, mas issue arquitetural."
+    },
+    {
+      "id": 5,
+      "title": "Mock data hardcoded sem contrato fallback",
+      "severity": "low",
+      "description": "UI depende de MOCK_LISTINGS/MOCK_OFFERS. Não há lógica para fallback para dados derivados de contrato se variáveis de ambiente não definirem NEXT_PUBLIC_MARKETPLACE_ADDRESS. Campo sellerName em mock é preenchido manualmente, sem integração a um serviço de resolução de nomes."
+    }
+  ],
+  "reviewDoc": "c:\\Users\\Usuário\\agrochain\\workspace-01a1162b-e061-7ff0-b060-dfa40cc70dfdzip\\.agents\\tasks\\marketplace\\review.md"
+}

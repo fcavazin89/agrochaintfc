@@ -46,6 +46,18 @@
   --info: #1f6f9e;
   --especial: #5f4aa0;
 
+  /* Status Colors (Delivery States) */
+  --status-aguardando: #b8912a;
+  --status-aguardando-bg: #fef9f0;
+  --status-emitido: #1f6f9e;
+  --status-emitido-bg: #eff6fd;
+  --status-transportando: #1f6440;
+  --status-transportando-bg: #e8f2ea;
+  --status-entregue: #1f6440;
+  --status-entregue-bg: #e8f2ea;
+  --status-rejeitado: #a83226;
+  --status-rejeitado-bg: #ffe8e3;
+
   /* Dark Scopes */
   --dark-fundo: #0b1d12;
   --dark-sup-1: #102519;

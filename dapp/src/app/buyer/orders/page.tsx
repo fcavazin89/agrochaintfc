@@ -215,25 +215,25 @@ export default function BuyerOrdersPage() {
   };
 
   const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'Aguardando': return '#b8912a';
-      case 'Emitido': return '#1f6f9e';
-      case 'Transportando': return '#1f6440';
-      case 'Entregue': return '#1f6440';
-      case 'Rejeitado': return '#a83226';
-      default: return '#495649';
-    }
+    const colors: Record<string, string> = {
+      'Aguardando': 'var(--status-aguardando)',
+      'Emitido': 'var(--status-emitido)',
+      'Transportando': 'var(--status-transportando)',
+      'Entregue': 'var(--status-entregue)',
+      'Rejeitado': 'var(--status-rejeitado)',
+    };
+    return colors[status] || 'var(--texto-2)';
   };
 
   const getStatusBgColor = (status: string) => {
-    switch (status) {
-      case 'Aguardando': return '#fef9f0';
-      case 'Emitido': return '#eff6fd';
-      case 'Transportando': return '#e8f2ea';
-      case 'Entregue': return '#e8f2ea';
-      case 'Rejeitado': return '#ffe8e3';
-      default: return '#f2ecdd';
-    }
+    const colors: Record<string, string> = {
+      'Aguardando': 'var(--status-aguardando-bg)',
+      'Emitido': 'var(--status-emitido-bg)',
+      'Transportando': 'var(--status-transportando-bg)',
+      'Entregue': 'var(--status-entregue-bg)',
+      'Rejeitado': 'var(--status-rejeitado-bg)',
+    };
+    return colors[status] || 'var(--sup-2)';
   };
 
   // Função para renderizar timeline dots
