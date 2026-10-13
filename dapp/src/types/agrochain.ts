@@ -53,6 +53,7 @@ export interface ComplianceResult {
   sustainabilityScore: number;
   recommendation: string;
   details: string[];
+  isRealData?: boolean;
 }
 
 export interface PoolInfo {
@@ -64,4 +65,21 @@ export interface PoolInfo {
   fee: number;
   volume24h: number;
   tvl: number;
+}
+
+export interface ProducerBatch {
+  id: string;
+  name: string;
+  type: BatchType;
+  weightKg: number;
+  status: 'Disponível' | 'Vendendo' | 'Vendido';
+  pricePerKg: number;
+}
+
+export interface ActiveSale {
+  id: string;
+  buyer: string;
+  token: string;
+  amount: number;
+  status: 'Escrow' | 'Aceito' | 'Rejeitado';
 }
