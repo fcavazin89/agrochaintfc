@@ -43,14 +43,10 @@ export default defineConfig({
     timeout: 120000
   },
   solidity: {
-    profiles: {
-      default: {
-        version: "0.8.37",
-        settings: {
-          optimizer: { enabled: true, runs: 200 },
-          viaIR: true
-        }
-      }
+    version: "0.8.37",
+    settings: {
+      optimizer: { enabled: true, runs: 200 },
+      viaIR: true
     }
   },
   networks
