@@ -217,3 +217,26 @@ export interface PurchaseOrder {
   origem?: string;
   observacoes?: string;
 }
+
+// =====================================================================
+// REVIEWS & REPUTATION TYPES
+// =====================================================================
+
+export interface ProducerReview {
+  produtor: string; // endereço do produtor
+  nome: string;
+  empresa: string;
+  reputacao: number; // média de ratings (0-100)
+  ratingMedio: number; // média de ratings (1-5)
+  totalTransacoes: number;
+  reviews: Review[];
+}
+
+export interface Review {
+  id: string;
+  orderId: string;
+  dataEnvio: number; // timestamp
+  rating: number; // 1-5
+  texto: string; // até 300 caracteres
+  status: 'Enviado' | 'Pendente' | 'Rejeitado';
+}

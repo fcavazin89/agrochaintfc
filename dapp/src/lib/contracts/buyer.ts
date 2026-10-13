@@ -2,6 +2,8 @@ import {
   BuyerProfile,
   PurchaseOrder,
   DeliveryStatus,
+  ProducerReview,
+  Review,
 } from '@/types/agrochain';
 
 /**
@@ -336,6 +338,63 @@ export function truncateAddress(address: string): string {
   return `${address.slice(0, 6)}...${address.slice(-4)}`;
 }
 
+/**
+ * Obtém produtores únicos dos pedidos de compra do comprador
+ * @param orders Array de pedidos de compra
+ * @returns Array de endereços únicos de produtores
+ */
+export function getProducersByBuyer(orders: PurchaseOrder[]): string[] {
+  const producers = new Set(orders.map(order => order.produtor));
+  return Array.from(producers);
+}
+
+/**
+ * Adiciona um novo review ao histórico
+ * @param reviews Array de reviews existentes
+ * @param newReview Review a adicionar
+ * @returns Array atualizado de reviews
+ */
+export function addReviewToBuyer(reviews: Review[], newReview: Review): Review[] {
+  return [...reviews, newReview];
+}
+
+/**
+ * Obtém reviews de um produtor específico
+ * @param allReviews Array de todos os reviews
+ * @param producerAddress Endereço do produtor
+ * @returns Array de reviews do produtor
+ */
+export function getReviewsByProducer(
+  allReviews: Review[],
+  producerAddress: string
+): Review[] {
+  return allReviews.filter(review => {
+    // Aqui você filtraria por produtor, mas como Review não tem produtor direto,
+    // usaremos isso em contexto com orderId para buscar o produtor da order
+    return true;
+  });
+}
+
+/**
+ * Calcula rating médio a partir de reviews
+ * @param reviews Array de reviews
+ * @returns Rating médio (1-5) ou 0 se sem reviews
+ */
+export function calculateAverageRating(reviews: Review[]): number {
+  if (reviews.length === 0) return 0;
+  const total = reviews.reduce((sum, review) => sum + review.rating, 0);
+  return total / reviews.length;
+}
+
+/**
+ * Converte rating (1-5) para reputação (0-100)
+ * @param rating Rating de 1-5
+ * @returns Reputação de 0-100
+ */
+export function ratingToReputation(rating: number): number {
+  return Math.round((rating / 5) * 100);
+}
+
 // =====================================================================
 // MOCK DATA (para desenvolvimento sem contrato deployado)
 // =====================================================================
@@ -556,3 +615,128 @@ export const MOCK_PURCHASE_ORDERS: PurchaseOrder[] = [
     observacoes: 'Pedido importante do cliente VIP',
   },
 ];
+
+/**
+ * Dados mock de reviews para testes/desenvolvimento
+ */
+export const MOCK_REVIEWS: Review[] = [
+  {
+    id: '1',
+    orderId: '1',
+    dataEnvio: Date.now() - 2505600000, // 29 dias atrás
+    rating: 5,
+    texto: 'Produto de excelente qualidade, chegou no prazo e bem embalado. Recomendo!',
+    status: 'Enviado',
+  },
+  {
+    id: '2',
+    orderId: '6',
+    dataEnvio: Date.now() - 3369600000, // 39 dias atrás
+    rating: 4,
+    texto: 'Bom café, entrega rápida. Tive um pequeno problema com embalagem.',
+    status: 'Enviado',
+  },
+  {
+    id: '3',
+    orderId: '2',
+    dataEnvio: Date.now() - 1641600000, // 19 dias atrás
+    rating: 5,
+    texto: 'Cacau de primeira qualidade. Muito satisfeito com a compra. Voltarei a fazer pedidos.',
+    status: 'Enviado',
+  },
+  {
+    id: '4',
+    orderId: '10',
+    dataEnvio: Date.now() - 5097600000, // 59 dias atrás
+    rating: 4,
+    texto: 'Ótimo produto, especialmente o aroma. Pequeno atraso na entrega, mas aceitável.',
+    status: 'Enviado',
+  },
+  {
+    id: '5',
+    orderId: '7',
+    dataEnvio: Date.now() - 259200000, // 3 dias atrás
+    rating: 2,
+    texto: 'Produto chegou com problemas de conformidade. Não atendeu aos padrões acordados.',
+    status: 'Enviado',
+  },
+];
+
+/**
+ * Agrupa reviews por produtor e calcula estatísticas
+ * @param orders Array de pedidos de compra
+ * @param reviews Array de reviews
+ * @param producerProfiles Array de perfis de produtores (com nome/empresa)
+ * @returns Array de ProducerReview com reviews agrupados
+ */
+export function groupReviewsByProducer(
+  orders: PurchaseOrder[],
+  reviews: Review[],
+  producerProfiles: BuyerProfile[] // usado como lookup para nomes/empresas
+): ProducerReview[] {
+  const producersMap: Record<string, { orders: PurchaseOrder[]; reviews: Review[] }> = {};
+
+  // Agrupa pedidos por produtor
+  orders.forEach(order => {
+    const producer = order.produtor.toLowerCase();
+    if (!producersMap[producer]) {
+      producersMap[producer] = { orders: [], reviews: [] };
+    }
+    producersMap[producer].orders.push(order);
+  });
+
+  // Agrupa reviews por produtor (via orderId)
+  reviews.forEach(review => {
+    const order = orders.find(o => o.orderId === review.orderId);
+    if (order) {
+      const producer = order.produtor.toLowerCase();
+      if (!producersMap[producer]) {
+        producersMap[producer] = { orders: [], reviews: [] };
+      }
+      producersMap[producer].reviews.push(review);
+    }
+  });
+
+  // Converte para array de ProducerReview
+  return Object.entries(producersMap).map(([producerAddress, data]) => {
+    const ratingMedio = calculateAverageRating(data.reviews);
+
+    return {
+      produtor: producerAddress,
+      nome: MOCK_PRODUCER_NAMES[producerAddress] || 'Produtor',
+      empresa: MOCK_PRODUCER_COMPANIES[producerAddress] || 'Empresa',
+      reputacao: ratingToReputation(ratingMedio || 0),
+      ratingMedio,
+      totalTransacoes: data.orders.length,
+      reviews: data.reviews,
+    };
+  });
+}
+
+/**
+ * Dados mock de nomes de produtores (lookup por endereço)
+ */
+export const MOCK_PRODUCER_NAMES: Record<string, string> = {
+  '0x1234567890123456789012345678901234567890': 'João Silva',
+  '0x2234567890123456789012345678901234567890': 'Maria Ferreira',
+  '0x3234567890123456789012345678901234567890': 'Carlos Oliveira',
+  '0x4234567890123456789012345678901234567890': 'Ana Costa',
+  '0x5234567890123456789012345678901234567890': 'Pedro Santos',
+  '0x6234567890123456789012345678901234567890': 'Lucia Alves',
+  '0x7234567890123456789012345678901234567890': 'Roberto Dias',
+  '0x8234567890123456789012345678901234567890': 'Fernanda Rocha',
+};
+
+/**
+ * Dados mock de empresas de produtores (lookup por endereço)
+ */
+export const MOCK_PRODUCER_COMPANIES: Record<string, string> = {
+  '0x1234567890123456789012345678901234567890': 'Fazenda Silva & Cia',
+  '0x2234567890123456789012345678901234567890': 'Produtora Ferreira Ltda',
+  '0x3234567890123456789012345678901234567890': 'Café Premium Oliveira',
+  '0x4234567890123456789012345678901234567890': 'Cacau Fino Costa',
+  '0x5234567890123456789012345678901234567890': 'Grãos Santos SA',
+  '0x6234567890123456789012345678901234567890': 'Produção Alves Premium',
+  '0x7234567890123456789012345678901234567890': 'Fazenda Dias Exportações',
+  '0x8234567890123456789012345678901234567890': 'Rocha Agro Produtos',
+};
