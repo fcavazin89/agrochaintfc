@@ -1998,7 +1998,7 @@ export function submitOriginVerification(
   const id = generateMockId('001', Math.floor(Math.random() * 10000));
   return {
     verificacaoId: id,
-    loteId,
+    loteId: lotId,
     pais: country,
     regiao: region,
     latitude: lat,
@@ -2022,7 +2022,7 @@ export function verifyEUDRCompliance(
   const id = generateMockId('002', Math.floor(Math.random() * 10000));
   return {
     eudrcId: id,
-    loteId,
+    loteId: lotId,
     dataVerificacao: Math.floor(Date.now() / 1000),
     desmatamentoDetectado: deforestationDetected,
     percentualDesmatamento: deforestationDetected ? Math.floor(Math.random() * 25) : 0,
@@ -2049,7 +2049,7 @@ export function calculateESGScore(
   const finalScore = Math.round((envScore * 40 + socScore * 30 + govScore * 30) / 100);
   return {
     esgId: id,
-    loteId,
+    loteId: lotId,
     scoreAmbiental: envScore,
     scoreSocial: socScore,
     scoreGovernanca: govScore,
