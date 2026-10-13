@@ -7,6 +7,14 @@ import { useSidebar } from '@/lib/sidebar-context';
 const navSections = [
   { label: 'PLATAFORMA', items: [{ href: '/', label: 'Home', icon: '🏠' }] },
   {
+    label: 'COMPRADOR',
+    items: [
+      { href: '/buyer', label: 'Dashboard', icon: '🛍️' },
+      { href: '/buyer/orders', label: 'Meus Pedidos', icon: '📋' },
+      { href: '/buyer/reviews', label: 'Avaliações', icon: '⭐' },
+    ]
+  },
+  {
     label: 'DASHBOARD',
     items: [
       { href: '/dashboard', label: 'Visão Geral', icon: '👁️' },
@@ -57,6 +65,7 @@ const navSections = [
 // Função para determinar se a seção deve estar expandida baseado no pathname
 function shouldSectionBeExpanded(sectionLabel: string, pathname: string): boolean {
   const sectionRouteMap: Record<string, string[]> = {
+    COMPRADOR: ['/buyer'],
     DASHBOARD: ['/dashboard', '/erp'],
     RASTREIO: ['/lote', '/rastreio', '/certificacao', '/zk-standalone'],
     DEX: ['/dex', '/compliance'],
