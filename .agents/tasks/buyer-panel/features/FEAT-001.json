@@ -1,0 +1,23 @@
+{
+  "id": "FEAT-001",
+  "type": "feat",
+  "description": "Foundation: tipos TypeScript, contrato AgroChainBuyer, e utils de buyer (mock data, helpers, ABI). Estabelece base para todas as páginas UI.",
+  "status": "completed",
+  "steps": [
+    "Expandir dapp/src/types/agrochain.ts: adicionar BuyerProfile, PurchaseOrder, DeliveryStatus type. Espelhar estrutura de MarketplaceListing.",
+    "Criar blockchain/contracts/AgroChainBuyer.sol: structs e funções stub (registerBuyer, getPurchaseHistory, getRating, submitReview). Não precisa ser funcional agora, só compilável.",
+    "Criar dapp/src/lib/contracts/buyer.ts: AGROCHAIN_BUYER_ABI, MOCK_BUYER_PROFILES (5 buyers), MOCK_PURCHASE_ORDERS (8-10 ordens com status variados), helpers calculateReputation, filterOrdersByStatus, filterOrdersByDateRange, filterOrdersByProducer. Espelhar pattern de marketplace.ts.",
+    "Verificar tipos: rodar npx tsc --noEmit e confirmar sem erros."
+  ],
+  "acceptance_criteria": [
+    "dapp/src/types/agrochain.ts compila sem erros; BuyerProfile, PurchaseOrder, DeliveryStatus são exportáveis e tipadas",
+    "blockchain/contracts/AgroChainBuyer.sol compila via 'npx hardhat compile'",
+    "dapp/src/lib/contracts/buyer.ts exporta AGROCHAIN_BUYER_ABI, MOCK_BUYER_PROFILES, MOCK_PURCHASE_ORDERS, calculateReputation, filterOrdersByStatus, filterOrdersByDateRange, filterOrdersByProducer"
+  ],
+  "verification": [
+    "npx tsc --noEmit em dapp/ — sem erros ✓",
+    "npx hardhat compile em workspace root — sem erros ✓"
+  ],
+  "blocked_reason": null,
+  "findings": "BuyerProfile, PurchaseOrder, DeliveryStatus tipos exportáveis em agrochain.ts; ABI stub completo com 12 funções (registerBuyer, createPurchaseOrder, updateDeliveryStatus, getPurchaseHistory, getPurchaseOrder, getBuyerProfile, calculateReputation, getRating, submitReview, getBuyerReviews, getReview); Mock data com 5 buyers e 10 purchase orders com status variados (Aguardando, Emitido, Transportando, Entregue, Rejeitado); Helpers prontos para UI: calculateReputation, filterOrdersByStatus, filterOrdersByDateRange, filterOrdersByProducer. Contrato está slim e compilável. Próximas features podem usar tipos e helpers diretamente em páginas UI do painel de buyer."
+}
