@@ -36,6 +36,15 @@ const navSections = [
     ]
   },
   {
+    label: 'VERIFICAÇÃO',
+    items: [
+      { href: '/verification', label: 'Dashboard', icon: '✓' },
+      { href: '/verification/origin', label: 'Origem', icon: '🌍' },
+      { href: '/verification/eudr', label: 'EUDR', icon: '📡' },
+      { href: '/verification/esg', label: 'ESG', icon: '📊' },
+    ]
+  },
+  {
     label: 'DEX',
     items: [
       { href: '/dex', label: 'Swap', icon: '💹' },
@@ -68,6 +77,7 @@ function shouldSectionBeExpanded(sectionLabel: string, pathname: string): boolea
     COMPRADOR: ['/buyer'],
     DASHBOARD: ['/dashboard', '/erp'],
     RASTREIO: ['/lote', '/rastreio', '/certificacao', '/zk-standalone'],
+    VERIFICAÇÃO: ['/verification'],
     DEX: ['/dex', '/compliance'],
     MONITORAMENTO: ['/iot', '/assistente', '/auditoria', '/imersivo'],
     EXTRAS: ['/producer', '/mercado', '/marketplace'],
