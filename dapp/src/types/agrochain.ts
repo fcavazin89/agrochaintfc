@@ -83,3 +83,34 @@ export interface ActiveSale {
   amount: number;
   status: 'Escrow' | 'Aceito' | 'Rejeitado';
 }
+
+export type LotStatus = 'Ativo' | 'Transferindo' | 'Transferido';
+
+export interface LotEvent {
+  tipo: string;
+  data: number; // timestamp
+  descrição: string;
+  localização: string;
+  responsável: string;
+  comprovante?: string;
+}
+
+export interface LotCertification {
+  tipo: 'NFT' | 'ZK' | 'EUDR' | 'ESG';
+  status: 'Pendente' | 'Certificado' | 'Revogado';
+  dataEmissão: number; // timestamp
+  dataVencimento: number; // timestamp
+}
+
+export interface Lot {
+  loteId: string;
+  produtor: string;
+  safra: string;
+  origem: string;
+  área: number; // hectares
+  dataPlantio: number; // timestamp
+  dataColheita: number; // timestamp
+  certificações: LotCertification[];
+  eventos: LotEvent[];
+  status: LotStatus;
+}
