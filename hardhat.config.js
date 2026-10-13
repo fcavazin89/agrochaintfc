@@ -18,6 +18,18 @@ if (process.env.POLYGON_AMOY_RPC_URL) {
   };
 }
 
+
+if (process.env.SEPOLIA_RPC_URL) {
+  networks.sepolia = {
+    type: "http",
+    chainType: "l1",
+    url: process.env.SEPOLIA_RPC_URL,
+    accounts: process.env.DEPLOYER_PRIVATE_KEY
+      ? [process.env.DEPLOYER_PRIVATE_KEY]
+      : []
+  };
+}
+
 export default defineConfig({
   plugins: [hardhatEthers, hardhatMocha, hardhatEthersChaiMatchers],
   defaultNetwork: "hardhatMainnet",
@@ -43,3 +55,26 @@ export default defineConfig({
   },
   networks
 });
+
+// Deploy tasks
+import { task } from "hardhat/config";
+
+task("deploy:mockusdc", "Deploy MockUSDC contract")
+  .setAction(async (taskArgs, hre) => {
+    const MockUSDC = await hre.ethers.getContractFactory("MockUSDC");
+    const mockUSDC = await MockUSDC.deploy();
+    await mockUSDC.waitForDeployment();
+    const mockUSDCAddress = await mockUSDC.getAddress();
+    console.log("MockUSDC deployed to:", mockUSDCAddress);
+    return mockUSDCAddress;
+  });
+
+task("deploy:payments", "Deploy AgroChainPayments contract")
+  .setAction(async (taskArgs, hre) => {
+    const AgroChainPayments = await hre.ethers.getContractFactory("AgroChainPayments");
+    const payments = await AgroChainPayments.deploy();
+    await payments.waitForDeployment();
+    const paymentsAddress = await payments.getAddress();
+    console.log("AgroChainPayments deployed to:", paymentsAddress);
+    return paymentsAddress;
+  });
