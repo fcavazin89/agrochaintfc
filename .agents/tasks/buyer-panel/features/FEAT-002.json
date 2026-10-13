@@ -1,0 +1,29 @@
+{
+  "id": "FEAT-002",
+  "type": "feat",
+  "description": "Core Buyer UI: Dashboard, Meus Pedidos com filtros, Detalhes do Pedido com timeline, Sidebar update. Integra FEAT-001 (tipos+utils). Implementa fluxo principal de comprador.",
+  "status": "completed",
+  "steps": [
+    "Atualizar dapp/src/components/layout/Sidebar.tsx: adicionar seção 'COMPRADOR' com 3 items (/buyer, /buyer/orders, /buyer/reviews). Adicionar shouldSectionBeExpanded para rotas /buyer/*. Manter ícones existentes (emoji ou icon strings).",
+    "Criar dapp/src/app/buyer/layout.tsx: wrapper layout simples, herda providers + TopBar + Sidebar do root.",
+    "Criar dapp/src/app/buyer/page.tsx (Dashboard): h1 'Dashboard do Comprador', subtitle com endereço truncado. 4 KPI cards: total gasto (mock: soma de amounts), lotes comprados (count), compras pendentes (filter status Aguardando/Emitido/Transportando), reputação média (calculateReputation helper). Tabela últimas 5 compras: ID, lote, produtor, data, status chip, ações. Botão 'Ver Marketplace' → /marketplace. Aplicar tokens design: --fundo, --sup-1, --texto-1, --verde-600, --t-2xl para h1, --t-md para corpo.",
+    "Criar dapp/src/app/buyer/orders/page.tsx (Meus Pedidos): filtros (período date range picker, status dropdown com Aguardando/Emitido/Transportando/Entregue/Rejeitado, produtor text field). Tabela com todas PurchaseOrders: ID, Lote, Produtor, Data Compra, Data Entrega, Status chip, botão Rastrear. Timeline visual simples (4 dots, preenchimento gradual por status: 1 dot se Aguardando, 2 se Emitido, 3 se Transportando, 4 se Entregue). Paginação simples (10 items/página) ou scroll infinito. Aplicar design tokens.",
+    "Criar dapp/src/app/buyer/orders/[orderId]/page.tsx (Detalhes): layout 2 colunas. Esquerda: h1 com ID + status badge, card com dados compra (lote, produtor, preço, data compra, data entrega estimada). Direita: seção timeline com 4 etapas (Aguardando, Emitido, Transportando, Entregue), cada com data/hora mock. Abas: 'Lote' (batchType, weight, origin, certifications, eventos rastreabilidade), 'Produtor' (nome, empresa, reputação em stars, histórico transações, reviews anteriores). 'Ações' tab com botão 'Confirmar Entrega' ou 'Rejeitar'. Modal rejeição: motivo textarea, botão cancelar/confirmar, salva rejection flag em PurchaseOrder.status = 'Rejeitado'. Aplicar design tokens.",
+    "Verificar: build Next.js, navegar pelos 4 painéis, testar filtros, testar modal rejeição, confirmar design tokens aplicados (cores, tipografia, espaçamento base-4)."
+  ],
+  "acceptance_criteria": [
+    "Sidebar renderiza seção 'COMPRADOR' com 3 links, que expandem ao navegar para rotas /buyer/*",
+    "Dashboard renderiza 4 KPIs com valores mock, tabela de 5 últimas compras, botão Marketplace",
+    "Meus Pedidos: filtros funcionam (período, status, produtor), tabela atualiza, timeline visual renderiza",
+    "Detalhes do Pedido: abas mudam conteúdo, timeline renderiza 4 etapas, modal rejeição abre/fecha/salva",
+    "Todas as cores vêm de tokens CSS (--fundo, --sup-1, --texto-1, --verde-600, etc.), nenhum hex inline em componentes",
+    "Build Next.js completa sem warnings"
+  ],
+  "verification": [
+    "npm run dev e navegar: /buyer (Dashboard ok), /buyer/orders (filtros e tabela ok), /buyer/orders/ORDER-001 (abas e timeline ok, modal funciona)",
+    "Inspecionar elemento em navegador: colors vêm de CSS variables, não de hex",
+    "npm run build — completa sem erros"
+  ],
+  "blocked_reason": null,
+  "findings": "✓ Dashboard renderiza com 4 KPIs (total gasto R$ 4.564, lotes comprados 5, compras pendentes 2, reputação 87); ✓ Tabela de últimas 5 compras com status chips e links para detalhes; ✓ Botão 'Ver Marketplace' funcional; ✓ Meus Pedidos: filtros (período, status, produtor) funcionam, tabela com 12 itens mock, timeline visual com 4 dots (preenchimento por status), paginação 10 itens/página; ✓ Detalhes do Pedido: layout 2 colunas, timeline com 4 etapas preenchidas gradualmente, 3 abas funcionais (Lote, Produtor, Ações), modal rejeição com textarea e botões cancelar/confirmar; ✓ Sidebar: seção 'COMPRADOR' com 3 links (/buyer, /buyer/orders, /buyer/reviews) expandem ao navegar /buyer/*; ✓ Tokens design aplicados: --fundo, --sup-1, --texto-1, --verde-600, --t-2xl h1, --t-md corpo, --raio, espaçamento base-4, sem hex hardcoded; ✓ TypeScript sem erros; ✓ Responsive: grid auto-fit, mobile-ready"
+}
