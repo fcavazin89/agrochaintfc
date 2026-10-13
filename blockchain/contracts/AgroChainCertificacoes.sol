@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
+import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import {ERC721URIStorage} from "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {ERC20Capped} from "@openzeppelin/contracts/token/ERC20/extensions/ERC20Capped.sol";
@@ -17,6 +18,9 @@ import {IAgroChainRegistro} from "./IAgroChainRegistro.sol";
 ///      documentos e do score originalmente comprometido. O circuito só prova
 ///      que o score privado correspondente ao compromisso atinge o limite.
 contract AgroChainCertificacoes is ERC721URIStorage, Ownable, ReentrancyGuard {
+    uint256 private constant BN254_ESCALAR =
+        21888242871839275222246405745257275088548364400416034343698204186575808495617;
+
     struct ProvaGroth16 {
         uint256[2] a;
         uint256[2][2] b;
@@ -147,9 +151,9 @@ contract AgroChainCertificacoes is ERC721URIStorage, Ownable, ReentrancyGuard {
         uint256[5] memory entradasPublicas = [
             uint256(pedido.compromissoScore),
             uint256(pedido.notaMinima),
-            uint256(pedido.loteId) % IAgroChainRegistro.BN254_ESCALAR(),
-            uint256(pedido.padraoHash) % IAgroChainRegistro.BN254_ESCALAR(),
-            uint256(pedido.hashLaudo) % IAgroChainRegistro.BN254_ESCALAR()
+            uint256(pedido.loteId) % BN254_ESCALAR,
+            uint256(pedido.padraoHash) % BN254_ESCALAR,
+            uint256(pedido.hashLaudo) % BN254_ESCALAR
         ];
         if (!verificadorZK.verifyProof(prova.a, prova.b, prova.c, entradasPublicas)) {
             revert ProvaZKNaoConfere();

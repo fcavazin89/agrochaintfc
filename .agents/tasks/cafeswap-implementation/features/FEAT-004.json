@@ -1,0 +1,38 @@
+{
+  "id": "FEAT-004",
+  "type": "feat",
+  "description": "Implement on-chain governance (CafeGovernance) for Coffee/Cacao protocol management with proposal creation, voting, execution, and timelock. Proposals require 1% threshold, 7-day voting period, 10% quorum, and 48-hour timelock before execution. Governs Coffee/Cacao farm allocation points, router pause, and emission rates. Includes deployment scripts and full Coffee/Cacao protocol integration test suite.",
+  "status": "pending",
+  "steps": [
+    "Implement CafeGovernance.sol: struct Proposal { uint256 id; address proposer; string description; uint256 startBlock; uint256 endBlock; uint256 creationTime; uint256 forVotes; uint256 againstVotes; uint256 abstainVotes; bool executed; bool canceled; mapping(address => bool) hasVoted; address[] targets; bytes[] calldatas; uint256[] values; }, VOTING_PERIOD = 7 days, TIMELOCK_DELAY = 48 hours, PROPOSAL_THRESHOLD = 1_000_000e18 (1% of 100M), QUORUM_PERCENTAGE = 10",
+    "Implement propose(address[] targets, uint256[] values, bytes[] calldatas, string description): require CAFE balance >= PROPOSAL_THRESHOLD, require arrays same length, create proposal with creationTime = block.timestamp (CRITICAL for timelock), emit ProposalCreated",
+    "Implement vote(uint256 proposalId, uint8 voteType): require block.number <= proposal.endBlock, require !hasVoted[msg.sender], voteType in [1=For, 2=Against, 3=Abstain], get voting power from CAFE.getVotes(msg.sender, proposal.startBlock) snapshot, add to forVotes/againstVotes/abstainVotes, mark hasVoted, emit VoteCast",
+    "Implement execute(uint256 proposalId): require block.number > proposal.endBlock (voting ended), require !executed, require forVotes > againstVotes (majority), require forVotes >= totalSupply * QUORUM_PERCENTAGE / 100 (quorum), require block.timestamp >= proposal.creationTime + TIMELOCK_DELAY (timelock), execute all targets.delegatecall(calldatas) with values, set executed = true, emit ProposalExecuted",
+    "Implement state(uint256 proposalId) view: return Pending/Active/Succeeded/Defeated/Executed based on block numbers, votes, quorum",
+    "Write blockchain/tests/CafeGovernance.test.js: test propose() requires 1% threshold, vote() weighted by snapshot, vote() prevents double voting, execute() requires quorum and timelock, execute() reverts before timelock elapsed, execute() performs delegatecall correctly, state() returns correct status at each stage",
+    "Create blockchain/scripts/deploy-coffeecacaoswap.mjs: deploy all Coffee/Cacao contracts in order (CafeToken → CoffeeCacaoSwapFactory(traceabilityContract) → CoffeeCacaoSwapPool implementation → CoffeeCacaoSwapRouter → CoffeeCacaoFarm → CafeGovernance), set up permissions (CoffeeCacaoFarm as CafeToken minter, Governance as CoffeeCacaoFarm/Router admin), log all deployed addresses, save to coffee-cacao-deployments.json, include AgroChainCoffeeCacaoTraceability address",
+    "Write blockchain/tests/full-coffee-cacao-protocol.test.js: complete end-to-end test including Coffee batch certification (Arabica), Cacao batch certification (Trinitario), addCertifiedCoffeeToken, addCertifiedCacaoToken, createPool(Coffee/Cacao), addLiquidity to Coffee/Cacao pool, swap Coffee→Cacao, stake Coffee/Cacao LP tokens in farm, harvest CAFE rewards, governance proposal to increase Coffee farm allocation points, proposal execution after timelock",
+    "Update package.json scripts: add 'test:coffeecacaoswap': 'hardhat test blockchain/tests/{CafeToken,CoffeeCacaoSwapFactory,CoffeeCacaoSwapPool,CoffeeCacaoSwapRouter,CoffeeCacaoFarm,CafeGovernance,coffee-cacao-integration,full-coffee-cacao-protocol}.test.js', add 'deploy:coffeecacaoswap': 'hardhat run blockchain/scripts/deploy-coffeecacaoswap.mjs --network hardhatMainnet'",
+    "Commit: 'feat: implement CafeGovernance with timelock and add Coffee/Cacao deployment scripts'"
+  ],
+  "acceptance_criteria": [
+    "propose() reverts when proposer has less than 1M CAFE tokens (1% threshold)",
+    "vote() uses voting power snapshot from proposal startBlock",
+    "execute() requires: voting period ended, forVotes > againstVotes, 10% quorum met, 48-hour timelock elapsed",
+    "execute() performs delegatecall to execute proposal actions",
+    "Governance can successfully call setRewardRate() on CoffeeCacaoFarm via proposal execution",
+    "Governance can successfully call setAllocPoint() to adjust Coffee vs Cacao farm rewards",
+    "Deployment script deploys all 6 Coffee/Cacao contracts and configures permissions correctly with AgroChainCoffeeCacaoTraceability integration",
+    "Full protocol test demonstrates complete Coffee/Cacao flow: batch certification → token whitelisting → pool creation → liquidity → swap → farm → governance",
+    "npm run test:coffeecacaoswap runs all CoffeeCacaoSwap test files and passes"
+  ],
+  "verification": [
+    "npm run blockchain:compile completes without errors",
+    "npx hardhat test blockchain/tests/CafeGovernance.test.js --network hardhatMainnet passes all tests",
+    "npx hardhat test blockchain/tests/full-coffee-cacao-protocol.test.js --network hardhatMainnet passes showing complete Coffee/Cacao protocol integration",
+    "npm run test:coffeecacaoswap runs all Coffee/Cacao tests successfully",
+    "npm run deploy:coffeecacaoswap deploys all Coffee/Cacao contracts and logs addresses including AgroChainCoffeeCacaoTraceability integration"
+  ],
+  "blocked_reason": null,
+  "findings": ""
+}

@@ -1,0 +1,38 @@
+{
+  "id": "FEAT-003",
+  "type": "feat",
+  "description": "Implement Coffee/Cacao liquidity mining (CoffeeCacaoFarm MasterChef) with per-second CAFE emissions, multiple Coffee/Cacao LP farms with allocation points, and correct reward debt management. Critical: reward debt MUST be set AFTER amount update to prevent reward loss, following the fixed algorithm from DESIGN-FIXES.md. Only Coffee/Cacao LP tokens accepted.",
+  "status": "pending",
+  "steps": [
+    "Implement CoffeeCacaoFarm.sol (MasterChef pattern): struct FarmInfo { IERC20 lpToken; uint256 allocPoint; uint256 lastRewardTime; uint256 accCafePerShare; string farmName; bool isCoffeeFarm; }, struct UserInfo { uint256 amount; uint256 rewardDebt; }, uint256 cafePerSecond emission rate, uint256 totalAllocPoint, MAX_FARMS = 50 constant, mapping to track Coffee-only farms vs Cacao-only farms vs Coffee/Cacao pair farms",
+    "Implement stake(uint256 farmId, uint256 amount): 1) updateFarm(farmId) to sync accCafePerShare, 2) calculate pending = user.amount * farm.accCafePerShare / 1e12 - user.rewardDebt and store, 3) user.amount += amount, 4) user.rewardDebt = user.amount * farm.accCafePerShare / 1e12 (CRITICAL: set AFTER amount update), 5) transfer LP tokens to contract, ReentrancyGuard",
+    "Implement unstake(uint256 farmId, uint256 amount): automatically call harvest() first, then decrement user.amount, recalculate rewardDebt, transfer LP tokens back, revert if amount > user.amount",
+    "Implement harvest(uint256 farmId): updateFarm(), calculate pending rewards = user.amount * accCafePerShare / 1e12 - user.rewardDebt, mint CAFE tokens to user, update user.rewardDebt",
+    "Implement updateFarm(uint256 farmId) internal: if no time elapsed or no LP supply return, calculate cafeReward = timeElapsed * cafePerSecond * farm.allocPoint / totalAllocPoint, accCafePerShare += cafeReward * 1e12 / lpSupply, lastRewardTime = block.timestamp",
+    "Implement addFarm(address lpToken, uint256 allocPoint, string memory farmName, bool isCoffeeFarm) onlyGovernance: require farms.length < MAX_FARMS, require lpToken is from CoffeeCacaoSwapFactory (Coffee/Cacao LP tokens ONLY), push new FarmInfo with farmName (e.g., 'Arabica-Robusta LP Farm', 'Cacao-Trinitario Farm'), totalAllocPoint += allocPoint",
+    "Implement setAllocPoint(uint256 farmId, uint256 newAllocPoint) onlyGovernance: updateFarm(farmId) first, adjust totalAllocPoint, update farm.allocPoint",
+    "Implement setRewardRate(uint256 newCafePerSecond) onlyGovernance: update all farms first, then set cafePerSecond",
+    "Implement pendingCafe(uint256 farmId, address farmer) view: calculate current accCafePerShare accounting for time elapsed, return user.amount * accCafePerShare / 1e12 - user.rewardDebt",
+    "Write blockchain/tests/CoffeeCacaoFarm.test.js: test stake() sets rewardDebt AFTER amount update (critical ordering test), unstake() auto-harvests Coffee/Cacao LP rewards, harvest() mints correct CAFE amount based on time elapsed for Coffee/Cacao farms, addFarm() enables new Coffee/Cacao LP farm, addFarm() reverts for non-Coffee/Cacao LP tokens, setAllocPoint() redistributes rewards across Coffee/Cacao farms, setRewardRate() changes emissions, pendingCafe() view matches actual harvest amount, max 50 farms enforcement, reward debt prevents double-claiming, test separate allocation points for Coffee-only vs Cacao-only vs Coffee/Cacao pair farms",
+    "Commit: 'feat: implement CoffeeCacaoFarm MasterChef with Coffee/Cacao LP support and correct reward debt management'"
+  ],
+  "acceptance_criteria": [
+    "stake() sets user.rewardDebt AFTER updating user.amount to prevent reward loss",
+    "harvest() mints CAFE proportional to time staked in Coffee/Cacao LP farms",
+    "unstake() automatically harvests pending Coffee/Cacao LP rewards before withdrawal",
+    "addFarm() enforces MAX_FARMS = 50 limit for Coffee/Cacao farms",
+    "addFarm() reverts when LP token is NOT from CoffeeCacaoSwapFactory (Coffee/Cacao pairs only)",
+    "setAllocPoint() correctly redistributes rewards across Coffee/Cacao farms",
+    "setRewardRate() updates CAFE emission rate and applies from next block",
+    "pendingCafe() view function accurately predicts harvest() results for Coffee/Cacao farms",
+    "Only governance can call addFarm, setAllocPoint, and setRewardRate",
+    "ReentrancyGuard prevents reentrancy attacks on stake/unstake/harvest",
+    "Farm names distinguish Coffee-only, Cacao-only, and Coffee/Cacao pair farms"
+  ],
+  "verification": [
+    "npm run blockchain:compile completes without errors",
+    "npx hardhat test blockchain/tests/CoffeeCacaoFarm.test.js --network hardhatMainnet passes all tests including Coffee/Cacao LP reward debt ordering test"
+  ],
+  "blocked_reason": null,
+  "findings": ""
+}

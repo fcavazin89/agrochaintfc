@@ -1,26 +1,251 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta http-equiv="refresh" content="0; url=AgroChain.html">
-<title>AgroChain — abrindo o protótipo</title>
-<style>body{background:#0b1a12;color:#d9e6dd;font-family:system-ui,sans-serif;display:grid;place-items:center;height:100vh;margin:0}
-a{color:#7fe0a4}</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgroChain - Coffee & Cacao Platform</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .hero {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .logo { font-size: 5em; margin-bottom: 20px; animation: float 3s ease-in-out infinite; }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+
+        h1 {
+            font-size: 3.5em;
+            margin-bottom: 15px;
+            background: linear-gradient(45deg, #ffd700, #ff8c00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle { font-size: 1.5em; color: #f0e68c; margin-bottom: 30px; }
+        
+        .badges {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .badge {
+            background: linear-gradient(45deg, #8B4513, #D2691E);
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 40px;
+        }
+
+        .btn {
+            padding: 18px 40px;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-block;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a6f);
+            color: white;
+            box-shadow: 0 5px 20px rgba(255,107,107,0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(255,107,107,0.6);
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-3px);
+        }
+
+        .links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .link-card {
+            background: rgba(255,255,255,0.1);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .link-card:hover {
+            background: rgba(255,255,255,0.15);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(78,205,196,0.3);
+        }
+
+        .link-card h3 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .link-card p {
+            color: #ccc;
+            margin-bottom: 15px;
+        }
+
+        .link-btn {
+            display: inline-block;
+            padding: 10px 25px;
+            background: linear-gradient(45deg, #4ecdc4, #44a8a0);
+            color: white;
+            text-decoration: none;
+            border-radius: 20px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .link-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(78,205,196,0.5);
+        }
+
+        .status {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.8);
+            padding: 12px 20px;
+            border-radius: 25px;
+            border: 2px solid #2ecc71;
+        }
+
+        .status-dot {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background: #2ecc71;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2.5em; }
+            .subtitle { font-size: 1.2em; }
+            .logo { font-size: 4em; }
+        }
+    </style>
 </head>
 <body>
-<div style="text-align:center">
-  <p>Abrindo o protótipo do AgroChain…</p>
-  <p><a href="AgroChain.html">Abrir AgroChain.html</a></p>
-</div>
+    <div class="hero">
+        <div class="logo">🌾</div>
+        <h1>AgroChain</h1>
+        <p class="subtitle">Blockchain + IA Compliance 360°</p>
+        
+        <div class="badges">
+            <div class="badge">☕ Coffee (Arabica & Robusta)</div>
+            <div class="badge">🍫 Cacao (All Varieties)</div>
+        </div>
 
-<!-- Capacitor Core (apenas em ambiente nativo) -->
-<script type="module">
-  if (window.Capacitor) {
-    import('https://cdn.jsdelivr.net/npm/@capacitor/core@6.0.0/dist/index.js').then(module => {
-      console.log('Capacitor carregado');
-    });
-  }
-</script>
+        <div class="buttons">
+            <a href="dashboard.html" class="btn btn-primary">🚀 Acessar Dashboard</a>
+            <a href="certificador.html" class="btn btn-secondary">🔐 Certificador ZK</a>
+        </div>
+
+        <div class="links">
+            <div class="link-card">
+                <h3>🔐</h3>
+                <p>Certificação Zero-Knowledge</p>
+                <a href="certificador.html" class="link-btn">Abrir</a>
+            </div>
+
+            <div class="link-card">
+                <h3>🤖</h3>
+                <p>AI Compliance API</p>
+                <a href="http://localhost:8001/docs" target="_blank" class="link-btn">API Docs</a>
+            </div>
+
+            <div class="link-card">
+                <h3>☕</h3>
+                <p>Coffee Traceability</p>
+                <a href="dashboard.html#coffee" class="link-btn">Testar</a>
+            </div>
+
+            <div class="link-card">
+                <h3>🍫</h3>
+                <p>Cacao Traceability</p>
+                <a href="dashboard.html#cacao" class="link-btn">Testar</a>
+            </div>
+
+            <div class="link-card">
+                <h3>📜</h3>
+                <p>Smart Contracts</p>
+                <a href="AgroChain.html" class="link-btn">Ver Portal</a>
+            </div>
+
+            <div class="link-card">
+                <h3>💱</h3>
+                <p>CoffeeCacaoSwap DEX</p>
+                <span style="display:inline-block;padding:10px 20px;background:#ff9800;color:white;border-radius:20px;"><a href="dex.html" class="link-btn">Ver Roadmap</a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="status">
+        <span class="status-dot"></span>
+        <span>Sistema Ativo</span>
+    </div>
+
+    <script>
+        // Teste de conectividade com API
+        fetch('http://localhost:8001/health')
+            .then(r => r.json())
+            .then(d => console.log('✓ API Health:', d))
+            .catch(e => console.warn('✗ API Offline:', e));
+    </script>
 </body>
 </html>
+

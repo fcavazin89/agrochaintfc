@@ -1,100 +1,128 @@
 'use client';
-import { useRef, Suspense } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, Text } from '@react-three/drei';
-import * as THREE from 'three';
+import { useEffect, useRef } from 'react';
 import type { TraceNode } from '@/types/agrochain';
 
-const STAGE_COLORS: Record<string, string> = {
-  ORIGINATION: '#b8912a',
-  BLOCKCHAIN:  '#1f6440',
-  COMPLIANCE:  '#2f8f52',
-  VALIDATION:  '#4a2f1c',
-};
-
-function NodeMesh({ node, position }: { node: TraceNode; position: [number, number, number] }) {
-  const meshRef = useRef<THREE.Mesh>(null);
-  const color = STAGE_COLORS[node.stage] ?? '#1f6440';
-  const isActive = node.status === 'ACTIVE';
-
-  useFrame((state) => {
-    if (meshRef.current && isActive) {
-      meshRef.current.scale.setScalar(
-        1 + Math.sin(state.clock.elapsedTime * 3) * 0.1,
-      );
-    }
-  });
-
-  return (
-    <group position={position}>
-      <mesh ref={meshRef}>
-        <sphereGeometry args={[0.25, 16, 16]} />
-        <meshStandardMaterial
-          color={color}
-          opacity={node.status === 'PENDING' ? 0.4 : 1}
-          transparent
-          emissive={isActive ? color : '#000'}
-          emissiveIntensity={isActive ? 0.3 : 0}
-        />
-      </mesh>
-      <Text
-        position={[0, -0.45, 0]}
-        fontSize={0.18}
-        color="#f3f7f2"
-        anchorX="center"
-        anchorY="middle"
-      >
-        {node.label}
-      </Text>
-    </group>
-  );
-}
-
-function ConnectorLine({ from, to }: { from: [number, number, number]; to: [number, number, number] }) {
-  const points = [new THREE.Vector3(...from), new THREE.Vector3(...to)];
-  const geometry = new THREE.BufferGeometry().setFromPoints(points);
-  return (
-    <line geometry={geometry}>
-      <lineBasicMaterial color="#2f8f52" opacity={0.6} transparent />
-    </line>
-  );
-}
-
-function ChainScene({ nodes }: { nodes: TraceNode[] }) {
-  const spacing = 2.5;
-  const positions: [number, number, number][] = nodes.map((_, i) => [
-    (i - (nodes.length - 1) / 2) * spacing,
-    0,
-    0,
-  ]);
-
-  return (
-    <>
-      <ambientLight intensity={0.6} />
-      <pointLight position={[0, 5, 5]} intensity={1} />
-      {nodes.map((node, i) => (
-        <NodeMesh key={node.id} node={node} position={positions[i]} />
-      ))}
-      {nodes.slice(0, -1).map((_, i) => (
-        <ConnectorLine key={i} from={positions[i]} to={positions[i + 1]} />
-      ))}
-    </>
-  );
-}
+/**
+ * TraceChain Component Props
+ * 
+ * @typedef {Object} TraceChainProps
+ * @property {TraceNode[]} nodes - Array of trace nodes to visualize
+ * 
+ * TraceNode structure:
+ * ```
+ * {
+ *   label: string;          // Node label (e.g., "Colheita", "Processamento")
+ *   status: 'DONE' | 'ACTIVE' | 'PENDING';  // Current node status
+ * }
+ * ```
+ */
 
 interface TraceChainProps {
   nodes: TraceNode[];
 }
 
+/**
+ * TraceChain - SVG-based traceability visualization component
+ * 
+ * Renders a horizontal timeline of production steps with status indicators.
+ * Used to show the path a product takes from farm to consumer.
+ * 
+ * @component
+ * @param {TraceChainProps} props
+ * @returns {JSX.Element} A container div with SVG timeline visualization
+ * 
+ * @example
+ * ```tsx
+ * const traceSteps = [
+ *   { label: '🌱 Plantio', status: 'DONE' },
+ *   { label: '🌾 Colheita', status: 'DONE' },
+ *   { label: '🏭 Processamento', status: 'ACTIVE' },
+ *   { label: '📦 Embalagem', status: 'PENDING' },
+ * ];
+ * 
+ * <TraceChain nodes={traceSteps} />
+ * ```
+ * 
+ * Visual Design:
+ * - Green (#1f6440) line connecting all nodes
+ * - Node colors: 
+ *   - 'DONE': green (#1f6440), r=10
+ *   - 'ACTIVE': gold (#b8912a), r=14 (emphasized)
+ *   - 'PENDING': gray (#495649), r=10
+ * - Labels positioned below nodes, white text
+ * 
+ * Performance:
+ * - Recommended max: 10 nodes per chain
+ * - Uses native SVG (no Canvas), lightweight
+ * - Re-renders on nodes prop change only
+ * - SVG dimensions: responsive width x 280px height
+ * 
+ * Accessibility:
+ * - Nodes should have descriptive labels
+ * - Status color should not be only visual indicator
+ */
 export function TraceChain({ nodes }: TraceChainProps) {
-  return (
-    <div style={{width: '100%', height: '280px', borderRadius: '12px', overflow: 'hidden', background: '#0b1d12'}}>
-      <Canvas camera={{position: [0, 0, 8], fov: 50}}>
-        <Suspense fallback={null}>
-          <ChainScene nodes={nodes} />
-          <OrbitControls enableZoom={false} />
-        </Suspense>
-      </Canvas>
-    </div>
-  );
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    // Simple SVG-based visualization of the trace chain
+    const width = containerRef.current.clientWidth;
+    const height = 280;
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('width', width.toString());
+    svg.setAttribute('height', height.toString());
+    svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+    svg.style.background = '#0b1d12';
+    
+    containerRef.current.innerHTML = '';
+    containerRef.current.appendChild(svg);
+
+    // Draw connecting line
+    const nodeCount = nodes.length;
+    const spacing = (width - 80) / Math.max(nodeCount - 1, 1);
+    const y = height / 2;
+
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', '40');
+    line.setAttribute('y1', y.toString());
+    line.setAttribute('x2', (width - 40).toString());
+    line.setAttribute('y2', y.toString());
+    line.setAttribute('stroke', '#2f8f52');
+    line.setAttribute('stroke-width', '2');
+    svg.appendChild(line);
+
+    // Draw nodes
+    nodes.forEach((node, idx) => {
+      const x = 40 + idx * spacing;
+      const cx = x;
+      const cy = y;
+
+      const color = node.status === 'DONE' ? '#1f6440' : node.status === 'ACTIVE' ? '#b8912a' : '#495649';
+      const radius = node.status === 'ACTIVE' ? 14 : 10;
+
+      // Circle
+      const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      circle.setAttribute('cx', cx.toString());
+      circle.setAttribute('cy', cy.toString());
+      circle.setAttribute('r', radius.toString());
+      circle.setAttribute('fill', color);
+      circle.setAttribute('opacity', '0.8');
+      svg.appendChild(circle);
+
+      // Label below
+      const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      text.setAttribute('x', cx.toString());
+      text.setAttribute('y', (cy + 35).toString());
+      text.setAttribute('text-anchor', 'middle');
+      text.setAttribute('font-size', '12');
+      text.setAttribute('fill', '#f3f7f2');
+      text.setAttribute('font-weight', '600');
+      text.textContent = node.label;
+      svg.appendChild(text);
+    });
+  }, [nodes]);
+
+  return <div ref={containerRef} style={{ height: '280px', borderRadius: '12px', overflow: 'hidden' }} />;
 }

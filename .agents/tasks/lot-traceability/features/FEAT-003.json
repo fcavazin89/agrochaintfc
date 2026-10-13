@@ -1,0 +1,34 @@
+{
+  "id": "FEAT-003",
+  "type": "feat",
+  "description": "Criar páginas UI para Lot Listing e Lot Details com integração MetaMask, mock data, e QR code generator. Atualizar Sidebar para incluir links de navegação.",
+  "status": "pending",
+  "steps": [
+    "Criar dapp/src/app/lote/page.tsx (Lot Listing): tabela/grid de lotes do produtor logado (mock data + filtros por safra/status/certificação), botão 'Criar Novo Lote' com modal simples, cada linha linkada para /lote/[lotId]",
+    "Criar dapp/src/app/lote/[lotId]/page.tsx (Lot Details): header com dados do lote (loteId, produtor, safra, origem, area, datas), seção 'Certificações' com cards de status (NFT/ZK/EUDR/ESG), seção 'Timeline de Eventos' com lista visual vertical, botão 'Adicionar Evento' com form (tipo, descricao, localizacao, responsavel) conectado a MetaMask",
+    "Implementar QR code generator em dapp/src/lib/lotUtils.ts: função gerarUriQRCode(lotId) retorna URI para QR code público /passport/[lotId]",
+    "Atualizar dapp/src/components/layout/Sidebar.tsx: adicionar links para /lote (Lotes) e /lote/[lotId] (Detalhes do Lote) no menu principal",
+    "Implementar form modal em ambas as páginas: usar wagmi hooks (useAccount, useConnect) para validar wallet, formulário inline com campos específicos (tipo de evento, descrição, localização), botão submit conectado a MetaMask (mock no frontend para agora)",
+    "Seguir design.md rigorosamente: usar --fundo #f5f1e7 para background, --texto-1 #1e2a22 para texto principal, --verde-600 #1f6440 para ações, --ouro #b8912a para atenção (status pendente), --linha #e6ddc9 para divisores, Georgia serif para títulos"
+  ],
+  "acceptance_criteria": [
+    "Página /lote carrega e exibe tabela com lotes (mock data)",
+    "Filtros funcionam: seleção de safra, status, certificação atualiza view sem reload",
+    "Botão 'Criar Novo Lote' abre modal com formulário",
+    "Página /lote/[lotId] carrega dados completos do lote e exibe timeline de eventos",
+    "Seção Certificações exibe cards com status visual (cores semânticas)",
+    "Botão 'Adicionar Evento' abre form, MetaMask conecta, form valida campos obrigatórios",
+    "Sidebar exibe links para /lote e /lote/[lotId] (se necessário)",
+    "UI segue design.md tokens: background, text color, button color, spacing, Georgia titles"
+  ],
+  "verification": [
+    "npm run build (Next.js compila sem erros)",
+    "Abrir http://localhost:3000/lote no navegador (mock page renderiza com dados)",
+    "Clicar em um lote na tabela: redireciona para /lote/[lotId] com dados carregados",
+    "Verificar que Sidebar exibe link para /lote",
+    "Inspecionar HTML: confirmar cores inline estão certas (background #f5f1e7, texto #1e2a22)",
+    "Testar form MetaMask: clicar 'Adicionar Evento', MetaMask snap, campos validam"
+  ],
+  "blocked_reason": null,
+  "findings": ""
+}

@@ -1,0 +1,31 @@
+{
+  "id": "FEAT-002",
+  "type": "feat",
+  "description": "Criar contrato SmartLot em blockchain/contracts/ com registro on-chain de lotes, emissão de eventos, certificações vinculadas, e funcionalidade de transfer condicionada a pagamento em AgroChainPayments.",
+  "status": "pending",
+  "steps": [
+    "Criar blockchain/contracts/SmartLot.sol com: struct Lot (loteId bytes32, produtor address, safra string, origem string, area uint256, dataPlantio uint256, dataColheita uint256, status enum, eventos LotEvent[], certificacoes LotCertification[])",
+    "Implementar mapping(bytes32 => Lot) public lotes para armazenar lotes on-chain",
+    "Adicionar função registerLot(safra, origem, area, dataPlantio) que cria novo lote com loteId único (hash), emite event LotRegistered(loteId, produtor, timestamp)",
+    "Adicionar função addEvent(loteId, tipo, descricao, localizacao) que adiciona evento ao lote e emite event LotEventAdded",
+    "Adicionar função addCertification(loteId, certType, comprovante) que vincula certificação ao lote, emite event CertificationAdded",
+    "Adicionar função transferLot(loteId, novoProdutor, orderId) que valida status do order em AgroChainPayments (ACCEPTED) antes de transferir propriedade, emite event LotTransferred",
+    "Adicionar função getCertifications(loteId) view que retorna array de certificações do lote",
+    "Adicionar função getLot(loteId) view que retorna struct Lot completo"
+  ],
+  "acceptance_criteria": [
+    "Contrato compila sem warnings com Solidity 0.8.37",
+    "Todas as funções têm visibility explícita (public, external, view, nonpayable)",
+    "Eventos LotRegistered, LotEventAdded, CertificationAdded, LotTransferred emitem dados completos",
+    "Função transferLot valida order status em AgroChainPayments antes de permitir transfer",
+    "Testes demonstram que lote pode ser registrado, evento adicionado, certificação vinculada, e transferência bloqueada sem pagamento"
+  ],
+  "verification": [
+    "npm run blockchain:compile succeeds with no errors",
+    "hardhat verify (manual inspection da ABI gerada em artifacts/)",
+    "Grep for 'event Lot' in blockchain/contracts/SmartLot.sol confirms all 4 events defined",
+    "Review function signatures: registerLot, addEvent, addCertification, transferLot, getCertifications, getLot all present"
+  ],
+  "blocked_reason": null,
+  "findings": ""
+}

@@ -1,0 +1,46 @@
+{
+  "verdict": "CHANGES_REQUESTED",
+  "findings": [
+    {
+      "severity": "HIGH",
+      "title": "MetaMask TX submission incomplete",
+      "description": "certificacao/page.tsx line 135–145 calls window.ethereum.request() directly with bare TX data instead of using Wagmi's useWriteContract() hook. This bypasses contract ABI encoding and causes TX rejection by the smart contract.",
+      "file": "app/certificacao/page.tsx",
+      "line": 135,
+      "fix": "Migrate to Wagmi useWriteContract with proper AGROCHAIN_VERIFIER_ABI, functionName 'emitCertificate', and typed arguments array."
+    },
+    {
+      "severity": "MEDIUM",
+      "title": "Wagmi config missing production middleware",
+      "description": "lib/wagmi.ts creates minimal config; missing QueryClient error handling, persistence middleware, and retry strategies. Production deployments may fail silently on RPC errors.",
+      "file": "lib/wagmi.ts",
+      "line": 1,
+      "fix": "Add QueryClient with retry config (retry: 2, retryDelay: 1000), implement error boundaries, test TX failure scenarios."
+    },
+    {
+      "severity": "MEDIUM",
+      "title": "Inline styles throughout all pages",
+      "description": "Every page.tsx uses React style objects instead of CSS classes or Tailwind utilities. This inflates bundle size, prevents optimizations, and complicates global theming.",
+      "file": "app/page.tsx, app/certificacao/page.tsx, app/compliance/page.tsx, app/dex/page.tsx, app/rastreio/page.tsx",
+      "line": "multiple",
+      "fix": "Extract common style objects to globals.css utility classes (.card, .input, .button, etc.) or migrate to Tailwind className attributes."
+    },
+    {
+      "severity": "MEDIUM",
+      "title": "Compliance API hard-coded to localhost",
+      "description": "compliance/page.tsx lines 27–29 construct endpoint URLs without environment variables. Production deploys will fail when API is not running locally.",
+      "file": "app/compliance/page.tsx",
+      "line": 28,
+      "fix": "Use NEXT_PUBLIC_COMPLIANCE_API_URL environment variable with localhost fallback. Add to .env.example."
+    },
+    {
+      "severity": "MEDIUM",
+      "title": "No global error boundaries or error handling",
+      "description": "No error.tsx in app/ and no Suspense boundary in root layout. Page crashes cascade to full page failure with no recovery UI.",
+      "file": "app/",
+      "line": "N/A",
+      "fix": "Add app/error.tsx component and wrap root layout children in Suspense with appropriate fallbacks."
+    }
+  ],
+  "reviewDoc": "c:\\Users\\Usuário\\agrochain\\workspace-01a1162b-e061-7ff0-b060-dfa40cc70dfdzip\\.agents\\tasks\\platform-unification\\review.md"
+}

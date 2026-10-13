@@ -1,0 +1,291 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoffeeCacaoSwap DEX - Preview</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container { max-width: 1400px; margin: 0 auto; }
+
+        .header {
+            text-align: center;
+            padding: 40px 20px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            margin-bottom: 40px;
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            font-size: 3em;
+            background: linear-gradient(45deg, #8B4513, #D2691E, #FFD700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 10px 25px;
+            background: linear-gradient(45deg, #ff9800, #ff5722);
+            border-radius: 25px;
+            font-weight: bold;
+            margin: 15px 0;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: linear-gradient(135deg, rgba(139,69,19,0.2), rgba(210,105,30,0.1));
+            border: 2px solid rgba(255,215,0,0.3);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .card h2 {
+            color: #FFD700;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        .feature-list {
+            list-style: none;
+            margin: 20px 0;
+        }
+
+        .feature-list li {
+            padding: 12px 0;
+            padding-left: 30px;
+            position: relative;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .feature-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #4ecdc4;
+            font-weight: bold;
+            font-size: 1.5em;
+        }
+
+        .coming-soon {
+            text-align: center;
+            padding: 60px 20px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 20px;
+            margin-top: 40px;
+        }
+
+        .coming-soon h2 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            color: #FFD700;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 30px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4ecdc4, #44a8a0);
+            width: 25%;
+            animation: progress 2s ease-in-out;
+        }
+
+        @keyframes progress {
+            from { width: 0%; }
+            to { width: 25%; }
+        }
+
+        .tech-stack {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .tech-badge {
+            background: rgba(255,255,255,0.1);
+            padding: 10px 20px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 15px 35px;
+            background: linear-gradient(45deg, #4ecdc4, #44a8a0);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: bold;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(78,205,196,0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a6f);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💱 CoffeeCacaoSwap DEX</h1>
+            <p style="font-size: 1.3em; color: #ccc;">Decentralized Exchange for Certified Coffee & Cacao Tokens</p>
+            <div class="status">🚧 Em Desenvolvimento - Fase 1 de Implementação</div>
+        </div>
+
+        <div class="grid">
+            <div class="card">
+                <h2>☕ Coffee Pools</h2>
+                <p style="color: #aaa; margin-bottom: 15px;">Pools especializados para tokens Coffee Arabica e Robusta/Conilon</p>
+                <ul class="feature-list">
+                    <li>COFFEE_ARABICA / USDC</li>
+                    <li>COFFEE_ROBUSTA / USDC</li>
+                    <li>COFFEE_ARABICA / COFFEE_ROBUSTA</li>
+                    <li>COFFEE / CAFE (Governance Token)</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h2>🍫 Cacao Pools</h2>
+                <p style="color: #aaa; margin-bottom: 15px;">Pools para tokens Cacao de qualidade premium</p>
+                <ul class="feature-list">
+                    <li>CACAO_CRIOLLO / USDC</li>
+                    <li>CACAO_FORASTERO / USDC</li>
+                    <li>CACAO_TRINITARIO / USDC</li>
+                    <li>CACAO / CAFE</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h2>🎯 AMM Features</h2>
+                <p style="color: #aaa; margin-bottom: 15px;">Automated Market Maker com modelo x*y=k</p>
+                <ul class="feature-list">
+                    <li>Constant Product Formula (x*y=k)</li>
+                    <li>0.3% Trading Fee</li>
+                    <li>TWAP Oracle Integration</li>
+                    <li>Slippage Protection</li>
+                    <li>Multi-hop Routing</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h2>🌾 Liquidity Mining</h2>
+                <p style="color: #aaa; margin-bottom: 15px;">Recompensas em CAFE token para provedores de liquidez</p>
+                <ul class="feature-list">
+                    <li>Stake LP Tokens</li>
+                    <li>Earn CAFE Rewards</li>
+                    <li>Allocation Points System</li>
+                    <li>Per-second Emissions</li>
+                    <li>Emergency Withdrawal</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h2>🏛️ Governance</h2>
+                <p style="color: #aaa; margin-bottom: 15px;">DAO descentralizada via CAFE token</p>
+                <ul class="feature-list">
+                    <li>1% Proposal Threshold (1M CAFE)</li>
+                    <li>7-day Voting Period</li>
+                    <li>48h Timelock Delay</li>
+                    <li>10% Quorum Requirement</li>
+                    <li>On-chain Execution</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h2>📜 Smart Contracts</h2>
+                <p style="color: #aaa; margin-bottom: 15px;">6 contratos Solidity ^0.8.20</p>
+                <ul class="feature-list">
+                    <li>CafeToken.sol (Governance)</li>
+                    <li>CoffeeCacaoSwapFactory.sol</li>
+                    <li>CoffeeCacaoSwapPool.sol</li>
+                    <li>CoffeeCacaoSwapRouter.sol</li>
+                    <li>CoffeeCacaoFarm.sol (MasterChef)</li>
+                    <li>CafeGovernance.sol</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="coming-soon">
+            <h2>🚀 Roadmap de Implementação</h2>
+            <p style="font-size: 1.2em; color: #ccc; margin-bottom: 20px;">
+                Workflow automático em execução: Planner → Coder → Reviewer
+            </p>
+            
+            <div class="progress-bar">
+                <div class="progress-fill"></div>
+            </div>
+            <p style="color: #4ecdc4; font-weight: bold;">25% Concluído - Fase de Planejamento</p>
+
+            <div style="margin-top: 40px;">
+                <h3 style="color: #FFD700; margin-bottom: 20px;">Fases do Workflow:</h3>
+                <p>✅ Fase 0: Requirements & Design (Completo)</p>
+                <p>🔄 Fase 1: Planejamento Detalhado (Em Progresso)</p>
+                <p>⏳ Fase 2: Implementação dos 6 Contratos</p>
+                <p>⏳ Fase 3: Code Review & Security Audit</p>
+                <p>⏳ Fase 4: Testes & Deployment</p>
+            </div>
+
+            <div class="tech-stack">
+                <div class="tech-badge">Solidity ^0.8.20</div>
+                <div class="tech-badge">OpenZeppelin v5</div>
+                <div class="tech-badge">Hardhat</div>
+                <div class="tech-badge">CREATE2</div>
+                <div class="tech-badge">ERC20Votes</div>
+                <div class="tech-badge">Multi-Chain</div>
+            </div>
+
+            <div style="margin-top: 40px;">
+                <a href="/" class="btn">← Voltar para Home</a>
+                <a href="dashboard.html" class="btn btn-secondary">Ver Dashboard</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simula atualização de progresso
+        setTimeout(() => {
+            const status = document.querySelector('.status');
+            status.textContent = '⚡ Workflow Ativo - Gerando Plano de Implementação...';
+        }, 2000);
+    </script>
+</body>
+</html>

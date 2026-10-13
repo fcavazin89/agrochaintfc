@@ -1,0 +1,30 @@
+{
+  "id": "FEAT-004",
+  "type": "feat",
+  "description": "Criar arquivo de utilitários SmartLot em dapp/src/lib/contracts/smartlot.ts com ABI exportado, funções helper para contrato, e integração com wagmi para leitura/escrita de dados. Incluir mock de dados para demo.",
+  "status": "pending",
+  "steps": [
+    "Criar dapp/src/lib/contracts/smartlot.ts com: export SMARTLOT_ABI (cópia do ABI gerado após compilação de SmartLot.sol)",
+    "Implementar funções helper: registerLot(wagmiClient, loteData) que chama contrato registerLot via writeContract, addEvent(loteId, eventData) que chama addEvent, transferLot(loteId, novoProdutor, orderId) que chama transferLot, getCertifications(loteId) que lê do contrato",
+    "Adicionar função getLot(loteId) que faz leitura on-chain e retorna Lot formatado em TypeScript",
+    "Criar dapp/src/lib/mockLotData.ts com dados mock para demo: array de Lot com eventos, certificações, diferentes status (Ativo, Transferindo, Transferido)",
+    "Implementar função getMockLotsForProducer(producerAddress) que filtra lotes mock pelo produtor logado",
+    "Todas as funções devem retornar tipos definidos em agrochain.ts (Lot, LotEvent, LotCertification)"
+  ],
+  "acceptance_criteria": [
+    "smartlot.ts exporta SMARTLOT_ABI com assinatura correta",
+    "Funções helper aceitas tipos corretos e retornam Promise<> ou tipadas",
+    "mockLotData.ts contém array com 5+ lotes, cada um com eventos e certificações",
+    "getMockLotsForProducer filtra corretamente por endereço",
+    "TypeScript compila sem erros em dapp/src/"
+  ],
+  "verification": [
+    "npm run build succeeds",
+    "grep -n 'export const SMARTLOT_ABI' dapp/src/lib/contracts/smartlot.ts returns ABI",
+    "grep -n 'export function registerLot' dapp/src/lib/contracts/smartlot.ts returns function",
+    "grep -n 'export const MOCK_LOTS' dapp/src/lib/mockLotData.ts returns data array",
+    "Abrir DevTools, importar mockLotData e executar getMockLotsForProducer('0x...') retorna array com lotes corretos"
+  ],
+  "blocked_reason": null,
+  "findings": ""
+}

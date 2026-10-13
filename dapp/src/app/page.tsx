@@ -17,11 +17,76 @@ const recentCerts = [
 export default function DashboardPage() {
   return (
     <div style={{maxWidth: '1200px', margin: '0 auto'}}>
-      <div style={{marginBottom: '24px'}}>
-        <h1 style={{margin: 0, fontFamily: 'Georgia, serif', fontSize: '28px', color: '#1e2a22'}}>
-          Dashboard
+      {/* Hero Section */}
+      <div style={{marginBottom: '48px', textAlign: 'center'}}>
+        <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '16px', marginBottom: '24px'}}>
+          <span style={{fontSize: '64px'}}>🌾</span>
+        </div>
+        <h1 style={{margin: '0 0 8px', fontFamily: 'Georgia, serif', fontSize: '42px', color: '#1e2a22', fontWeight: '700'}}>
+          AgroChain
         </h1>
-        <p style={{margin: '4px 0 0', color: '#495649', fontSize: '14px'}}>
+        <p style={{margin: '0 0 24px', color: '#495649', fontSize: '18px', fontWeight: '500'}}>
+          Rastreabilidade de Coffee &amp; Cacao na Blockchain com Certificação ZK
+        </p>
+        
+        {/* Feature badges */}
+        <div style={{display: 'flex', justifyContent: 'center', gap: '12px', marginBottom: '32px', flexWrap: 'wrap'}}>
+          <span style={{background: '#f0faf4', color: '#1f6440', padding: '8px 16px', borderRadius: '20px', fontSize: '14px', fontWeight: '600'}}>
+            ☕ Coffee Arabica &amp; Robusta
+          </span>
+          <span style={{background: '#f9f7f2', color: '#6b4426', padding: '8px 16px', borderRadius: '20px', fontSize: '14px', fontWeight: '600'}}>
+            🍫 Cacao Premium
+          </span>
+          <span style={{background: '#e8f2ea', color: '#195236', padding: '8px 16px', borderRadius: '20px', fontSize: '14px', fontWeight: '600'}}>
+            🔐 Zero-Knowledge Proofs
+          </span>
+        </div>
+
+        {/* CTA Buttons */}
+        <div style={{display: 'flex', justifyContent: 'center', gap: '12px', flexWrap: 'wrap'}}>
+          <a href="/erp" style={{display: 'inline-block', background: '#1f6440', color: '#fff', padding: '14px 32px', borderRadius: '8px', textDecoration: 'none', fontWeight: '700', fontSize: '15px', cursor: 'pointer'}}>
+            📊 Ver Dashboard
+          </a>
+          <a href="/dex" style={{display: 'inline-block', background: '#b8912a', color: '#fff', padding: '14px 32px', borderRadius: '8px', textDecoration: 'none', fontWeight: '700', fontSize: '15px', cursor: 'pointer'}}>
+            💱 Explorar DEX
+          </a>
+          <a href="/certificacao" style={{display: 'inline-block', background: '#2f8f52', color: '#fff', padding: '14px 32px', borderRadius: '8px', textDecoration: 'none', fontWeight: '700', fontSize: '15px', cursor: 'pointer'}}>
+            🏆 Certificação ZK
+          </a>
+        </div>
+      </div>
+
+      {/* Features Grid */}
+      <div style={{marginBottom: '48px'}}>
+        <h2 style={{margin: '0 0 24px', textAlign: 'center', fontFamily: 'Georgia, serif', fontSize: '28px', color: '#1e2a22'}}>
+          Recursos Principais
+        </h2>
+        <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px'}}>
+          {[
+            { icon: '🔍', title: 'Rastreabilidade', desc: 'Rastreie cada lote na blockchain' },
+            { icon: '🏆', title: 'Certificação ZK', desc: 'Provas criptográficas verificáveis' },
+            { icon: '💱', title: 'DEX Integrado', desc: 'Troque Coffee por Cacao facilmente' },
+            { icon: '📊', title: 'ERP Completo', desc: 'Gestão financeira integrada' },
+            { icon: '📡', title: 'IoT Monitoramento', desc: 'Sensores em tempo real' },
+            { icon: '🤖', title: 'IA Assistente', desc: 'Consultoria agrícola com IA' },
+          ].map((feat, i) => (
+            <div key={i} style={{background: '#fff', borderRadius: '12px', padding: '20px', border: '1px solid #ddd8cc', textAlign: 'center'}}>
+              <div style={{fontSize: '40px', marginBottom: '12px'}}>{feat.icon}</div>
+              <h3 style={{margin: '0 0 8px', fontFamily: 'Georgia, serif', fontSize: '16px', color: '#1e2a22'}}>{feat.title}</h3>
+              <p style={{margin: 0, fontSize: '13px', color: '#495649'}}>{feat.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <hr style={{border: 'none', borderTop: '1px solid #ddd8cc', margin: '48px 0'}} />
+
+      {/* Dashboard Content Below */}
+      <div style={{marginBottom: '24px'}}>
+        <h1 style={{margin: '0 0 8px', fontFamily: 'Georgia, serif', fontSize: '28px', color: '#1e2a22'}}>
+          📊 Dashboard em Tempo Real
+        </h1>
+        <p style={{margin: '0 0 24px', color: '#495649', fontSize: '14px'}}>
           Visão geral da cadeia Coffee &amp; Cacao — AgroChain
         </p>
       </div>

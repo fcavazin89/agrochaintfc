@@ -21,6 +21,7 @@ const navSections = [
   {
     label: 'RASTREIO',
     items: [
+      { href: '/lote', label: 'Lotes', icon: '📦' },
       { href: '/rastreio', label: 'Rastreabilidade', icon: '🔍' },
       { href: '/certificacao', label: 'Certificação ZK', icon: '🏆' },
       { href: '/zk-standalone', label: 'Certificador ZK', icon: '🔐' },
@@ -55,7 +56,7 @@ const navSections = [
 function shouldSectionBeExpanded(sectionLabel: string, pathname: string): boolean {
   const sectionRouteMap: Record<string, string[]> = {
     DASHBOARD: ['/dashboard', '/erp'],
-    RASTREIO: ['/rastreio', '/certificacao', '/zk-standalone'],
+    RASTREIO: ['/lote', '/rastreio', '/certificacao', '/zk-standalone'],
     DEX: ['/dex', '/compliance'],
     MONITORAMENTO: ['/iot', '/assistente', '/auditoria', '/imersivo'],
     EXTRAS: ['/producer', '/mercado'],

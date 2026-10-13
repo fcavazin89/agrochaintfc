@@ -54,7 +54,8 @@ export const DESIGN_TOKENS = {
   colors: {
     fundo: '#f5f1e7', // kraft paper
     texto1: '#1e2a22', // texto principal
-    texto2: '#4a6fa5', // texto secundário
+    texto2: '#495649', // texto secundário
+    texto3: '#7c867a', // texto terciário/nota
     verde600: '#1f6440',
     ouro: '#b8912a',
     vermelho: '#c43c2c',

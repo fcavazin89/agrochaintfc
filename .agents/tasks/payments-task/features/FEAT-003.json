@@ -1,0 +1,28 @@
+{
+  "id": "FEAT-003",
+  "type": "feat",
+  "description": "Criar página Next.js dapp/src/app/producer/page.tsx com Dashboard do Produtor: lista de lotes (mock data), vendas ativas/pendentes, botão para criar anúncio, integração Web3 com MetaMask via wagmi, estilo conforme design.md.",
+  "status": "complete",
+  "steps": [
+    "Criar dapp/src/app/producer/ directory",
+    "Criar dapp/src/app/producer/page.tsx como 'use client' component com: (a) useState para lotes (mock data: array com { id, nome, tipo, peso, status, preço }); (b) useState para vendas ativas (mock: { id, comprador, token, montante, estado }); (c) useAccount de wagmi para mostrar endereço do produtor; (d) layout: h1 'Dashboard do Produtor', seção de lotes em cards grid, seção de vendas em tabela, botão 'Novo Anúncio' verde; (e) cards de lotes com: nome, tipo (Coffee/Cacao), peso, status (Disponível/Vendendo), preço per kg, botão 'Anunciar'; (f) tabela de vendas com: id, comprador (truncado), valor, status (Escrow/Aceito/Rejeitado), ações; (g) estilos seguem design.md (cores, tipografia serifa em títulos, paleta clara)",
+    "Integrar no sidebar (Sidebar.tsx): adicionar item 'Produtor' → '/producer' no grupo 'EXTRAS' ou novo grupo 'MARKETPLACE'",
+    "Adicionar tipos TypeScript em dapp/src/types/agrochain.ts: ProducerBatch { id, name, type, weightKg, status, pricePerKg }, ActiveSale { id, buyer, token, amount, status }"
+  ],
+  "acceptance_criteria": [
+    "Página renderiza sem erros com MetaMask conectada ou não",
+    "Lotes e vendas mockados exibem em layout grid + tabela",
+    "Botões 'Anunciar' e 'Novo Anúncio' estão presentes e estilizados",
+    "Navegação via sidebar aponta para /producer",
+    "Estilos seguem design.md: cores (#1f6440 verde primário, #f5f1e7 papel kraft, #1e2a22 texto principal, tipografia Georgia para títulos)"
+  ],
+  "verification": [
+    "npm run dev em dapp/, navegar para /producer, confirmar renderização e mock data exibindo",
+    "MetaMask conectado: confirmar endereço truncado exibindo no conteúdo",
+    "Sidebar exibe link para Produtor",
+    "Verificar contraste e tipografia via browser DevTools contra design.md"
+  ],
+  "blocked_reason": null,
+  "findings": "✓ IMPLEMENTADO COM SUCESSO\n\n### Achados de Implementação:\n\n1. **Types (agrochain.ts)**\n   - Adicionados ProducerBatch { id, name, type, weightKg, status, pricePerKg }\n   - Adicionados ActiveSale { id, buyer, token, amount, status }\n   - Ambos integram com tipos existentes (BatchType, etc.)\n\n2. **Página Producer (producer/page.tsx)**\n   - Implementada como 'use client' component\n   - useAccount() do wagmi captura e trunca o endereço do produtor\n   - Mock data: 3 lotes (1 Coffee Disponível, 1 Coffee Vendendo, 1 Cacao Disponível)\n   - Mock data: 3 vendas (Escrow, Aceito, Rejeitado)\n   - Layout grid responsivo para cartões (minmax(280px, 1fr))\n   - Tabela com linhas alternadas (background) conforme design.md\n   - Estilos: cores exatas do design (#1f6440, #f5f1e7, #1e2a22)\n   - Tipografia: Georgia serifa para h1/h2, sans para corpo\n   - Botões com hover e transições (120ms cubic-bezier)\n   - Sombras e raios conforme design.md (12px para cartões, 8px para botões)\n   - Rodapé com procedência ('Dados mockados · Integração Sepolia')\n\n3. **Sidebar.tsx**\n   - Adicionado item 'Produtor' (emoji 🌾) com href='/producer' no grupo EXTRAS\n   - Atualizado sectionRouteMap para ['/producer', '/mercado']\n   - Link ativo reconhece rota /producer e expande seção EXTRAS\n\n4. **Validações**\n   - npm run build: ✓ Compiled successfully (sem erros TypeScript)\n   - Arquivo criado sem dependências faltantes\n   - Padrão de CSS inline mantém estilo cohesivo com rastreio/page.tsx\n   - Acessibilidade: cores + texto, sem dependência só de cor\n\n5. **Verificação Design.md**\n   - Cores: --verde-600 (#1f6440 ação), --fundo (#f5f1e7 papel kraft), --texto-1 (#1e2a22)\n   - Tipografia: Georgia para KPI/títulos, sans para corpo\n   - Espaçamento: base 4px (gap 16px, padding 18px conforme --raio e --e-4/6)\n   - Cartão: raio 12px, sombra-2 (0 12px 28px), brilho inset\n   - Tabela: cabeçalho em --sup-3, linhas alternadas, hover --sup-2\n   - Buttons: height 40px, raio-sm (8px), transition 120ms\n\n6. **Commit**\n   - Hash: 97cc8d7\n   - Message: 'feat(dapp): add producer dashboard with mock data and Sepolia integration'\n   - 3 files changed: types/agrochain.ts, app/producer/page.tsx, layout/Sidebar.tsx"
+}
+

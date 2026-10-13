@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
@@ -470,6 +470,8 @@
       }
     }
   </style>
+  <script src="https://unpkg.com/snarkjs@0.7.4/build/snarkjs.min.js"></script>
+  <script src="https://unpkg.com/circomlibjs@0.1.7/build/circomlibjs.min.js"></script>
 </head>
 <body>
   <div class="container">
@@ -720,7 +722,7 @@
   <!-- Scripts -->
   <script src="11_web3.js" type="module"></script>
   <script>
-    import Web3 from './11_web3.js';
+    // Web3 via script src acima
 
     // Estado da aplicação
     let estadoApp = {
@@ -821,51 +823,106 @@
       }
     }
 
-    async function gerarProva() {
-      try {
-        const score = parseInt(document.getElementById('inputScore').value);
-        const notaMinima = parseInt(document.getElementById('inputNotaMinima').value);
-        
-        if (score < notaMinima) {
-          mostrarMensagem(
-            `Score privado (${score}) deve ser >= nota mínima (${notaMinima})`, 
-            'erro'
-          );
-          return;
-        }
-        
-        const provaStatus = document.getElementById('provaStatus');
-        provaStatus.textContent = 'Gerando prova ZK...';
-        provaStatus.style.color = 'var(--especial)';
-        
-        // Simulação: em produção, chamar snarkjs
-        await new Promise(r => setTimeout(r, 2000));
-        
-        estadoApp.provaGerada = {
-          a: [
-            '18829982177676234826872850762208638486324023945313654395844934025887607968245',
-            '7999922891700869408821211969851944662202897149297662301929814068286221949769'
-          ],
-          b: [
-            ['12904929353254609961525891066607254797813607256906046752906131226555435705488', 
-             '17589937779149687900129638408131303387779208948859597661844848372844146851814'],
-            ['20854305319234502433950239761695944076050065346309625755019889159637699149869',
-             '13131762976395589905862739816262653597046393929638087055159689555476838797933']
-          ],
-          c: [
-            '9207835018649485826700849933062761203895263997926050754936356763820801316707',
-            '14769857509267297797268816848873932223937305717152405754155485346606088087618'
-          ]
-        };
-        
-        provaStatus.textContent = '✓ Prova gerada com sucesso!';
-        provaStatus.style.color = 'var(--verde-600)';
-        
-        mostrarMensagem('Prova ZK gerada (simulada para demo)', 'info');
-      } catch (error) {
-        mostrarMensagem('Erro ao gerar prova: ' + error.message, 'erro');
-      }
+
+    // ── ZK STATE ────────────────────────────────────────────────────
+    let _poseidon = null;
+    const BN_FR = BigInt("21888242871839275222246405745257275088548364400416034343698204186575808495617");
+    async function _buildPoseidon() {
+      if (_poseidon) return _poseidon;
+      if (window.circomlibjs && window.circomlibjs.buildPoseidon)
+        _poseidon = await window.circomlibjs.buildPoseidon();
+      return _poseidon;
     }
+    function _toFr(s) {
+      let n; try { n = BigInt(String(s)); } catch(e) { try { n = BigInt("0x" + String(s).replace(/^0x/,"")); } catch(e2) { n = 1n; } }
+      return n % BN_FR;
+    }
+
+    async function gerarProva() {
+      const statusEl = document.getElementById("provaStatus");
+      const btnEl    = document.getElementById("btnGerarProva");
+      btnEl.disabled = true;
+      estadoApp.provaGerada = null;
+      try {
+        const score   = parseInt(document.getElementById("inputScore").value) || 0;
+        const notaMin = parseInt(document.getElementById("inputNotaMinima").value) || 80;
+        const salt    = BigInt(document.getElementById("inputSal").value || "12345");
+        const loteRaw = document.getElementById("inputLoteId").value   || "1";
+        const padRaw  = document.getElementById("inputPadraoHash").value || "2";
+        const laudRaw = document.getElementById("inputHashLaudo").value  || "3";
+
+        if (score < 0 || score > 100) { mostrarMensagem("Score deve ser 0-100","erro"); return; }
+        if (score < notaMin) { mostrarMensagem("Score (" + score + ") < nota minima (" + notaMin + ")","erro"); return; }
+
+        statusEl.innerHTML = "<span class=\"carregando\"></span> Carregando Poseidon…";
+        statusEl.style.color = "var(--especial)";
+
+        const loteFr = _toFr(loteRaw), padFr = _toFr(padRaw), laudFr = _toFr(laudRaw);
+
+        let commitment = "0";
+        const poseidon = await _buildPoseidon();
+        if (poseidon) {
+          const h = poseidon([BigInt(score), salt, loteFr, padFr, laudFr]);
+          commitment = poseidon.F.toString(h);
+        } else {
+          let acc = 7n;
+          const raw = score + "|" + salt + "|" + loteFr;
+          for (const c of new TextEncoder().encode(raw)) acc = (acc * 31n + BigInt(c)) % BN_FR;
+          commitment = acc.toString();
+        }
+        estadoApp.zkCommitment = commitment;
+
+        statusEl.innerHTML = "<span class=\"carregando\"></span> Verificando wasm/zkey…";
+
+        const WASM = "/blockchain/circuits/agrochain-score-threshold_js/agrochain-score-threshold.wasm";
+        const ZKEY = "/blockchain/circuits/agrochain-score-threshold_final.zkey";
+        const [wasmOk, zkeyOk] = await Promise.all([
+          fetch(WASM,{method:"HEAD"}).then(r=>r.ok).catch(()=>false),
+          fetch(ZKEY,{method:"HEAD"}).then(r=>r.ok).catch(()=>false)
+        ]);
+
+        let prova, modoZK = false;
+        if (wasmOk && zkeyOk && window.snarkjs) {
+          statusEl.innerHTML = "<span class=\"carregando\"></span> Gerando prova Groth16…";
+          const { proof, publicSignals } = await snarkjs.groth16.fullProve(
+            { commitment, minimumScore: String(notaMin), lotContext: String(loteFr),
+              standardContext: String(padFr), reportContext: String(laudFr),
+              qualityScore: String(score), salt: String(salt) }, WASM, ZKEY);
+          prova = { a:[proof.pi_a[0],proof.pi_a[1]], b:[[proof.pi_b[0][1],proof.pi_b[0][0]],[proof.pi_b[1][1],proof.pi_b[1][0]]], c:[proof.pi_c[0],proof.pi_c[1]], publicSignals, real:true };
+          modoZK = true;
+        } else {
+          prova = { a:[commitment.slice(0,20)||"0","0"], b:[["0","0"],["0","0"]], c:["0","0"],
+            publicSignals:[commitment,String(notaMin),String(loteFr),String(padFr),String(laudFr)], real:false };
+        }
+        estadoApp.provaGerada = prova;
+
+        statusEl.textContent = modoZK ? "✓ Prova Groth16 real gerada"
+          : (poseidon ? "✓ Commitment Poseidon calculado (wasm: " + (wasmOk?"ok":"ausente") + ")" : "✓ Commitment calculado");
+        statusEl.style.color = modoZK ? "var(--verde-600)" : "var(--ouro)";
+        mostrarMensagem(
+          modoZK ? "Prova Groth16 gerada — pronto para emitir na blockchain"
+                 : "Commitment calculado. Para Groth16 completo: npm run zk:setup:prod",
+          modoZK ? "sucesso" : "info");
+
+        let badge = document.getElementById("zkBadge");
+        if (!badge) { badge = document.createElement("div"); badge.id = "zkBadge";
+          badge.style.cssText = "margin-top:10px;padding:8px 12px;border-radius:8px;font-size:11px;font-family:monospace;line-height:1.6;word-break:break-all;";
+          statusEl.after(badge); }
+        badge.style.background = modoZK ? "rgba(47,143,82,.12)" : "rgba(184,145,42,.14)";
+        badge.style.color = modoZK ? "var(--verde-700)" : "var(--ouro-claro)";
+        badge.style.border = modoZK ? "1px solid rgba(47,143,82,.3)" : "1px solid rgba(184,145,42,.35)";
+        badge.innerHTML = (modoZK ? "🔐 ZK Groth16 (real)" : (poseidon ? "🔑 Poseidon ativo" : "🔑 Commitment"))
+          + "<br><span style=\"opacity:.7\">commitment: " + commitment.slice(0,44) + "…</span>"
+          + (wasmOk ? "" : "<br><span style=\"opacity:.5\">wasm/zkey: npm run zk:setup:prod</span>");
+
+      } catch(err) {
+        statusEl.textContent = "✗ Erro ao gerar prova";
+        statusEl.style.color = "var(--critico)";
+        mostrarMensagem("Erro ZK: " + err.message, "erro");
+        console.error("[ZK]", err);
+      } finally { btnEl.disabled = false; }
+    }
+
 
     async function emitirCertificacao() {
       try {

@@ -1,0 +1,26 @@
+{
+  "id": "FEAT-001",
+  "type": "feat",
+  "description": "Expandir tipos TypeScript e criar enums/constants para o módulo de lotes. Adicionar interfaces Lot, LotEvent, LotCertification aos tipos existentes em dapp/src/types/agrochain.ts, e criar arquivo de constantes com enums e colors.",
+  "status": "completed",
+  "steps": [
+    "Adicionar ao dapp/src/types/agrochain.ts: interface Lot com campos loteId, produtor, safra, origem, área, dataPlantio, dataColheita, certificações[], eventos[], status ('Ativo'|'Transferindo'|'Transferido')",
+    "Adicionar interface LotEvent com campos tipo, data, descrição, localização, responsável, comprovante (opcional)",
+    "Adicionar interface LotCertification com tipo ('NFT'|'ZK'|'EUDR'|'ESG'), status ('Pendente'|'Certificado'|'Revogado'), dataEmissão, dataVencimento",
+    "Criar dapp/src/lib/lotConstants.ts com enums: LotEventType, CertificationType, LotStatus, color mappings (seguindo design.md: verde para ativo, ouro para atenção, vermelho para revogado)",
+    "Adicionar helpers em dapp/src/lib/lotUtils.ts: formatarData(), gerarUriQRCode(), obterCorStatus(), formatarArea()"
+  ],
+  "acceptance_criteria": [
+    "TypeScript compila sem erros em dapp/src/",
+    "Interfaces Lot, LotEvent, LotCertification aparecem em agrochain.ts",
+    "lotConstants.ts define LotEventType, CertificationType, LotStatus com valores corretos",
+    "lotUtils.ts exporta funções helper que aceitam tipos corretos e retornam strings/cores/URIs formatadas"
+  ],
+  "verification": [
+    "npm run build (Next.js compilation succeeds)",
+    "grep -n 'interface Lot' dapp/src/types/agrochain.ts returns the new interfaces",
+    "grep -n 'export enum' dapp/src/lib/lotConstants.ts returns enum definitions"
+  ],
+  "blocked_reason": null,
+  "findings": ""
+}

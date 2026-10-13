@@ -1,0 +1,23 @@
+{
+  "project_type": "Next.js 14 dapp + Hardhat blockchain, TypeScript monorepo, Web3 stack (wagmi/viem, MetaMask)",
+  "language": "TypeScript, Solidity 0.8.37, Next.js/React (pt-BR labels)",
+  "build_system": "npm workspaces, hardhat for contracts, next.js dev server on port 3000",
+  "test_framework": "hardhat test (Mocha), no Jest for dapp yet",
+  "build_command": "npm run blockchain:compile && npm run build (next build if exists)",
+  "test_command": "npm run test:cafeswap (contract tests), manual browser testing for UI",
+  "verification_instructions": "1. Deploy contracts to Sepolia testnet. 2. Verify ABIs in dapp/src/lib/contracts/ match deployed artifacts. 3. Run UI manually: load /lote page, check rendering matches design.md. 4. Test MetaMask integration: connect wallet, create/edit lot events.",
+  "snapshot_or_generated_files": "Smart contract ABIs are manually exported to dapp/src/lib/contracts/ after compilation. Commands: hardhat compile generates artifacts/, then copy ABI JSON to contracts.ts.",
+  "environment_constraints": "Sepolia testnet only (hardcoded in hardhat.config.js). Design system from design.md must be followed strictly (kraft paper #f5f1e7, green #1f6440). No external UI libraries — inline CSS only. MetaMask required for Web3 interaction.",
+  "contribution_requirements": "From AGENTS.md (inferred): commit small, testable units; use pt-BR for UI labels; follow design.md tokens for colors and spacing; include mock data patterns from existing pages like producer/page.tsx.",
+  "key_patterns": "1. Page components use 'use client' + useState for mock data (see producer/page.tsx). 2. Types in dapp/src/types/agrochain.ts (CoffeeBatch, CacaoBatch, TraceNode patterns). 3. Contracts follow AgroChainPayments pattern (events for state changes, mappings for storage, view functions for reads). 4. Design tokens: --fundo (#f5f1e7), --texto-1 (#1e2a22), --verde-600 (#1f6440), --ouro (#b8912a) for status colors. 5. Sidebar links must route to new pages.",
+  "relevant_files": [
+    "dapp/src/types/agrochain.ts — existing types (CoffeeBatch, CacaoBatch, TraceNode, ComplianceResult)",
+    "dapp/src/lib/contracts.ts — ABI export pattern",
+    "dapp/src/app/producer/page.tsx — page structure, mock data, styling pattern, wagmi usage",
+    "blockchain/contracts/AgroChainPayments.sol — escrow pattern, order state machine, events",
+    "blockchain/contracts/AgroChainCoffeeCacaoTraceability.sol — existing rastreio logic (study for reuse)",
+    "blockchain/hardhat.config.js — network setup, deploy tasks",
+    "design.md — color tokens, spacing, typography (Georgia serif for titles)"
+  ],
+  "directory_structure": "blockchain/contracts/ — Solidity contracts; blockchain/scripts/ — deployment scripts; dapp/src/app/ — Next.js pages; dapp/src/lib/contracts/ — ABIs and utilities; dapp/src/types/ — TypeScript interfaces; dapp/src/components/ — UI components (minimal); .agents/tasks/ — task artifacts."
+}

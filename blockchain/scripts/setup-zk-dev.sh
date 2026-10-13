@@ -7,6 +7,11 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 BUILD="$ROOT/blockchain/build/zk"
 CIRCUIT="$ROOT/blockchain/circuits/agrochain-score-threshold.circom"
 mkdir -p "$BUILD"
+rm -f \
+  "$BUILD"/powersOfTau*.ptau \
+  "$BUILD"/agrochain-score-threshold*.zkey \
+  "$BUILD"/verification_key.json \
+  "$ROOT/blockchain/contracts/AgroChainGroth16Verifier.sol"
 
 npx circom2 "$CIRCUIT" \
   --r1cs --wasm --sym \
@@ -17,7 +22,7 @@ npx snarkjs powersoftau new bn128 12 "$BUILD/powersOfTau_0000.ptau"
 npx snarkjs powersoftau contribute \
   "$BUILD/powersOfTau_0000.ptau" "$BUILD/powersOfTau_0001.ptau" \
   --name="AgroChain local development contribution" \
-  -e "$(node -e "process.stdout.write(require('node:crypto').randomBytes(32).toString('hex'))")"
+  -e="$(node -e "process.stdout.write(require('node:crypto').randomBytes(32).toString('hex'))")"
 npx snarkjs powersoftau prepare phase2 \
   "$BUILD/powersOfTau_0001.ptau" "$BUILD/powersOfTau_final.ptau"
 npx snarkjs groth16 setup \
@@ -28,7 +33,7 @@ npx snarkjs zkey contribute \
   "$BUILD/agrochain-score-threshold_0000.zkey" \
   "$BUILD/agrochain-score-threshold_final.zkey" \
   --name="AgroChain local development contribution" \
-  -e "$(node -e "process.stdout.write(require('node:crypto').randomBytes(32).toString('hex'))")"
+  -e="$(node -e "process.stdout.write(require('node:crypto').randomBytes(32).toString('hex'))")"
 npx snarkjs zkey verify \
   "$BUILD/agrochain-score-threshold.r1cs" \
   "$BUILD/powersOfTau_final.ptau" \

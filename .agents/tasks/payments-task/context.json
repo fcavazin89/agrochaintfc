@@ -1,0 +1,24 @@
+{
+  "project_type": "Next.js 14 + TypeScript full-stack dApp com Hardhat 0.8.37 / Solidity, MetaMask, Sepolia testnet",
+  "language": "TypeScript (dapp) e Solidity 0.8.37 (blockchain)",
+  "build_system": "Hardhat para contratos (hardhat compile), Next.js para dapp",
+  "test_framework": "Hardhat mocha (contratos). No dapp: nenhum framework de testes configurado ainda.",
+  "build_command": "npm run blockchain:compile (para contratos)",
+  "test_command": "npm run test:cafeswap (executa testes com hardhat test em paralelo)",
+  "verification_instructions": "1. Compilar contratos: npm run blockchain:compile. 2. Deploy em Sepolia: npm run deploy:sepolia (requer DEPLOYER_PRIVATE_KEY em .env). 3. Testes dapp: executar Next.js dev server (npm run dev em dapp/) e testar manualmente com MetaMask em Sepolia.",
+  "snapshot_or_generated_files": "Artefatos build: blockchain/artifacts/contracts/ (ABIs geradas após compile). dapp/.next/ (Next.js build). Ambos .gitignored. Nenhum gerado que exija check-in.",
+  "environment_constraints": "Deployer privado já em .env. Sepolia testnet. Mock ERC20 (sem permissões). Escrow simples sem features complexas de liberação condicional.",
+  "contribution_requirements": "Seguir padrões design.md (paleta clara/escura, tipografia, espaço, componentes). Contratos: usar OpenZeppelin ERC20. Frontend: padrão sidebar + topbar + conteúdo claro (papel kraft #f5f1e7). Navegação via sidebar no grupo 'MERCADO' ou novo.",
+  "key_patterns": "Contratos: comentários detalhados, eventos, structs nomeadas. Frontend: 'use client' em Client Components, dynamic() para Three.js, useState + useAccount/Connect do wagmi, estilos inline com tema de cores. Componentes existentes usam palette de cores do design.md (--verde-600 = #1f6440, --ouro = #b8912a, etc).",
+  "relevant_files": [
+    "blockchain/contracts/AgroChainCoffeeCacaoTraceability.sol (padrão para escrow e token handling)",
+    "blockchain/contracts/AgroChainCertNFT.sol (padrão ERC721, mint com dados on-chain)",
+    "blockchain/hardhat.config.js (deploy tasks)",
+    "dapp/src/lib/contracts.ts (ABIs existentes)",
+    "dapp/src/lib/wagmi.ts (wagmi config, Sepolia chain)",
+    "dapp/src/components/layout/Sidebar.tsx (navegação)",
+    "dapp/src/app/rastreio/page.tsx (exemplo de página com padrões)",
+    "design.md (guia visual, cores, tipografia, componentes)"
+  ],
+  "directory_structure": "blockchain/contracts/: contratos Solidity. blockchain/scripts/: deploy e helpers. dapp/src/app/: pages Next.js (cada diretório = rota). dapp/src/lib/: utilities, hooks, ABIs. dapp/src/components/: React components. dapp/src/types/: tipos TypeScript."
+}

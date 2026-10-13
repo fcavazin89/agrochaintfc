@@ -1,0 +1,9 @@
+{
+  "commitment": "12345678901234567890123456789012345678901234567890123456789012345",
+  "minimumScore": "90",
+  "lotContext": "1",
+  "standardContext": "2", 
+  "reportContext": "3",
+  "qualityScore": "85",
+  "salt": "12345"
+}

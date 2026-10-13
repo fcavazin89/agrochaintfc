@@ -34,6 +34,9 @@ contract CoffeeCacaoSwapFactory is Ownable, ReentrancyGuard {
     /// @notice All created pool addresses
     address[] public allPools;
     
+    /// @notice Mapping to check if an address is a pool created by this factory
+    mapping(address => bool) public isPool;
+    
     /// @dev Custom errors for gas efficiency
     error ZeroAddress();
     error NotCertifiedCoffee();
@@ -129,6 +132,7 @@ contract CoffeeCacaoSwapFactory is Ownable, ReentrancyGuard {
         getPool[token0][token1] = pool;
         getPool[token1][token0] = pool;
         allPools.push(pool);
+        isPool[pool] = true;
         
         emit PoolCreated(token0, token1, pool, allPools.length - 1);
     }

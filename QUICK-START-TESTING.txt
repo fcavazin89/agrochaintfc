@@ -1,0 +1,144 @@
+═══════════════════════════════════════════════════════════════════════════════
+                    🧪 METAMASK INTEGRATION TEST - QUICK START
+═══════════════════════════════════════════════════════════════════════════════
+
+✅ STATUS: READY TO TEST
+
+📍 DApp URL: http://localhost:3000/certificacao
+📍 Test Contract: 0x5FbDB2315678afecb367f032d93F642f64180aa3
+📍 Network: Hardhat (localhost:8545, Chain ID: 31337)
+
+───────────────────────────────────────────────────────────────────────────────
+SETUP (2 minutes)
+───────────────────────────────────────────────────────────────────────────────
+
+1. METAMASK NETWORK SETUP:
+   • MetaMask → Settings → Networks → Add network
+   • Name: Hardhat Local
+   • RPC: http://127.0.0.1:8545
+   • Chain ID: 31337
+   • Save
+
+2. OPTIONAL - Import Test Account:
+   • MetaMask → My Accounts → Import Account
+   • Private Key: ac0974bec39a17e36ba4a6b4d238ff944bacb476c6b8d6f58f1e62b12abeab0d
+   • This account has 10,000 ETH pre-funded
+
+───────────────────────────────────────────────────────────────────────────────
+TEST (3 minutes)
+───────────────────────────────────────────────────────────────────────────────
+
+1. Open: http://localhost:3000/certificacao
+
+2. Click MetaMask icon (top-right) → Connect wallet
+
+3. Click button: "⚠️ Configurar Endereço do Contrato"
+   Paste: 0x5FbDB2315678afecb367f032d93F642f64180aa3
+   Click OK
+
+4. Fill form:
+   • Batch ID: BATCH-001
+   • Type: Coffee
+   • Variety: Arabica
+   • Weight (kg): 100
+   • Origin: Colombia
+
+5. Click: "🎯 Emitir Certificado"
+   ← METAMASK DIALOG SHOULD APPEAR HERE ←
+
+6. In MetaMask: Click "Confirm"
+
+7. Expected result:
+   ✅ TX hash appears on page (starts with 0x)
+   ✅ All 4 steps show green checkmarks
+   ✅ Green success message appears
+
+───────────────────────────────────────────────────────────────────────────────
+KEY INDICATORS OF SUCCESS
+───────────────────────────────────────────────────────────────────────────────
+
+✅ Page loads without error
+✅ Wallet connects (address shows top-right)
+✅ Contract address accepts valid 42-char address
+✅ Form submits without validation errors
+✅ MetaMask dialog appears IMMEDIATELY after form submit
+✅ TX hash generates after MetaMask confirmation
+✅ All 4 progress steps complete
+
+───────────────────────────────────────────────────────────────────────────────
+TROUBLESHOOTING
+───────────────────────────────────────────────────────────────────────────────
+
+❌ Hydration error:
+   → Refresh page (F5)
+
+❌ MetaMask not found:
+   → Check F12 → Console for errors
+   → Type: window.ethereum (should show object, not undefined)
+
+❌ Contract address "invalid":
+   → Must be exactly 42 characters
+   → Must start with 0x
+   → Use: 0x5FbDB2315678afecb367f032d93F642f64180aa3
+
+❌ MetaMask dialog doesn't appear:
+   → Refresh page
+   → Check F12 → Console for errors
+   → Verify MetaMask is on "Hardhat Local" network
+   → Verify MetaMask is unlocked
+
+❌ TX doesn't execute:
+   → Check MetaMask for pending transactions
+   → Look at browser console (F12)
+   → Verify all form fields are filled
+
+───────────────────────────────────────────────────────────────────────────────
+FILES INVOLVED
+───────────────────────────────────────────────────────────────────────────────
+
+• dapp/src/app/certificacao/page.tsx
+  → Main page (FIXED: hydration issue resolved)
+
+• dapp/src/components/layout/TopBar.tsx
+  → Wallet connect component (FIXED: suppressHydrationWarning added)
+
+• blockchain/contracts/CertificacaoTest.sol
+  → Test contract on Hardhat network
+
+• blockchain/deployment-local.json
+  → Contract deployment info
+
+───────────────────────────────────────────────────────────────────────────────
+COMMANDS
+───────────────────────────────────────────────────────────────────────────────
+
+Start DApp:
+  cd dapp && npm run dev
+
+Rebuild contract (if modified):
+  npm run blockchain:compile
+
+Deploy new test contract:
+  npx hardhat test blockchain/tests/deploy-and-print.test.js --network hardhatMainnet
+
+───────────────────────────────────────────────────────────────────────────────
+NEXT STEPS
+───────────────────────────────────────────────────────────────────────────────
+
+✅ Phase 1 (NOW): Test local MetaMask integration
+   → You are here! Test the flow above.
+
+✅ Phase 2 (If successful): Deploy to Sepolia testnet
+   → Get Sepolia ETH from faucet
+   → Deploy contract to Sepolia
+   → Update MetaMask to Sepolia network
+   → Test end-to-end with real blockchain
+
+✅ Phase 3 (If Phase 2 succeeds): Integrate full platform
+   → Deploy CoffeeCacaoTraceability contract
+   → Connect DEX endpoints
+   → Test all modules
+
+═══════════════════════════════════════════════════════════════════════════════
+Ready? → Open http://localhost:3000/certificacao and test! 🚀
+═══════════════════════════════════════════════════════════════════════════════
