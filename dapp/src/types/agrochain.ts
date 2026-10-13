@@ -177,3 +177,43 @@ export interface MarketplaceStats {
   averagePrice: number;
   mostCommon: BatchType;
 }
+
+// =====================================================================
+// BUYER TYPES
+// =====================================================================
+
+export enum DeliveryStatus {
+  Aguardando = 'Aguardando',
+  Emitido = 'Emitido',
+  Transportando = 'Transportando',
+  Entregue = 'Entregue',
+  Rejeitado = 'Rejeitado',
+}
+
+export interface BuyerProfile {
+  buyerId: string;
+  nome: string;
+  empresa: string;
+  país: string;
+  reputação: number; // Valor entre 0-100 (average rating)
+  lotesComprados: number;
+  endereco?: string; // wallet address
+  dataRegistro?: number; // timestamp
+  email?: string;
+}
+
+export interface PurchaseOrder {
+  orderId: string;
+  listingId: string;
+  loteId: string;
+  produtor: string; // endereço do produtor
+  dataCompra: number; // timestamp
+  dataEntrega: number; // timestamp (data esperada)
+  status: DeliveryStatus;
+  quantidadeKg?: number;
+  precoUnitario?: number;
+  precoTotal?: number;
+  comprador?: string; // endereço do comprador
+  origem?: string;
+  observacoes?: string;
+}
