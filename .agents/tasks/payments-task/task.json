@@ -1,0 +1,7 @@
+{
+  "task_id": "task-payments-escrow",
+  "task_description": "Implementar arquitetura de pagamentos com Mock ERC20 (MockUSDC) e contrato escrow (AgroChainPayments), mais utils TypeScript com ABIs e Dashboard do Produtor para listar lotes e vendas ativas.",
+  "status": "completed",
+  "feature_order": ["FEAT-001", "FEAT-002", "FEAT-003"],
+  "blocked_reason": null
+}
