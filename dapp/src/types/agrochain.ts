@@ -240,3 +240,47 @@ export interface Review {
   texto: string; // até 300 caracteres
   status: 'Enviado' | 'Pendente' | 'Rejeitado';
 }
+
+// =====================================================================
+// VERIFICATION TYPES (Módulo de Verificação)
+// =====================================================================
+
+export type VerificationStatus = 'Não Iniciado' | 'Em Verificação' | 'Aprovado' | 'Rejeitado';
+
+export interface OriginVerification {
+  verificacaoId: string;
+  loteId: string;
+  pais: string;
+  regiao: string;
+  latitude: number;
+  longitude: number;
+  provaDeOrigem: string;
+  dataVerificacao: number;
+  status: VerificationStatus;
+  verificadorAddress?: string;
+}
+
+export interface EUDRCompliance {
+  eudrcId: string;
+  loteId: string;
+  dataVerificacao: number;
+  desmatamentoDetectado: boolean;
+  percentualDesmatamento?: number;
+  sateliteProva: string;
+  confianca: number;
+  status: VerificationStatus;
+  dataAnalise?: number;
+}
+
+export interface ESGScore {
+  esgId: string;
+  loteId: string;
+  scoreAmbiental: number;
+  scoreSocial: number;
+  scoreGovernanca: number;
+  scoreFinal: number;
+  dataCalculada: number;
+  metodologia: string;
+  status: VerificationStatus;
+  detalhes?: string;
+}
