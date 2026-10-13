@@ -1,0 +1,23 @@
+{
+  "id": "FEAT-001",
+  "type": "feat",
+  "description": "Implementar dois contratos Solidity 0.8.37 em OpenZeppelin: MockUSDC (ERC20 teste com mint aberto) e AgroChainPayments (escrow simples: produtor vende, comprador deposita USDC, depois aceita/rejeita para liberar/reembolsar).",
+  "status": "completed",
+  "steps": [
+    "Criar blockchain/contracts/MockUSDC.sol: herda ERC20 de OpenZeppelin, totalsupply 18 decimais, função mint() pública sem permissões, construtor inicializa as constantes",
+    "Criar blockchain/contracts/AgroChainPayments.sol: (a) Struct Order { id, seller, buyer, productId, tokenAddress, amount, status }; (b) Mapping orders[orderId]; (c) função createOrder(seller, productId, amount, tokenAddress): cria nova ordem em ESCROW; (d) função depositEscrow(orderId): comprador deposita tokens no escrow; (e) função acceptOrder(orderId): libera fundos ao vendedor; (f) função rejectOrder(orderId): devolve fundos ao comprador; (g) eventos OrderCreated, Deposited, Accepted, Rejected com índices",
+    "Atualizar blockchain/hardhat.config.js: adicionar task 'deploy:mockusdc' que chama deploy do MockUSDC (retorna endereço em console.log), adicionar task 'deploy:payments' que chama deploy do AgroChainPayments (retorna endereço em console.log)"
+  ],
+  "acceptance_criteria": [
+    "npm run blockchain:compile executa sem erros",
+    "MockUSDC tem função mint() pública que cria tokens, transferências funcionam com ERC20 padrão",
+    "AgroChainPayments compila e deploy tasks existem",
+    "Contratos seguem estrutura e comentários de AgroChainCoffeeCacaoTraceability (style check manual)"
+  ],
+  "verification": [
+    "npm run blockchain:compile: sem erros, artefatos gerados em blockchain/artifacts/contracts/",
+    "npm run deploy:sepolia (se configure): compila e apresenta endereços dos dois contratos"
+  ],
+  "blocked_reason": null,
+  "findings": "✓ MockUSDC.sol compilado com sucesso - ERC20 com mint() pública, 18 decimais\n✓ AgroChainPayments.sol compilado com sucesso - escrow com Order struct, eventos indexed, 4 status (PENDING, ESCROW, ACCEPTED, REJECTED)\n✓ Artefatos gerados em blockchain/artifacts/blockchain/contracts/\n✓ hardhat.config.js atualizado com deploy tasks (deploy:mockusdc, deploy:payments)\n✓ SafeERC20 import usado para segurança em transferências\n✓ Sintaxe de events corrigida: indexed vem antes do tipo, não depois"
+}
