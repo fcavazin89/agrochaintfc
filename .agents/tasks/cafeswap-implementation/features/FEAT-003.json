@@ -2,7 +2,7 @@
   "id": "FEAT-003",
   "type": "feat",
   "description": "Implement Coffee/Cacao liquidity mining (CoffeeCacaoFarm MasterChef) with per-second CAFE emissions, multiple Coffee/Cacao LP farms with allocation points, and correct reward debt management. Critical: reward debt MUST be set AFTER amount update to prevent reward loss, following the fixed algorithm from DESIGN-FIXES.md. Only Coffee/Cacao LP tokens accepted.",
-  "status": "pending",
+  "status": "done",
   "steps": [
     "Implement CoffeeCacaoFarm.sol (MasterChef pattern): struct FarmInfo { IERC20 lpToken; uint256 allocPoint; uint256 lastRewardTime; uint256 accCafePerShare; string farmName; bool isCoffeeFarm; }, struct UserInfo { uint256 amount; uint256 rewardDebt; }, uint256 cafePerSecond emission rate, uint256 totalAllocPoint, MAX_FARMS = 50 constant, mapping to track Coffee-only farms vs Cacao-only farms vs Coffee/Cacao pair farms",
     "Implement stake(uint256 farmId, uint256 amount): 1) updateFarm(farmId) to sync accCafePerShare, 2) calculate pending = user.amount * farm.accCafePerShare / 1e12 - user.rewardDebt and store, 3) user.amount += amount, 4) user.rewardDebt = user.amount * farm.accCafePerShare / 1e12 (CRITICAL: set AFTER amount update), 5) transfer LP tokens to contract, ReentrancyGuard",
