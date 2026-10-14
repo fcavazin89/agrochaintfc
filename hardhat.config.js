@@ -40,7 +40,8 @@ export default defineConfig({
     artifacts: "./blockchain/artifacts"
   },
   mocha: {
-    timeout: 120000
+    timeout: 120000,
+    spec: ["blockchain/tests/**/*.test.js", "blockchain/test/**/*.test.js"]
   },
   solidity: {
     version: "0.8.37",

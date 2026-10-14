@@ -69,7 +69,9 @@ contract CafeSwapRouter is ReentrancyGuard, Ownable {
     }
     
     /// @notice Adds liquidity to a token pair pool
-    /// @dev Creates pool if it doesn't exist (only if both tokens are certified)
+    /// @dev If createPoolIfNeeded is false and the pool does not exist, the call reverts.
+    ///      Set createPoolIfNeeded=true only when you explicitly intend to deploy a new pool
+    ///      (incurs pool-deployment gas cost).
     function addLiquidity(
         address tokenA,
         address tokenB,
@@ -78,7 +80,8 @@ contract CafeSwapRouter is ReentrancyGuard, Ownable {
         uint256 amountAMin,
         uint256 amountBMin,
         address to,
-        uint256 deadline
+        uint256 deadline,
+        bool createPoolIfNeeded
     ) external ensure(deadline) nonReentrant returns (uint256 amountA, uint256 amountB, uint256 liquidity) {
         // Canonicalize order
         (address token0, address token1) = tokenA < tokenB ? (tokenA, tokenB) : (tokenB, tokenA);
@@ -86,6 +89,7 @@ contract CafeSwapRouter is ReentrancyGuard, Ownable {
         // Get or create pool
         address pool = ICafeSwapFactory(factory).getPair(token0, token1);
         if (pool == address(0)) {
+            if (!createPoolIfNeeded) revert InsufficientLiquidity();
             pool = ICafeSwapFactory(factory).createPool(tokenA, tokenB);
         }
         

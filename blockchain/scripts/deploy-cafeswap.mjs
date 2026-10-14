@@ -74,6 +74,16 @@ console.log("  ✓ Governance granted GOVERNANCE_ROLE on Farm");
 await (await router.setGovernance(deployments.governance)).wait();
 console.log("  ✓ Router governance set\n");
 
+// Transfer factory ownership to governance so certification whitelisting
+// is governed by token holders rather than the deployer (Finding 4 fix).
+// This runs AFTER initial setup so any bootstrap certification can still
+// be done in the same deployment transaction if needed.
+console.log("  Transferring Factory ownership to Governance...");
+await (await factory.transferOwnership(deployments.governance)).wait();
+console.log("  ✓ Factory ownership transferred to Governance");
+console.log("    NOTE: Future addCertifiedToken/removeCertifiedToken calls");
+console.log("    must go through on-chain governance proposals.\n");
+
 // 7. Save deployment addresses
 console.log("7. Saving deployment addresses...");
 const deploymentPath = path.join(root, "blockchain", "cafeswap-deployments.json");

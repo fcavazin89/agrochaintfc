@@ -12,6 +12,8 @@ interface IERC20 {
 
 interface ICafeToken {
     function mint(address to, uint256 amount) external;
+    function totalSupply() external view returns (uint256);
+    function MAX_SUPPLY() external view returns (uint256);
 }
 
 /// @title CafeFarm
@@ -56,6 +58,9 @@ contract CafeFarm is ReentrancyGuard, AccessControl {
     error InvalidPool();
     error InsufficientBalance();
     error OnlyGovernance();
+    
+    /// @notice Emitted when CAFE minting is skipped because max supply was reached
+    event RewardSkipped(address indexed user, uint256 indexed pid, uint256 amount);
     
     event Deposit(address indexed user, uint256 indexed pid, uint256 amount);
     event Withdraw(address indexed user, uint256 indexed pid, uint256 amount);
@@ -103,13 +108,14 @@ contract CafeFarm is ReentrancyGuard, AccessControl {
     }
     
     /// @notice Updates allocation points for a pool
-    function setAllocPoint(uint256 pid, uint256 allocPoint, bool withUpdate) external {
+    /// @dev Always updates all pools first to prevent reward miscalculation
+    function setAllocPoint(uint256 pid, uint256 allocPoint) external {
         if (!hasRole(GOVERNANCE_ROLE, msg.sender)) revert OnlyGovernance();
         if (pid >= poolInfo.length) revert InvalidPool();
         
-        if (withUpdate) {
-            massUpdatePools();
-        }
+        // Always update all pools before changing allocation to prevent
+        // reward miscalculation for the period before this change
+        massUpdatePools();
         
         totalAllocPoint = totalAllocPoint - poolInfo[pid].allocPoint + allocPoint;
         poolInfo[pid].allocPoint = allocPoint;
@@ -274,7 +280,17 @@ contract CafeFarm is ReentrancyGuard, AccessControl {
     }
     
     /// @dev Safe CAFE transfer function (mints new tokens)
+    /// @dev Gracefully skips minting if the max supply cap would be exceeded.
+    ///      Emits RewardSkipped so indexers can detect supply-exhausted farms.
     function safeCafeTransfer(address to, uint256 amount) internal {
-        ICafeToken(cafe).mint(to, amount);
+        ICafeToken cafeToken = ICafeToken(cafe);
+        uint256 remaining = cafeToken.MAX_SUPPLY() - cafeToken.totalSupply();
+        if (remaining == 0) {
+            // Supply cap reached – skip reward to avoid reverting the entire operation
+            emit RewardSkipped(to, 0, amount);
+            return;
+        }
+        uint256 mintAmount = amount > remaining ? remaining : amount;
+        cafeToken.mint(to, mintAmount);
     }
 }

@@ -77,7 +77,7 @@ contract CafeGovernance {
     error QuorumNotReached();
     error OnlyProposer();
     error ProposalAlreadyCanceled();
-    error ExecutionFailed();
+    error ExecutionFailed(uint256 callIndex, bytes returnData);
     
     event ProposalCreated(
         uint256 indexed proposalId,
@@ -219,10 +219,10 @@ contract CafeGovernance {
         
         // Execute all calls
         for (uint256 i = 0; i < proposal.targets.length; i++) {
-            (bool success, ) = proposal.targets[i].call{value: proposal.values[i]}(
+            (bool success, bytes memory returnData) = proposal.targets[i].call{value: proposal.values[i]}(
                 proposal.calldatas[i]
             );
-            if (!success) revert ExecutionFailed();
+            if (!success) revert ExecutionFailed(i, returnData);
         }
         
         emit ProposalExecuted(proposalId);

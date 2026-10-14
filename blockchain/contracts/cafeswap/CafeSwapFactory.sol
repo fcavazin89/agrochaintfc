@@ -41,6 +41,7 @@ contract CafeSwapFactory is Ownable {
     
     event PoolCreated(address indexed token0, address indexed token1, address pool, uint256 totalPools);
     event CertifiedTokenAdded(address indexed token, bytes32 certId);
+    event CertifiedTokenRemoved(address indexed token);
     event FeeToChanged(address indexed feeTo);
     event FeeToSetterChanged(address indexed feeToSetter);
     
@@ -71,8 +72,20 @@ contract CafeSwapFactory is Ownable {
         emit CertifiedTokenAdded(token, certId);
     }
     
-    /// @notice Creates a new liquidity pool for a certified token pair
-    /// @dev Both tokens must be certified, uses CREATE2 for deterministic addresses
+    /// @notice Removes a token from the certification whitelist
+    /// @dev Does NOT affect existing pools – they continue to operate.
+    ///      New pools cannot be created for the delisted token.
+    /// @param token The token address to delist
+    function removeCertifiedToken(address token) external onlyOwner {
+        if (!certifiedTokens[token]) revert TokenNotCertified();
+        
+        certifiedTokens[token] = false;
+        tokenToCertId[token] = bytes32(0);
+        
+        emit CertifiedTokenRemoved(token);
+    }
+    
+    /// @notice Creates a new liquidity pool for a certified token pair    /// @dev Both tokens must be certified, uses CREATE2 for deterministic addresses
     /// @param tokenA First token address
     /// @param tokenB Second token address
     /// @return pool The address of the created pool
@@ -301,17 +314,27 @@ contract CafeSwapPool {
         );
     }
     
-    /// @notice Returns simplified TWAP data (cumulative prices)
-    /// @dev Caller must track prior values for true TWAP calculation
-    function getCurrentTWAP(uint32 windowSize) external view returns (uint256 price0Average, uint256 price1Average) {
-        // Return current cumulative prices
-        // NOTE: This is a simplified implementation. For true TWAP, the caller
-        // must store prior cumulative values and calculate the difference over the window
+    /// @notice Returns cumulative price accumulators for TWAP computation
+    /// @dev To compute a true TWAP over a window, callers must:
+    ///      1. Record (price0CumulativeLast, block.timestamp) at time T0
+    ///      2. Record (price0CumulativeLast, block.timestamp) at time T1
+    ///      3. Compute average = (cumulative1 - cumulative0) / (T1 - T0)
+    ///      The windowSize parameter is accepted for ABI compatibility but is not used here.
+    /// @param windowSize Reserved for future on-chain averaging (unused)
+    /// @return price0Average Current price0CumulativeLast value (not a windowed average)
+    /// @return price1Average Current price1CumulativeLast value (not a windowed average)
+    function getPriceCumulatives(uint32 windowSize) external view returns (uint256 price0Average, uint256 price1Average) {
+        // Return current cumulative prices.
+        // NOTE: These are NOT averages. Use the difference between two snapshots to get TWAP.
         price0Average = price0CumulativeLast;
         price1Average = price1CumulativeLast;
     }
     
     /// @notice Emergency withdrawal of stuck tokens (not pool tokens)
+    /// @dev CENTRALIZATION NOTE: feeToSetter (initially the deployer) can extract
+    ///      non-pool tokens immediately with no timelock. Intended only for genuine
+    ///      stuck-token recovery. Mitigate by transferring feeToSetter to a multisig
+    ///      or governance contract after deployment.
     function emergencyWithdraw(address token, address to) external {
         address _feeToSetter = CafeSwapFactory(factory).feeToSetter();
         if (msg.sender != _feeToSetter) revert Forbidden();
