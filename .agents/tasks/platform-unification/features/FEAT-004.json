@@ -1,0 +1,19 @@
+{
+  "id": "FEAT-004",
+  "type": "feat",
+  "description": "Adicionar error boundary global (app/error.tsx) e envolvê-lo com Suspense no layout raiz (review finding 5).",
+  "status": "completed",
+  "steps": [
+    "Criar dapp/src/app/error.tsx como Client Component com props error/reset e botão 'Tentar novamente'",
+    "Importar Suspense em layout.tsx e envolver {children} com fallback 'Carregando…'"
+  ],
+  "acceptance_criteria": [
+    "app/error.tsx existe e é client component",
+    "layout.tsx usa <Suspense> em volta de {children}"
+  ],
+  "verification": [
+    "npm run build (dapp): Compiled successfully"
+  ],
+  "blocked_reason": null,
+  "findings": "✓ error.tsx criado (recuperação via reset()); layout raiz agora tem boundary de Suspense com fallback."
+}

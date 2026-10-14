@@ -1,0 +1,13 @@
+{
+  "verdict": "APPROVED",
+  "findings": [
+    "FEAT-001 (finding 1 — escrow gap na rejeição): rejectOffer() só atua sobre ofertas PENDING, que ainda não possuem ordem/escrow. Para ofertas efetivamente financiadas foi adicionado refundOfferEscrow(), que chama agroChainPayments.rejectOrder() e repassa os tokens devolvidos ao comprador real. Gap resolvido.",
+    "FEAT-001 (finding 2 — peso irreversível): criado o helper _releaseReservedWeight() e usado em refundOfferEscrow() e cancelAcceptedOffer(). O vendedor pode liberar o peso de uma oferta aceita e ainda não financiada, e o reembolso reativa listagens marcadas como SOLD.",
+    "FEAT-001 (finding 3 — expiração): já havia require(offer.expiresAt > block.timestamp) em acceptOffer (linha ~381). Comportamento agora coberto por teste dedicado ('Should revert when the offer has expired').",
+    "FEAT-001 (finding 4 — overflow/bounds): adicionadas constantes MAX_QUANTITY_KG (1e9) e MAX_PRICE_PER_KG (1e18) aplicadas em createListing e makeOffer, com mensagens de revert dedicadas e testes de limite.",
+    "FEAT-001 (finding 5 — mock data sem fallback): fora do escopo do contrato; o frontend atual (dapp/src/lib/contracts/marketplace.ts) é um stub e não foi alterado nesta task. Registrado como follow-up de integração Web3.",
+    "FEAT-002 (cobertura de testes): criada a suíte blockchain/tests/AgroChainMarketplace.test.js com 32 testes cobrindo deploy, listagem, ofertas, aceite, financiamento, liberação, reembolso, cancelamento e guards de acesso.",
+    "Verificação: npx hardhat compile sem erros; npx hardhat test 'blockchain/tests/AgroChainMarketplace.test.js' --network hardhatMainnet => 32 passing."
+  ],
+  "notes": "Integração de escrow corrigida com relay não-custodial no Marketplace. Enum OfferStatus estendido de forma aditiva (0-3 estáveis para o frontend; 4-6 novos). Nenhuma alteração no frontend nesta task."
+}

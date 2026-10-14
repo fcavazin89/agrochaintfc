@@ -1,0 +1,12 @@
+{
+  "verdict": "APPROVED",
+  "findings": [
+    "FEAT-001 (finding 1, HIGH — MetaMask TX incompleto): certificacao/page.tsx migrado de window.ethereum.request('eth_sendTransaction') para useWriteContract/useWaitForTransactionReceipt com AGRO_CERT_NFT_ABI e função mintCertificado. Hooks declarados antes do early-return de hidratação. Receipt tratado em useEffect (status reverted e parse do log CertificadoMintado).",
+    "FEAT-002 (finding 2, MEDIUM — config Wagmi): lib/wagmi.ts agora inclui sepolia nos chains/transports; providers.tsx configura QueryClient com retry: 2, retryDelay: 1000 e refetchOnWindowFocus: false.",
+    "FEAT-003 (finding 4, MEDIUM — endpoint hard-coded): compliance/page.tsx usa process.env.NEXT_PUBLIC_COMPLIANCE_API_URL com fallback local; criado dapp/.env.example documentando as variáveis NEXT_PUBLIC_*.",
+    "FEAT-004 (finding 5, MEDIUM — error boundaries): criado dapp/src/app/error.tsx e o layout raiz envolve {children} em <Suspense> com fallback.",
+    "Finding 3 (MEDIUM — inline styles em todas as páginas): NÃO corrigido nesta task; refatoração ampla e não bloqueante, registrada como adiada (deferred_findings em task.json).",
+    "Verificação: npm run build em dapp/ => Compiled successfully (sem erros de tipo)."
+  ],
+  "notes": "Findings bloqueantes e de produção (1,2,4,5) resolvidos e verificados via build. O único finding remanescente (inline styles) é cosmético/manutenção e foi explicitamente adiado."
+}

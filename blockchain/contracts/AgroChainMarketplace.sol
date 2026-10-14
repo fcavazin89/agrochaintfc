@@ -20,11 +20,16 @@ contract AgroChainMarketplace {
     }
 
     /// @notice Status possível de uma oferta
+    /// @dev Os valores 0-3 são estáveis (consumidos pelo frontend); novos
+    ///      estados são anexados ao final para não quebrar mapeamentos.
     enum OfferStatus {
         PENDING,     // 0: Aguardando resposta do produtor
-        ACCEPTED,    // 1: Aceita, pagamento processado
+        ACCEPTED,    // 1: Aceita pelo produtor, aguardando financiamento do escrow
         REJECTED,    // 2: Rejeitada pelo produtor
-        CANCELLED    // 3: Cancelada pelo comprador
+        CANCELLED,   // 3: Cancelada pelo comprador
+        FUNDED,      // 4: Escrow financiado pelo comprador
+        COMPLETED,   // 5: Escrow liberado ao vendedor
+        REFUNDED     // 6: Escrow devolvido ao comprador
     }
 
     /// @notice Tipo de lote: Coffee ou Cacao
@@ -92,6 +97,12 @@ contract AgroChainMarketplace {
     /// @notice Tempo de expiração de uma oferta em segundos (48 horas)
     uint256 public constant OFFER_EXPIRATION_TIME = 48 hours;
 
+    /// @notice Teto de quantidade aceitável por listagem/oferta (1 bilhão de kg)
+    uint256 public constant MAX_QUANTITY_KG = 1_000_000_000;
+
+    /// @notice Teto de preço por kg em unidades do token (ex: 1e18 = 1 token com 18 decimals)
+    uint256 public constant MAX_PRICE_PER_KG = 1e18;
+
     /// @notice Comissão do marketplace em basis points (ex: 250 = 2.5%)
     uint256 public marketplaceFeePercentage = 250; // 2.5%
 
@@ -151,6 +162,41 @@ contract AgroChainMarketplace {
         uint256 quantityKg,
         uint256 totalPrice,
         uint256 orderId,
+        uint256 timestamp
+    );
+
+    /// @notice Emitido quando o comprador financia o escrow de uma oferta aceita
+    event OfferEscrowDeposited(
+        uint256 indexed offerId,
+        uint256 indexed orderId,
+        address indexed buyer,
+        uint256 amount,
+        uint256 timestamp
+    );
+
+    /// @notice Emitido quando o escrow é liberado ao vendedor
+    event OfferEscrowReleased(
+        uint256 indexed offerId,
+        uint256 indexed orderId,
+        address indexed seller,
+        uint256 amount,
+        uint256 timestamp
+    );
+
+    /// @notice Emitido quando o escrow é devolvido ao comprador
+    event OfferEscrowRefunded(
+        uint256 indexed offerId,
+        uint256 indexed orderId,
+        address indexed buyer,
+        uint256 amount,
+        uint256 timestamp
+    );
+
+    /// @notice Emitido quando o peso reservado por uma oferta é liberado
+    event OfferWeightReleased(
+        uint256 indexed offerId,
+        uint256 indexed listingId,
+        uint256 quantityKg,
         uint256 timestamp
     );
 
@@ -253,7 +299,9 @@ contract AgroChainMarketplace {
         string calldata _safra
     ) external returns (uint256) {
         require(_weightKg > 0, "AgroChainMarketplace: Peso deve ser maior que zero");
+        require(_weightKg <= MAX_QUANTITY_KG, "AgroChainMarketplace: Peso excede o limite maximo");
         require(_pricePerKg > 0, "AgroChainMarketplace: Preco deve ser maior que zero");
+        require(_pricePerKg <= MAX_PRICE_PER_KG, "AgroChainMarketplace: Preco excede o limite maximo");
         require(_tokenAddress != address(0), "AgroChainMarketplace: Endereco do token invalido");
         require(bytes(_origin).length > 0, "AgroChainMarketplace: Origem nao pode estar vazia");
         require(bytes(_safra).length > 0, "AgroChainMarketplace: Safra nao pode estar vazia");
@@ -328,11 +376,13 @@ contract AgroChainMarketplace {
 
         require(listing.status == ListingStatus.ACTIVE, "AgroChainMarketplace: Listagem nao esta ACTIVE");
         require(_quantityKg > 0, "AgroChainMarketplace: Quantidade deve ser maior que zero");
+        require(_quantityKg <= MAX_QUANTITY_KG, "AgroChainMarketplace: Quantidade excede o limite maximo");
         require(
             _quantityKg <= (listing.weightKg - listing.weightSoldKg),
             "AgroChainMarketplace: Quantidade nao disponivel"
         );
         require(_pricePerKg > 0, "AgroChainMarketplace: Preco deve ser maior que zero");
+        require(_pricePerKg <= MAX_PRICE_PER_KG, "AgroChainMarketplace: Preco excede o limite maximo");
         require(msg.sender != listing.seller, "AgroChainMarketplace: Vendedor nao pode fazer oferta no seu proprio anuncio");
 
         uint256 totalPrice = _quantityKg * _pricePerKg;
@@ -442,6 +492,103 @@ contract AgroChainMarketplace {
         offer.status = OfferStatus.CANCELLED;
 
         emit OfferCancelled(_offerId, offer.listingId, msg.sender, block.timestamp);
+    }
+
+    // =====================================================================
+    // ESCROW FUNCTIONS
+    // =====================================================================
+
+    /// @notice Comprador financia o escrow de uma oferta já aceita pelo vendedor.
+    /// @dev O Marketplace atua como intermediário: puxa os tokens do comprador,
+    ///      aprova o contrato de pagamentos e deposita no escrow. Como o
+    ///      Marketplace é quem chama `AgroChainPayments.createOrder`, ele é o
+    ///      `buyer` da ordem e por isso é o único autorizado a depositar.
+    /// @param _offerId ID da oferta a financiar
+    function depositOfferEscrow(uint256 _offerId) external offerExists(_offerId) {
+        Offer storage offer = offers[_offerId];
+        Listing storage listing = listings[offer.listingId];
+
+        require(offer.status == OfferStatus.ACCEPTED, "AgroChainMarketplace: Oferta nao esta aguardando financiamento");
+        require(msg.sender == offer.buyer, "AgroChainMarketplace: Apenas o comprador pode financiar o escrow");
+
+        IERC20 token = IERC20(listing.tokenAddress);
+        uint256 amount = offer.totalPrice;
+
+        offer.status = OfferStatus.FUNDED;
+
+        token.safeTransferFrom(offer.buyer, address(this), amount);
+        token.forceApprove(address(agroChainPayments), amount);
+        agroChainPayments.depositEscrow(offer.orderId);
+
+        emit OfferEscrowDeposited(_offerId, offer.orderId, offer.buyer, amount, block.timestamp);
+    }
+
+    /// @notice Comprador libera o escrow financiado ao vendedor.
+    /// @param _offerId ID da oferta financiada
+    function releaseOfferEscrow(uint256 _offerId) external offerExists(_offerId) {
+        Offer storage offer = offers[_offerId];
+        Listing storage listing = listings[offer.listingId];
+
+        require(offer.status == OfferStatus.FUNDED, "AgroChainMarketplace: Oferta nao esta financiada");
+        require(msg.sender == offer.buyer, "AgroChainMarketplace: Apenas o comprador pode liberar o escrow");
+
+        offer.status = OfferStatus.COMPLETED;
+
+        agroChainPayments.acceptOrder(offer.orderId);
+
+        emit OfferEscrowReleased(_offerId, offer.orderId, listing.seller, offer.totalPrice, block.timestamp);
+    }
+
+    /// @notice Comprador solicita o reembolso do escrow financiado.
+    /// @dev O contrato de pagamentos devolve os tokens ao Marketplace (buyer da
+    ///      ordem); o Marketplace repassa ao comprador real e libera o peso
+    ///      reservado na listagem.
+    /// @param _offerId ID da oferta a reembolsar
+    function refundOfferEscrow(uint256 _offerId) external offerExists(_offerId) {
+        Offer storage offer = offers[_offerId];
+        Listing storage listing = listings[offer.listingId];
+
+        require(offer.status == OfferStatus.FUNDED, "AgroChainMarketplace: Oferta nao esta financiada");
+        require(msg.sender == offer.buyer, "AgroChainMarketplace: Apenas o comprador pode reembolsar o escrow");
+
+        offer.status = OfferStatus.REFUNDED;
+        _releaseReservedWeight(offer.listingId, offer.quantityKg);
+
+        agroChainPayments.rejectOrder(offer.orderId);
+
+        IERC20(listing.tokenAddress).safeTransfer(offer.buyer, offer.totalPrice);
+
+        emit OfferEscrowRefunded(_offerId, offer.orderId, offer.buyer, offer.totalPrice, block.timestamp);
+        emit OfferWeightReleased(_offerId, offer.listingId, offer.quantityKg, block.timestamp);
+    }
+
+    /// @notice Vendedor cancela uma oferta aceita que ainda não foi financiada.
+    /// @dev Libera o peso reservado, permitindo que a listagem volte a ficar ACTIVE.
+    /// @param _offerId ID da oferta aceita (e ainda não financiada)
+    function cancelAcceptedOffer(uint256 _offerId) external offerExists(_offerId) {
+        Offer storage offer = offers[_offerId];
+        Listing storage listing = listings[offer.listingId];
+
+        require(msg.sender == listing.seller, "AgroChainMarketplace: Apenas o vendedor pode cancelar a oferta aceita");
+        require(offer.status == OfferStatus.ACCEPTED, "AgroChainMarketplace: Oferta nao esta aguardando financiamento");
+
+        offer.status = OfferStatus.CANCELLED;
+        _releaseReservedWeight(offer.listingId, offer.quantityKg);
+
+        emit OfferCancelled(_offerId, offer.listingId, offer.buyer, block.timestamp);
+        emit OfferWeightReleased(_offerId, offer.listingId, offer.quantityKg, block.timestamp);
+    }
+
+    /// @notice Libera o peso reservado por uma oferta e reativa a listagem se necessário
+    /// @param _listingId ID da listagem
+    /// @param _quantityKg Quantidade a liberar
+    function _releaseReservedWeight(uint256 _listingId, uint256 _quantityKg) internal {
+        Listing storage listing = listings[_listingId];
+        listing.weightSoldKg -= _quantityKg;
+        if (listing.status == ListingStatus.SOLD && listing.weightSoldKg < listing.weightKg) {
+            listing.status = ListingStatus.ACTIVE;
+        }
+        listing.updatedAt = block.timestamp;
     }
 
     // =====================================================================

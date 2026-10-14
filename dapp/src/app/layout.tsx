@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
 import './globals.css';
 import Sidebar from '@/components/layout/Sidebar';
 import TopBar from '@/components/layout/TopBar';
@@ -21,7 +22,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <div style={{display: 'flex', flex: 1}}>
                 <Sidebar />
                 <main style={{flex: 1, padding: '24px', overflowY: 'auto'}}>
-                  {children}
+                  <Suspense fallback={<div style={{padding: '24px', color: '#495649'}}>Carregando…</div>}>
+                    {children}
+                  </Suspense>
                 </main>
               </div>
             </div>

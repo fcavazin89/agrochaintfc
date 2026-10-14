@@ -1,0 +1,10 @@
+{
+  "task_id": "task-platform-unification",
+  "task_description": "Remediar os findings do review estrutural do DApp: (1) migrar a emissão de certificado em certificacao/page.tsx de window.ethereum para Wagmi useWriteContract/useWaitForTransactionReceipt; (2) endurecer a config Wagmi/QueryClient e adicionar Sepolia; (3) usar NEXT_PUBLIC_COMPLIANCE_API_URL no compliance/page.tsx; (4) adicionar error boundary global + Suspense no layout.",
+  "status": "completed",
+  "feature_order": ["FEAT-001", "FEAT-002", "FEAT-003", "FEAT-004"],
+  "blocked_reason": null,
+  "deferred_findings": [
+    "Review finding 3 (inline styles em todas as páginas): refatoração ampla e não bloqueante, adiada para task de higiene de CSS."
+  ]
+}

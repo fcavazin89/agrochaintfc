@@ -1,0 +1,30 @@
+{
+  "id": "FEAT-001",
+  "type": "fix",
+  "description": "Corrigir a integração de escrow em blockchain/contracts/AgroChainMarketplace.sol, endereçando os findings 1-4 da revisão semântica do módulo Marketplace.",
+  "status": "completed",
+  "steps": [
+    "Estender o enum OfferStatus com os estados FUNDED (4), COMPLETED (5) e REFUNDED (6), preservando os valores 0-3 consumidos pelo frontend",
+    "Adicionar constantes de limite MAX_QUANTITY_KG (1e9) e MAX_PRICE_PER_KG (1e18) e aplicar as validações em createListing e makeOffer (finding 4: overflow/limites)",
+    "Adicionar eventos OfferEscrowDeposited, OfferEscrowReleased, OfferEscrowRefunded e OfferWeightReleased",
+    "Implementar depositOfferEscrow(offerId): puxa os tokens do comprador para o Marketplace, aprova o contrato de pagamentos e deposita no escrow (status FUNDED)",
+    "Implementar releaseOfferEscrow(offerId): aciona agroChainPayments.acceptOrder e libera os fundos ao vendedor (status COMPLETED)",
+  "Implementar refundOfferEscrow(offerId): aciona rejectOrder, repassa os tokens ao comprador real e libera o peso reservado (status REFUNDED)",
+    "Implementar cancelAcceptedOffer(offerId) para o vendedor liberar o peso de uma oferta aceita e ainda não financiada (status CANCELLED)",
+    "Criar helper interno _releaseReservedWeight(listingId, quantityKg) que decrementa weightSoldKg e reativa a listagem quando ela sai de SOLD"
+  ],
+  "acceptance_criteria": [
+    "npx hardhat compile executa sem erros",
+    "Comprador consegue financiar o escrow de uma oferta aceita e o peso permanece reservado",
+    "Reembolso devolve os tokens ao comprador e libera o peso reservado",
+    "Vendedor consegue liberar o peso de uma oferta aceita não financiada",
+    "Ofertas expiradas não podem ser aceitas (require já existente, coberto por teste)",
+    "Preço/quantidade acima dos limites configurados revertem com mensagem dedicada"
+  ],
+  "verification": [
+    "npx hardhat compile: compila sem erros",
+    "npx hardhat test \"blockchain/tests/AgroChainMarketplace.test.js\" --network hardhatMainnet: 32 testes passando"
+  ],
+  "blocked_reason": null,
+  "findings": "✓ Enum OfferStatus estendido ao final (0-3 preservados; FUNDED=4, COMPLETED=5, REFUNDED=6)\n✓ Bounds MAX_QUANTITY_KG/MAX_PRICE_PER_KG aplicados em createListing e makeOffer\n✓ depositOfferEscrow/releaseOfferEscrow/refundOfferEscrow/cancelAcceptedOffer implementados com guardas de acesso\n✓ Nota: AgroChainPayments usa msg.sender como buyer da ordem, por isso o Marketplace é o buyer e o único autorizado a depositar/liberar; o relay resolve o gap descrito no review\n✓ _releaseReservedWeight reativa listagem SOLD → ACTIVE quando o peso volta a ficar disponível"
+}

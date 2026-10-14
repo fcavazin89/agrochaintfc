@@ -1,0 +1,26 @@
+{
+  "task_id": "task-platform-unification",
+  "repo_root": "workspace-01a1162b-e061-7ff0-b060-dfa40cc70dfdzip",
+  "stack": "Next.js 14 App Router + TypeScript + Wagmi v2 / Viem / @tanstack/react-query",
+  "verification_commands": {
+    "build": "npm run build (em dapp/)",
+    "lint": "npm run lint (em dapp/)"
+  },
+  "dependencies": {
+    "wagmi": "2.12.29",
+    "viem": "2.21.54",
+    "@tanstack/react-query": "5.56.2"
+  },
+  "relevant_files": [
+    "dapp/src/app/certificacao/page.tsx (migração para Wagmi)",
+    "dapp/src/lib/wagmi.ts (chains/transports)",
+    "dapp/src/app/providers.tsx (QueryClient)",
+    "dapp/src/app/compliance/page.tsx (endpoint via env)",
+    "dapp/src/app/layout.tsx (Suspense)",
+    "dapp/src/app/error.tsx (novo error boundary)",
+    "dapp/.env.example (novo)",
+    "dapp/src/lib/contracts.ts (AGRO_CERT_NFT_ABI, CERTIFICADO_MINTADO_TOPIC)"
+  ],
+  "key_patterns": "Client Components com 'use client'. Hooks do Wagmi declarados antes de early-return de hidratação (regras dos hooks). Receipt de transação tratado em useEffect. Variáveis públicas expostas via prefixo NEXT_PUBLIC_.",
+  "notes": "Review originalmente CHANGES_REQUESTED. Finding 3 (inline styles) permanece como refatoração adiada e não bloqueante."
+}

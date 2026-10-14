@@ -1,0 +1,24 @@
+{
+  "id": "FEAT-001",
+  "type": "fix",
+  "description": "Migrar a emissão de certificado NFT de window.ethereum.request('eth_sendTransaction') para Wagmi useWriteContract + useWaitForTransactionReceipt (review finding 1, HIGH).",
+  "status": "completed",
+  "steps": [
+    "Importar useAccount/useWriteContract/useWaitForTransactionReceipt de wagmi e getAddress de viem",
+    "Importar AGRO_CERT_NFT_ABI e CERTIFICADO_MINTADO_TOPIC de @/lib/contracts",
+    "Remover o construtor manual de TX (selector hard-coded + data hex manual)",
+    "Declarar hooks antes do early-return de isMounted (regras de hooks)",
+    "Substituir o envio por writeContractAsync({ address, abi: AGRO_CERT_NFT_ABI, functionName: 'mintCertificado', args: [...] })",
+    "Tratar o receipt em useEffect (status reverted -> erro; parse do log CERTIFICADO_MINTADO_TOPIC -> tokenId; setDone)"
+  ],
+  "acceptance_criteria": [
+    "Nenhuma chamada a window.ethereum.request para envio de TX",
+    "MetaMask recebe uma chamada de contrato corretamente codificada via ABI",
+    "npm run build em dapp/ compila sem erros de tipo"
+  ],
+  "verification": [
+    "npm run build (dapp): Compiled successfully"
+  ],
+  "blocked_reason": null,
+  "findings": "✓ Uso de writeContractAsync com AGRO_CERT_NFT_ABI e função mintCertificado; hooks declarados antes do early-return de hidratação; receipt tratado em useEffect com parse do tópico CertificadoMintado."
+}

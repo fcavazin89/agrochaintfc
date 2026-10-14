@@ -1,0 +1,26 @@
+{
+  "id": "FEAT-002",
+  "type": "test",
+  "description": "Criar suíte de testes do contrato AgroChainMarketplace em blockchain/tests/AgroChainMarketplace.test.js cobrindo ciclo de vida de listagens/ofertas e o relay de escrow.",
+  "status": "completed",
+  "steps": [
+    "Deploy de MockUSDC, AgroChainPayments, SmartLot e AgroChainMarketplace com helpers de setup",
+    "Helpers registerLot() (parse do evento LotRegistered), createListing(), makeOffer(), acceptOffer() e advanceTime()",
+    "Testes de Deployment (referências + reverts de endereço zero)",
+    "Testes de createListing (criação ACTIVE, produtor do lote, bounds de peso/preço)",
+    "Testes de makeOffer (PENDING, total/expiração, auto-oferta, disponibilidade, bounds)",
+    "Testes de acceptOffer (reserva de peso, SOLD, acesso, expiração, estado)",
+    "Testes de depositOfferEscrow/releaseOfferEscrow/refundOfferEscrow (fluxo de tokens, guardas)",
+    "Testes de cancelAcceptedOffer e reativação de listagem SOLD após reembolso"
+  ],
+  "acceptance_criteria": [
+    "npx hardhat test executa a suíte sem falhas",
+    "Fluxo completo (aceitar -> financiar -> liberar) paga o vendedor integralmente",
+    "Fluxo de reembolso restaura o saldo do comprador e reativa a listagem"
+  ],
+  "verification": [
+    "npx hardhat test \"blockchain/tests/AgroChainMarketplace.test.js\" --network hardhatMainnet: 32 passing"
+  ],
+  "blocked_reason": null,
+  "findings": "✓ 32 testes passando. Ciclo completo de escrow (deposit -> release), reembolso com liberação de peso, cancelamento de oferta aceita e guards de acesso/existência cobertos."
+}

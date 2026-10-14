@@ -1,7 +1,8 @@
 ﻿'use client';
 import { useState, useEffect } from 'react';
-import { useAccount } from 'wagmi';
-import { encodeFunctionData, getAddress } from 'viem';
+import { useAccount, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
+import { getAddress } from 'viem';
+import { AGRO_CERT_NFT_ABI, CERTIFICADO_MINTADO_TOPIC } from '@/lib/contracts';
 
 const NFT_CONTRACT_KEY = 'agrochain_nft_contract_address';
 const NFT_CONTRACT_DEFAULT = '0x444853d891F884EbD1b69Dc6F044a2Ff4f9C9269';
@@ -16,22 +17,8 @@ const INITIAL_STEPS: CertStep[] = [
   { label: '4. Confirmação',            status: 'PENDING' },
 ];
 
-const MINT_ABI = [{
-  name: 'mintCertificado',
-  type: 'function' as const,
-  inputs: [
-    { name: 'batchId',   type: 'string' },
-    { name: 'tipo',      type: 'string' },
-    { name: 'variedade', type: 'string' },
-    { name: 'pesoKg',    type: 'uint256' },
-    { name: 'origem',    type: 'string' },
-  ],
-  outputs: [{ name: 'tokenId', type: 'uint256' }],
-  stateMutability: 'nonpayable' as const,
-}] as const;
-
 export default function CertificacaoPage() {
-  const { address, isConnected, chain } = useAccount();
+  const { isConnected, chain } = useAccount();
 
   const [form, setForm] = useState({
     batchId: '',
@@ -51,11 +38,39 @@ export default function CertificacaoPage() {
   const [contractAddress, setContractAddressState] = useState('');
   const [isMounted, setIsMounted] = useState(false);
 
+  const { writeContractAsync } = useWriteContract();
+  const [pendingHash, setPendingHash] = useState<`0x${string}` | undefined>();
+  const { data: receipt, error: receiptError } = useWaitForTransactionReceipt({ hash: pendingHash });
+
   useEffect(() => {
     const saved = localStorage.getItem(NFT_CONTRACT_KEY) || NFT_CONTRACT_DEFAULT;
     setContractAddressState(saved);
     setIsMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (!receipt) return;
+    if (receipt.status === 'reverted') {
+      setError('TX revertida no contrato. Verifique os dados.');
+      setIsProcessing(false);
+      setSteps(INITIAL_STEPS.map(s => ({ ...s })));
+      return;
+    }
+    const mintLog = receipt.logs.find(
+      (l) => l.topics[0]?.toLowerCase() === CERTIFICADO_MINTADO_TOPIC.toLowerCase()
+    );
+    if (mintLog?.topics[1]) setMintedTokenId(BigInt(mintLog.topics[1]).toString());
+    setSteps(prev => prev.map((s, i) => i === 3 ? { ...s, status: 'DONE' } : s));
+    setIsProcessing(false);
+    setIsDone(true);
+  }, [receipt]);
+
+  useEffect(() => {
+    if (!receiptError) return;
+    setError(receiptError.message || 'Falha ao confirmar a transação');
+    setIsProcessing(false);
+    setSteps(INITIAL_STEPS.map(s => ({ ...s })));
+  }, [receiptError]);
 
   if (!isMounted) {
     return (
@@ -146,48 +161,20 @@ export default function CertificacaoPage() {
       });
       setSteps(prev => prev.map((s, i) => i === 1 ? { ...s, status: 'DONE' } : s));
 
-      // ─── Step 3: Mint NFT ──────────────────────────────────────────
+      // ─── Step 3: Mint NFT (wagmi writeContract) ────────────────────
       setSteps(prev => prev.map((s, i) => i === 2 ? { ...s, status: 'ACTIVE' } : s));
 
-      const callData = encodeFunctionData({
-        abi: MINT_ABI,
+      const hash = await writeContractAsync({
+        address: getAddress(contractAddress),
+        abi: AGRO_CERT_NFT_ABI,
         functionName: 'mintCertificado',
         args: [form.batchId, form.type, form.variety, BigInt(form.weightKg), form.origin],
       });
-
-      const hash = await (window as any).ethereum.request({
-        method: 'eth_sendTransaction',
-        params: [{ to: getAddress(contractAddress), from: address, value: '0x0', data: callData }],
-      }) as string;
       if (!hash) throw new Error('Transação cancelada no MetaMask');
       setTxHash(hash);
+      setPendingHash(hash);
       setSteps(prev => prev.map((s, i) => i === 2 ? { ...s, status: 'DONE' } : s));
-
-      // ─── Step 4: Aguardar confirmação ──────────────────────────────
-      setSteps(prev => prev.map((s, i) => i === 3 ? { ...s, status: 'ACTIVE' } : s));
-
-      let receipt: any = null;
-      const t0 = Date.now();
-      while (!receipt) {
-        if (Date.now() - t0 > 60000) throw new Error('Timeout. Verifique no Etherscan.');
-        await new Promise(r => setTimeout(r, 2000));
-        receipt = await (window as any).ethereum.request({
-          method: 'eth_getTransactionReceipt',
-          params: [hash],
-        });
-      }
-      if (receipt.status === '0x0') throw new Error('TX revertida no contrato. Verifique os dados.');
-
-      // Parse CertificadoMintado event → tokenId
-      const EVENT_SIG = '0x425172b26c617fba6dd5b862e8adaabfde830edd3875c593ae7342a2815f1d26';
-      const mintLog = receipt.logs?.find((l: any) =>
-        l.topics?.[0]?.toLowerCase() === EVENT_SIG.toLowerCase()
-      );
-      if (mintLog?.topics?.[1]) setMintedTokenId(BigInt(mintLog.topics[1]).toString());
-
-      setSteps(prev => prev.map((s, i) => i === 3 ? { ...s, status: 'DONE' } : s));
-      setIsProcessing(false);
-      setIsDone(true);
+      // Step 4 (confirmação) é finalizado pelo efeito que observa o receipt.
 
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro desconhecido');

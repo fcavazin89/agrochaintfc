@@ -2,8 +2,9 @@
 import { useState } from 'react';
 import type { ComplianceResult } from '@/types/agrochain';
 
-const NFT_CONTRACT_DEFAULT = '0x444853d891F884EbD1b69Dc6F044a2Ff4f9C9269';
-const SEPOLIA_RPC = 'https://ethereum-sepolia-rpc.publicnode.com';
+const NFT_CONTRACT_DEFAULT = process.env.NEXT_PUBLIC_NFT_CONTRACT_ADDRESS || '0x444853d891F884EbD1b69Dc6F044a2Ff4f9C9269';
+const SEPOLIA_RPC = process.env.NEXT_PUBLIC_SEPOLIA_RPC_URL || 'https://ethereum-sepolia-rpc.publicnode.com';
+const COMPLIANCE_API_BASE = process.env.NEXT_PUBLIC_COMPLIANCE_API_URL || 'http://localhost:8001';
 
 // ABI fragments needed for verification
 const GET_CERT_ABI = '{"name":"getCertificado","type":"function","inputs":[{"name":"tokenId","type":"uint256"}],"outputs":[{"name":"","type":"tuple","components":[{"name":"batchId","type":"string"},{"name":"tipo","type":"string"},{"name":"variedade","type":"string"},{"name":"pesoKg","type":"uint256"},{"name":"origem","type":"string"},{"name":"fazendeiro","type":"address"},{"name":"timestamp","type":"uint256"}]}],"stateMutability":"view"}';
@@ -51,7 +52,7 @@ export default function CompliancePage() {
     setLoading(true);
     setError(null);
     try {
-      const endpoint = form.type === 'coffee' ? 'http://localhost:8001/api/coffee/analyze' : 'http://localhost:8001/api/cacao/analyze';
+      const endpoint = `${COMPLIANCE_API_BASE}/api/${form.type}/analyze`;
       const resp = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

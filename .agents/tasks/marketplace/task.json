@@ -1,0 +1,7 @@
+{
+  "task_id": "task-marketplace-escrow",
+  "task_description": "Corrigir a integração de escrow do módulo Marketplace (AgroChainMarketplace.sol): relay de financiamento/liberação/reembolso via AgroChainPayments, liberação do peso reservado em ofertas não concretizadas, bounds de preço/quantidade e suíte de testes do contrato.",
+  "status": "completed",
+  "feature_order": ["FEAT-001", "FEAT-002"],
+  "blocked_reason": null
+}

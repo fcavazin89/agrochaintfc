@@ -1,0 +1,20 @@
+{
+  "id": "FEAT-002",
+  "type": "fix",
+  "description": "Endurecer a configuração Wagmi/React Query (retry de queries, refetch controlado) e adicionar a chain Sepolia à configuração (review finding 2).",
+  "status": "completed",
+  "features_note": "config em lib/wagmi.ts e providers.tsx",
+  "steps": [
+    "Adicionar sepolia à lista de chains e ao map de transports em lib/wagmi.ts",
+    "Configurar QueryClient em providers.tsx com retry: 2, retryDelay: 1000, refetchOnWindowFocus: false"
+  ],
+  "acceptance_criteria": [
+    "wagmiConfig inclui sepolia e mainnet",
+    "QueryClient possui política de retry explícita"
+  ],
+  "verification": [
+    "npm run build (dapp): Compiled successfully"
+  ],
+  "blocked_reason": null,
+  "findings": "✓ Sepolia adicionada às chains/transports; QueryClient com retry e refetchOnWindowFocus:false para reduzir falhas de RPC em testnet."
+}

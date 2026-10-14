@@ -1,0 +1,20 @@
+{
+  "id": "FEAT-003",
+  "type": "fix",
+  "description": "Substituir o endpoint hard-coded http://localhost:8001 do compliance/page.tsx por NEXT_PUBLIC_COMPLIANCE_API_URL com fallback (review finding 4).",
+  "status": "completed",
+  "steps": [
+    "Introduzir COMPLIANCE_API_BASE = process.env.NEXT_PUBLIC_COMPLIANCE_API_URL || 'http://localhost:8001'",
+    "Construir o endpoint como `${COMPLIANCE_API_BASE}/api/${form.type}/analyze`",
+    "Criar dapp/.env.example documentando NEXT_PUBLIC_COMPLIANCE_API_URL e demais variáveis públicas"
+  ],
+  "acceptance_criteria": [
+    "Nenhuma URL de API hard-coded no compliance/page.tsx",
+    "dapp/.env.example documenta NEXT_PUBLIC_COMPLIANCE_API_URL"
+  ],
+  "verification": [
+    "npm run build (dapp): Compiled successfully"
+  ],
+  "blocked_reason": null,
+  "findings": "✓ Endpoint derivado de variável pública com fallback local; .env.example criado documentando as variáveis NEXT_PUBLIC_*."
+}

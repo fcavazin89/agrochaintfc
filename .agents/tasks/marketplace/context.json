@@ -1,0 +1,27 @@
+{
+  "task_id": "task-marketplace-escrow",
+  "repo_root": "workspace-01a1162b-e061-7ff0-b060-dfa40cc70dfdzip",
+  "stack": "Solidity 0.8.37 (Hardhat) + Next.js/TypeScript (dapp)",
+  "solidity_version": "0.8.37",
+  "openzeppelin_version": "5.6.1",
+  "network_default": "hardhatMainnet",
+  "compile_command": "npx hardhat compile",
+  "test_command": "npx hardhat test \"blockchain/tests/AgroChainMarketplace.test.js\" --network hardhatMainnet",
+  "contracts": [
+    "blockchain/contracts/AgroChainMarketplace.sol",
+    "blockchain/contracts/AgroChainPayments.sol",
+    "blockchain/contracts/SmartLot.sol",
+    "blockchain/contracts/MockUSDC.sol"
+  ],
+  "relevant_files": [
+    "blockchain/contracts/AgroChainMarketplace.sol (alvo das correções)",
+    "blockchain/contracts/AgroChainPayments.sol (escrow: createOrder/depositEscrow/acceptOrder/rejectOrder)",
+    "blockchain/contracts/SmartLot.sol (getLot para validar produtor)",
+    "blockchain/contracts/MockUSDC.sol (token de teste com mint() público)",
+    "blockchain/tests/SmartLot.test.js (padrão de setup/parse de eventos)",
+    "blockchain/tests/CafeGovernance.test.js (padrão de advanceTime com evm_increaseTime + hardhat_mine)",
+    "dapp/src/lib/contracts/marketplace.ts (stub atual do frontend)"
+  ],
+  "key_patterns": "Contratos com NatSpec, eventos indexed, SafeERC20 (safeTransferFrom/safeTransfer/forceApprove). Testes em ESM (import hre from 'hardhat'), ethers obtido via hre.network.create(), revert assertions com .to.be.revertedWith(mensagem).",
+  "notes": "O Marketplace chama AgroChainPayments.createOrder e por isso figura como buyer da ordem; o relay de depósito/liberação/reembolso foi implementado no próprio Marketplace para reconciliar o comprador real."
+}
