@@ -1,0 +1,42 @@
+{
+  "id": "FEAT-005",
+  "type": "feat",
+  "description": "Integrar seção VERIFICAÇÃO em dapp/src/components/layout/Sidebar.tsx com 4 links para as páginas de verification (Dashboard, Origem, EUDR, ESG). Novo grupo de navegação agrupa as rotas de verificação no menu lateral, seguindo padrão de seções existentes (RASTREIO, DASHBOARD). Items com ícones emoji (temporário, será SVG futuramente) e expand/collapse como outras seções.",
+  "status": "completed",
+  "steps": [
+    "Abrir dapp/src/components/layout/Sidebar.tsx",
+    "Localizar array 'navSections' (por volta de linha 6-40)",
+    "Após seção 'RASTREIO' (ou antes de 'DEX'), adicionar novo objeto seção: { label: 'VERIFICAÇÃO', items: [{ href: '/verification', label: 'Dashboard', icon: '✓' }, { href: '/verification/origin', label: 'Origem', icon: '🌍' }, { href: '/verification/eudr', label: 'EUDR', icon: '📡' }, { href: '/verification/esg', label: 'ESG', icon: '📊' }] }",
+    "Localizar função 'shouldSectionBeExpanded' (por volta de linha 45-55)",
+    "Adicionar entry no mapa 'sectionRouteMap': VERIFICAÇÃO: ['/verification']",
+    "Verificar que o novo item aparece no menu lateral com ícones e labels corretos",
+    "Testar que clique em item de Verificação navega para URL correta",
+    "Testar que seção expand/collapse funciona como as outras (click no label VERIFICAÇÃO alterna visibilidade dos items)",
+    "Testar que item ativo (ex: /verification/origin) marca link ativo com background verde e texto claro"
+  ],
+  "acceptance_criteria": [
+    "Sidebar.tsx compila sem erros TypeScript",
+    "Seção 'VERIFICAÇÃO' aparece no menu lateral entre as outras seções",
+    "4 items visíveis quando seção está expandida: Dashboard, Origem, EUDR, ESG",
+    "Ícones aparecem corretamente (✓ 🌍 📡 📊)",
+    "Links href são corretos: /verification, /verification/origin, /verification/eudr, /verification/esg",
+    "Seção expand/collapse funciona (clique no 'VERIFICAÇÃO' collapsa/expande items)",
+    "Item ativo: quando pathname=/verification, Dashboard fica com fundo #1f6440 e texto branco",
+    "Idem para origin/eudr/esg subpages — item correspondente fica ativo",
+    "Hover em item inativo: fundo #f0faf4 (claro verde) conforme padrão",
+    "Sem erros no console (DevTools)"
+  ],
+  "verification": [
+    "cd dapp && npm run build",
+    "Esperado: sem erros",
+    "Abrir DevTools, inspecionar elemento Sidebar",
+    "Esperado: section 'VERIFICAÇÃO' present em DOM",
+    "Verificar que 4 links estão presentes com hrefs corretos: /verification, /verification/origin, /verification/eudr, /verification/esg",
+    "Clicar em link de Verificação: esperado navegação para URL",
+    "Voltar para / e clicar em VERIFICAÇÃO: expandir seção, verificar que items aparecem",
+    "Navegar para /verification: verificar que item 'Dashboard' fica ativo (fundo verde, texto branco)",
+    "Navegar para /verification/origin: verificar que 'Origem' fica ativo"
+  ],
+  "blocked_reason": null,
+  "findings": ""
+}

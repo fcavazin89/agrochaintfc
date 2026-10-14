@@ -1,0 +1,37 @@
+{
+  "id": "FEAT-002",
+  "type": "feat",
+obrigatório, layout sem sidebar (apenas header mínimo + conteúdo), meta tags Open Graph, exibe: dados completos do lote (produtor, safra, origem, área, datas), timeline visual de eventos (plantio, colheita, processamento) com cores por tipo, certificações (NFT, ZK, EUDR, ESG) com status visual, verificações (Origin, EUDR Compliance, ESG Score), QR code próprio para compartilhamento, botão 'Verificar Autenticidade' (mock on-chain), design responsivo, versão impressão (media print).",
+  "status": "completed",
+  "steps": [
+    "Criar diretório dapp/src/app/passport/[lotId]/ se não existir",
+    "Criar dapp/src/app/passport/[lotId]/page.tsx: página 'use client' que (1) extrai [lotId] do params; (2) busca dados via buildPassportData(); (3) não exibe Sidebar/TopBar — usar layout customizado ou conforme design; (4) renderiza cabeçalho h1 com loteId, produtor, safra; (5) KPI grid: origem, area, dataPlantio, dataColheita; (6) seção Certificações em grid com status badges (Pendente/ouro, Certificado/verde, Revogado/vermelho); (7) Timeline visual: seção com eventos ordenados, pontos coloridos conectados por linhas, cada evento mostra tipo, data, descrição, local, responsável; (8) Verificações: 3 cards para Origin Verification, EUDR Compliance, ESG Score com status; (9) QR code display à direita do cabeçalho; (10) botão 'Verificar Autenticidade' chama verifyLotAuthenticity() e mostra toast/modal com resultado; (11) rodapé com metadata do lote (data referência, fonte mock)",
+    "Aplicar design conforme design.md: cores de DESIGN_TOKENS, tipografia serifa para títulos, paper kraft (#f5f1e7) de fundo, chips com véu para status, hierarquia clara, contraste 4.5:1 mínimo",
+    "Implementar layout sem sidebar: criar layout local dapp/src/app/passport/layout.tsx que envolve apenas content sem Sidebar, ou usar conditional render na page",
+    "Meta tags Open Graph: adicionar generateMetadata() in page.tsx ou via next/head para title, description, og:image (usar URL do QR ou imagem genérica), og:url=/passport/[lotId]",
+    "Responsividade: grid quebra para 1 coluna em telas < 768px; QR move para topo; botões em mobile stack vertical",
+    "Print media: aplicar @media print para ocultar botões de ação, realçar dados principais, ajustar cores para impressão"
+  ],
+  "acceptance_criteria": [
+    "Página existe em dapp/src/app/passport/[lotId]/page.tsx",
+    "Acessar /passport/LOT-2026-001 carrega a página sem login",
+    "Cabeçalho mostra loteId, produtor, safra; KPI grid com origem, área, datas",
+    "Certificações renderizam em grid com status badges (cores corretas)",
+    "Timeline visual renderiza com eventos ordenados, pontos conectados, informações completas",
+    "Verificações mostram 3 cards com status",
+    "QR code visível e codifica corretamente /passport/[lotId]",
+    "Botão 'Verificar Autenticidade' clicável, chama função, mostra resultado",
+    "Página responsiva: telas < 768px mostram layout de coluna única",
+    "Meta tags presentes: og:title, og:description, og:url"
+  ],
+  "verification": [
+    "npm run build em dapp/ — sem erros",
+    "Navegar em browser para http://localhost:3000/passport/LOT-2026-001 — página carrega sem sidebar",
+    "Inspecionar HTML: verificar <meta property=\"og:title\" /> e similares",
+    "Testar responsividade com DevTools (640px, 768px, 1024px)",
+    "Testar botão 'Verificar Autenticidade' — deve chamar função e exibir feedback",
+    "Print preview (Ctrl+P) — validar layout de impressão"
+  ],
+  "blocked_reason": null,
+  "findings": "Página pública funcional com acesso direto via URL; design conforme sistema; sem dependências de autenticação"
+}

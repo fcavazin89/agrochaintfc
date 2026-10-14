@@ -3,14 +3,13 @@ import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { useAccount } from 'wagmi';
 import type { Lot } from '@/types/agrochain';
-// import { obterCorStatus, obterStatusCertificacaoAgregado } from '@/lib/lotUtils';
-// import { DESIGN_TOKENS, LotStatus, CertificationType } from '@/lib/lotConstants';
+import { getMockLotsForProducer } from '@/lib/mockLotData';
 
 // Funções auxiliares locais
 const obterCorStatus = (status: string) => {
-  if (status === 'Ativo') return 'var(--verde-profundo)';
-  if (status === 'Transferindo') return '#f59e0b';
-  return '#6b7280';
+  if (status === 'Ativo') return 'var(--verde-600)';
+  if (status === 'Transferindo') return 'var(--atencao)';
+  return 'var(--texto-2)';
 };
 
 const obterStatusCertificacaoAgregado = (certificacoes: any[]) => {
@@ -27,76 +26,14 @@ const DESIGN_TOKENS = {
     bodyFont: 'system-ui, -apple-system, sans-serif',
   },
   colors: {
-    verde600: 'var(--verde-profundo)',
-    texto1: '#1e2a22',
-    texto2: '#495649',
-    texto3: '#6b7d6b',
-    fundo: '#f5f1e7',
+    verde600: 'var(--verde-600)',
+    texto1: 'var(--texto-1)',
+    texto2: 'var(--texto-2)',
+    texto3: 'var(--texto-3)',
+    fundo: 'var(--fundo)',
   },
-};
 
-// Mock data de lotes do produtor logado
-const MOCK_LOTS: Lot[] = [
-  {
-    loteId: 'LOT-2026-001',
-    produtor: 'Fazenda São Benedito',
-    safra: '2025/2026',
-    origem: 'Minas Gerais - MG',
-    área: 15.5,
-    dataPlantio: Math.floor(Date.now() / 1000) - 8640000, // 100 dias atrás
-    dataColheita: Math.floor(Date.now() / 1000) - 1080000, // 12.5 dias atrás
-    certificações: [
-      { tipo: 'NFT', status: 'Certificado', dataEmissão: Math.floor(Date.now() / 1000) - 864000, dataVencimento: Math.floor(Date.now() / 1000) + 15552000 },
-      { tipo: 'ZK', status: 'Certificado', dataEmissão: Math.floor(Date.now() / 1000) - 864000, dataVencimento: Math.floor(Date.now() / 1000) + 15552000 },
-      { tipo: 'EUDR', status: 'Pendente', dataEmissão: 0, dataVencimento: 0 },
-    ],
-    eventos: [
-      { tipo: 'Plantio', data: Math.floor(Date.now() / 1000) - 8640000, descrição: 'Plantio de mudas selecionadas', localização: 'Talhão A', responsável: 'João Silva' },
-      { tipo: 'Colheita', data: Math.floor(Date.now() / 1000) - 1080000, descrição: 'Colheita manual realizada', localização: 'Talhão A', responsável: 'Equipe de colheita' },
-    ],
-    status: 'Ativo',
-  },
-  {
-    loteId: 'LOT-2026-002',
-    produtor: 'Fazenda São Benedito',
-    safra: '2025/2026',
-    origem: 'São Paulo - SP',
-    área: 22.0,
-    dataPlantio: Math.floor(Date.now() / 1000) - 12960000, // 150 dias atrás
-    dataColheita: Math.floor(Date.now() / 1000) - 5184000, // 60 dias atrás
-    certificações: [
-      { tipo: 'NFT', status: 'Certificado', dataEmissão: Math.floor(Date.now() / 1000) - 4320000, dataVencimento: Math.floor(Date.now() / 1000) + 15552000 },
-      { tipo: 'ZK', status: 'Certificado', dataEmissão: Math.floor(Date.now() / 1000) - 4320000, dataVencimento: Math.floor(Date.now() / 1000) + 15552000 },
-      { tipo: 'EUDR', status: 'Certificado', dataEmissão: Math.floor(Date.now() / 1000) - 2592000, dataVencimento: Math.floor(Date.now() / 1000) + 31536000 },
-      { tipo: 'ESG', status: 'Pendente', dataEmissão: 0, dataVencimento: 0 },
-    ],
-    eventos: [
-      { tipo: 'Plantio', data: Math.floor(Date.now() / 1000) - 12960000, descrição: 'Plantio iniciado', localização: 'Talhão B-C', responsável: 'Gerente de Operações' },
-      { tipo: 'Colheita', data: Math.floor(Date.now() / 1000) - 5184000, descrição: 'Colheita concluída', localização: 'Talhão B-C', responsável: 'Equipe de colheita' },
-      { tipo: 'Armazenamento', data: Math.floor(Date.now() / 1000) - 3024000, descrição: 'Grãos armazenados em silos climatizados', localização: 'Galpão principal', responsável: 'José Pereira' },
-    ],
-    status: 'Ativo',
-  },
-  {
-    loteId: 'LOT-2025-015',
-    produtor: 'Fazenda São Benedito',
-    safra: '2024/2025',
-    origem: 'Espírito Santo - ES',
-    área: 18.7,
-    dataPlantio: Math.floor(Date.now() / 1000) - 31536000, // 1 ano atrás
-    dataColheita: Math.floor(Date.now() / 1000) - 23328000, // 270 dias atrás
-    certificações: [
-      { tipo: 'NFT', status: 'Certificado', dataEmissão: Math.floor(Date.now() / 1000) - 21600000, dataVencimento: Math.floor(Date.now() / 1000) - 2592000 },
-      { tipo: 'ZK', status: 'Revogado', dataEmissão: Math.floor(Date.now() / 1000) - 21600000, dataVencimento: Math.floor(Date.now() / 1000) - 7776000 },
-    ],
-    eventos: [
-      { tipo: 'Plantio', data: Math.floor(Date.now() / 1000) - 31536000, descrição: 'Plantio realizado', localização: 'Talhão D', responsável: 'Supervisor de Campo' },
-      { tipo: 'Colheita', data: Math.floor(Date.now() / 1000) - 23328000, descrição: 'Colheita mecanizada', localização: 'Talhão D', responsável: 'Equipe mecanizada' },
-      { tipo: 'Processamento', data: Math.floor(Date.now() / 1000) - 21600000, descrição: 'Processamento em cooperativa', localização: 'Cooperativa Local', responsável: 'Técnico de Processamento' },
-    ],
-    status: 'Transferido',
-  },
-];
+};
 
 interface FilterState {
   safra: string;
@@ -119,9 +56,15 @@ export default function LoteListing() {
     safra: '',
   });
 
+  // Lotes do produtor conectado (mock contextual)
+  const producerLots = useMemo<Lot[]>(
+    () => (address ? getMockLotsForProducer(address) : []),
+    [address]
+  );
+
   // Filtrar lotes baseado no estado
   const filteredLotes = useMemo(() => {
-    return MOCK_LOTS.filter(lot => {
+    return producerLots.filter(lot => {
       if (filterState.safra && lot.safra !== filterState.safra) return false;
       if (filterState.status && lot.status !== filterState.status) return false;
       if (filterState.certificacao) {
@@ -130,14 +73,14 @@ export default function LoteListing() {
       }
       return true;
     });
-  }, [filterState]);
+  }, [producerLots, filterState]);
 
   // Obter valores únicos para filtros
-  const safras = useMemo(() => Array.from(new Set(MOCK_LOTS.map(l => l.safra))), []);
-  const statusOptions = useMemo(() => Array.from(new Set(MOCK_LOTS.map(l => l.status))), []);
+  const safras = useMemo(() => Array.from(new Set(producerLots.map(l => l.safra))), [producerLots]);
+  const statusOptions = useMemo(() => Array.from(new Set(producerLots.map(l => l.status))), [producerLots]);
   const certStatusOptions = useMemo(
-    () => Array.from(new Set(MOCK_LOTS.map(l => obterStatusCertificacaoAgregado(l.certificações)))),
-    []
+    () => Array.from(new Set(producerLots.map(l => obterStatusCertificacaoAgregado(l.certificações)))),
+    [producerLots]
   );
 
   const handleFilterChange = (field: keyof FilterState, value: string) => {
@@ -378,7 +321,11 @@ export default function LoteListing() {
           padding: '48px 24px',
           color: DESIGN_TOKENS.colors.texto2,
         }}>
-          <p style={{ fontSize: '14px', margin: 0 }}>Nenhum lote encontrado com os filtros selecionados</p>
+          <p style={{ fontSize: '14px', margin: 0 }}>
+            {!address
+              ? 'Conecte sua carteira para visualizar seus lotes'
+              : 'Nenhum lote encontrado com os filtros selecionados'}
+          </p>
         </div>
       )}
 

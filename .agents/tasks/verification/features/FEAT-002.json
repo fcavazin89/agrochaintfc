@@ -1,0 +1,33 @@
+{
+  "id": "FEAT-002",
+  "type": "feat",
+  "description": "Implementar 3 contratos Solidity modulares em blockchain/contracts/: OriginVerifier.sol (registro de origem com prova geolocalizada), EUDRVerifier.sol (conformidade EUDR com satélite), ESGScorer.sol (cálculo de scores com ponderação 40/30/30). Cada contrato é independente, com enums de status, structs de dados, mappings, eventos e funções de submit/get. Versão 0.8.37, padrão OpenZeppelin.",
+  "status": "completed",
+  "steps": [
+    "Criar blockchain/contracts/OriginVerifier.sol com: pragma 0.8.37, imports OpenZeppelin (Ownable, ReentrancyGuard se necessário), enum VerificationStatus (NOT_STARTED=0, IN_REVIEW=1, APPROVED=2, REJECTED=3), struct OriginVerification (verificacaoId bytes32, loteId bytes32, pais string, regiao string, latitude uint256, longitude uint256, provaDeOrigem string, dataVerificacao uint256, status VerificationStatus, verificadorAddress address), mapping verificationsById, contadores, eventos OriginVerificationSubmitted, funções submitOriginVerification() e getVerification(), owner-based approve/reject",
+    "Criar blockchain/contracts/EUDRVerifier.sol com: mesmo padrão de header/imports, enum VerificationStatus igual, struct EUDRCompliance (eudrcId bytes32, loteId bytes32, dataVerificacao uint256, desmatamentoDetectado bool, confianca uint256, sateliteProva string, status VerificationStatus), mapping compliancesById, eventos EUDRAnalysisSubmitted, funções submitEUDRAnalysis() e getCompliance(), owner-based update",
+    "Criar blockchain/contracts/ESGScorer.sol com: mesmo padrão, enum VerificationStatus igual, struct ESGScore (esgId bytes32, loteId bytes32, scoreAmbiental uint256, scoreSocial uint256, scoreGovernanca uint256, scoreFinal uint256, dataCalculada uint256, metodologia string, status VerificationStatus), helper function calculateFinalScore(env, soc, gov) = (env*40 + soc*30 + gov*30)/100, mapping scoresById, eventos ESGScoreSubmitted, funções submitESGScore() e getScore()",
+    "Adicionar NatSpec (@notice, @dev, @param, @return) a todos os contratos conforme padrão AgroChainMarketplace",
+    "Verificar que cada contrato compila sem warnings (usar hardhat compile isoladamente se necessário)",
+    "Verificar que ABIs geradas em artifacts/ estão válidas (files criados após compile)"
+  ],
+  "acceptance_criteria": [
+    "npm run blockchain:compile compila todos os 3 contratos sem erros",
+    "ABIs aparecem em artifacts/contracts/OriginVerifier.sol/OriginVerifier.json (e idem para EUDR, ESG)",
+    "Cada contrato tem: constructor, pelo menos 2 funções públicas, pelo menos 1 evento, enums de status",
+    "Nenhuma referência a endereços hardcoded (usar msg.sender, owner, etc.)",
+    "Gas estimation não explode (não há loops infinitos óbvios)",
+    "Eventos são emitidos em cada submit/approve/reject"
+  ],
+  "verification": [
+    "Terminal em workspace root",
+    "Executar: npm run blockchain:compile",
+    "Esperado: 'Successfully compiled X files with 0 errors' (X=14+ existing + 3 new)",
+    "Executar: ls -la blockchain/artifacts/contracts/ | grep -i verifier",
+    "Esperado: 6 files (OriginVerifier.json, EUDR.json, ESGScorer.json + leurs DBG)",
+    "Executar: cat blockchain/artifacts/contracts/OriginVerifier.sol/OriginVerifier.json | jq '.abi | length'",
+    "Esperado: ≥10 (múltiplas funções + eventos)"
+  ],
+  "blocked_reason": null,
+  "findings": ""
+}

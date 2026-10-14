@@ -1,0 +1,31 @@
+{
+  "project_type": "Next.js 14 DApp — monorepo com blockchain/ (Hardhat + Solidity 0.8.x) e dapp/ (Next.js 14 App Router, Wagmi v2, Tailwind)",
+  "language": "TypeScript / Solidity",
+  "build_system": "npm workspaces; dapp usa next build. Sem turbopack. Build verifica TypeScript e ESLint.",
+  "test_framework": "Nenhum framework de teste configurado no dapp. Hardhat para contratos (npx hardhat compile). Verificação = next build sem erros.",
+  "build_command": "cd dapp && npm run build",
+  "test_command": "cd dapp && npm run build",
+  "verification_instructions": "1. cd dapp && npm run build — deve completar sem erros TypeScript ou ESLint. 2. Confirmar que as novas rotas /analytics, /credits aparecem na saída de páginas geradas.",
+  "snapshot_or_generated_files": "blockchain/artifacts/** (gerado por npx hardhat compile). Não fazer commit de artifacts em novos contratos; apenas o .sol é necessário.",
+  "environment_constraints": "Windows PowerShell. Não iniciar servidor de desenvolvimento. Nunca usar npm run dev. Sempre executar npx hardhat compile dentro do diretório blockchain/ para compilar contratos.",
+  "contribution_requirements": "Cada arquivo de página Next.js deve começar com 'use client' se usar hooks. Nenhum test framework — verificar com build. Usar design tokens do globals.css (--verde-600, --texto-1, --sup-1, --linha, etc.) via var() inline.",
+  "key_patterns": "1. Todas as páginas são 'use client', usam inline styles com tokens CSS var(--...). 2. Mock data definida inline ou importada de @/lib/mockLotData. 3. Helpers de contrato em dapp/src/lib/contracts/*.ts seguem padrão de payments.ts: exportar ABI como const, funções helper, CONTRACT_ADDRESSES. 4. Sidebar.tsx usa navSections array com label/items; cada item tem href/label/icon. 5. tipos em dapp/src/types/agrochain.ts são interfaces/enums TypeScript puros sem imports externos. 6. layout.tsx tem Sidebar e TopBar STUBADOS (não importa o real); precisam ser descomentados ou o import real restaurado. 7. Padrão de gráfico de barras: usar SVG inline (ver verification/esg/page.tsx renderChart). 8. qrcode.react está disponível como dependência mas QRCodeDisplay.tsx usa apenas placeholder div — pode ser atualizado para usar QRCode de qrcode.react.",
+  "relevant_files": [
+    "dapp/src/app/globals.css",
+    "dapp/src/types/agrochain.ts",
+    "dapp/src/lib/mockLotData.ts",
+    "dapp/src/components/layout/Sidebar.tsx",
+    "dapp/src/app/layout.tsx",
+    "dapp/src/app/buyer/page.tsx",
+    "dapp/src/app/marketplace/page.tsx",
+    "dapp/src/app/verification/esg/page.tsx",
+    "dapp/src/app/passport/[lotId]/page.tsx",
+    "dapp/src/app/passport/generate/page.tsx",
+    "dapp/src/components/QRCodeDisplay.tsx",
+    "dapp/src/lib/contracts/payments.ts",
+    "dapp/src/lib/contracts/marketplace.ts",
+    "blockchain/contracts/AgroChainCertificacoes.sol",
+    "blockchain/contracts/ESGScorer.sol"
+  ],
+  "directory_structure": "workspace-root/blockchain/contracts/*.sol — contratos Solidity; workspace-root/dapp/src/app/**/* — páginas Next.js App Router; dapp/src/components/layout/Sidebar.tsx — navegação lateral; dapp/src/lib/contracts/*.ts — ABIs e helpers de contrato; dapp/src/lib/mockLotData.ts — mock data central com 6 lotes; dapp/src/types/agrochain.ts — todos os tipos TypeScript compartilhados; .agents/tasks/finalizar-modulos/ — artefatos FEAT (NUNCA dentro do worktree dapp/)"
+}

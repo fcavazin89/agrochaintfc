@@ -98,3 +98,78 @@ export function setVerifierContractAddress(address: string) {
     localStorage.setItem('agrochain_verifier_address', address);
   }
 }
+
+export const AGRO_CERT_NFT_ABI = [
+  {
+    inputs: [
+      { internalType: 'string', name: 'batchId', type: 'string' },
+      { internalType: 'string', name: 'tipo', type: 'string' },
+      { internalType: 'string', name: 'variedade', type: 'string' },
+      { internalType: 'uint256', name: 'pesoKg', type: 'uint256' },
+      { internalType: 'string', name: 'origem', type: 'string' },
+    ],
+    name: 'mintCertificado',
+    outputs: [{ internalType: 'uint256', name: 'tokenId', type: 'uint256' }],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [{ internalType: 'uint256', name: 'tokenId', type: 'uint256' }],
+    name: 'getCertificado',
+    outputs: [
+      {
+        internalType: 'struct AgroChainCertNFT.Certificado',
+        name: '',
+        type: 'tuple',
+        components: [
+          { internalType: 'string', name: 'batchId', type: 'string' },
+          { internalType: 'string', name: 'tipo', type: 'string' },
+          { internalType: 'string', name: 'variedade', type: 'string' },
+          { internalType: 'uint256', name: 'pesoKg', type: 'uint256' },
+          { internalType: 'string', name: 'origem', type: 'string' },
+          { internalType: 'address', name: 'fazendeiro', type: 'address' },
+          { internalType: 'uint256', name: 'timestamp', type: 'uint256' },
+        ],
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [{ internalType: 'uint256', name: 'tokenId', type: 'uint256' }],
+    name: 'tokenURI',
+    outputs: [{ internalType: 'string', name: '', type: 'string' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'uint256', name: 'tokenId', type: 'uint256' },
+      { indexed: true, internalType: 'address', name: 'fazendeiro', type: 'address' },
+      { indexed: false, internalType: 'string', name: 'batchId', type: 'string' },
+    ],
+    name: 'CertificadoMintado',
+    type: 'event',
+  },
+] as const;
+
+// keccak256("CertificadoMintado(uint256,address,string)")
+export const CERTIFICADO_MINTADO_TOPIC =
+  '0x425172b26c617fba6dd5b862e8adaabfde830edd3875c593ae7342a2815f1d26';
+
+export const NFT_CONTRACT_STORAGE_KEY = 'agrochain_nft_contract_address';
+
+export function getNFTContractAddress(): string {
+  if (typeof window !== 'undefined') {
+    const stored = localStorage.getItem(NFT_CONTRACT_STORAGE_KEY);
+    if (stored) return stored;
+  }
+  return process.env.NEXT_PUBLIC_NFT_CONTRACT_ADDRESS || '';
+}
+
+export function setNFTContractAddress(address: string) {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem(NFT_CONTRACT_STORAGE_KEY, address);
+  }
+}

@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { QrCode } from 'lucide-react';
 
 export default function Sidebar() {
   const pathname = usePathname();
@@ -48,7 +49,7 @@ export default function Sidebar() {
     {
       label: 'PASSAPORTE',
       items: [
-        { href: '/passport/generate', label: 'Gerar QR Code', icon: '🔲' },
+        { href: '/passport/generate', label: 'Passaporte Digital', icon: 'qrcode' },
       ],
     },
   ];
@@ -104,7 +105,11 @@ export default function Sidebar() {
                       transition: 'all 0.2s',
                     }}
                   >
-                    <span>{item.icon}</span>
+                    {item.icon === 'qrcode' ? (
+                      <QrCode size={18} />
+                    ) : (
+                      <span>{item.icon}</span>
+                    )}
                     <span>{item.label}</span>
                   </Link>
                 );

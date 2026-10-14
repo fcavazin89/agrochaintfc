@@ -2,7 +2,7 @@
   "id": "FEAT-004",
   "type": "feat",
   "description": "Criar arquivo de utilitários SmartLot em dapp/src/lib/contracts/smartlot.ts com ABI exportado, funções helper para contrato, e integração com wagmi para leitura/escrita de dados. Incluir mock de dados para demo.",
-  "status": "pending",
+  "status": "completed",
   "steps": [
     "Criar dapp/src/lib/contracts/smartlot.ts com: export SMARTLOT_ABI (cópia do ABI gerado após compilação de SmartLot.sol)",
     "Implementar funções helper: registerLot(wagmiClient, loteData) que chama contrato registerLot via writeContract, addEvent(loteId, eventData) que chama addEvent, transferLot(loteId, novoProdutor, orderId) que chama transferLot, getCertifications(loteId) que lê do contrato",

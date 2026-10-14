@@ -1,0 +1,30 @@
+{
+  "id": "FEAT-001",
+  "type": "feat",
+  "description": "Estender dapp/src/types/agrochain.ts com 4 novas interfaces (OriginVerification, EUDRCompliance, ESGScore) e 1 type (VerificationStatus). Estes tipos são a base para contratos, utils e páginas. Valores em PT-BR, status com 4 estados semânticos (Não Iniciado, Em Verificação, Aprovado, Rejeitado). Scores 0-100 para clareza.",
+  "status": "completed",
+  "steps": [
+    "Abrir dapp/src/types/agrochain.ts e localizar o final do arquivo (após Review interface)",
+    "Adicionar export type VerificationStatus = 'Não Iniciado' | 'Em Verificação' | 'Aprovado' | 'Rejeitado'",
+    "Adicionar export interface OriginVerification com campos: verificacaoId, loteId, pais, regiao, latitude, longitude, provaDeOrigem, dataVerificacao (number), status (VerificationStatus), verificadorAddress? (opcional)",
+    "Adicionar export interface EUDRCompliance com campos: eudrcId, loteId, dataVerificacao (number), desmatamentoDetectado (boolean), percentualDesmatamento? (0-100), sateliteProva (string), confianca (0-100), status (VerificationStatus), dataAnalise? (number)",
+    "Adicionar export interface ESGScore com campos: esgId, loteId, scoreAmbiental (0-100), scoreSocial (0-100), scoreGovernanca (0-100), scoreFinal (0-100), dataCalculada (number), metodologia (string), status (VerificationStatus), detalhes? (string)",
+    "Verificar que não há conflitos de nome com tipos existentes (usar grep 'OriginVerification' para confirmar que é novo)",
+    "Salvar arquivo"
+  ],
+  "acceptance_criteria": [
+    "npx tsc --noEmit compila sem erros",
+    "import { OriginVerification, EUDRCompliance, ESGScore, VerificationStatus } from '@/types/agrochain' funciona sem erro",
+    "Todos os campos são tipados corretamente (status é VerificationStatus, scores são number 0-100, timestamps são number)",
+    "Interfaces aparecem no IntelliSense quando importadas"
+  ],
+  "verification": [
+    "Abrir terminal em workspace root",
+    "Executar: npx tsc --noEmit",
+    "Esperado: sem erros, sem warnings sobre tipos não existentes",
+    "Executar: grep -n 'OriginVerification' dapp/src/types/agrochain.ts",
+    "Esperado: 1 linha com 'export interface OriginVerification' e 1+ linhas de uso"
+  ],
+  "blocked_reason": null,
+  "findings": ""
+}

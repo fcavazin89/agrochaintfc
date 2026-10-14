@@ -2,7 +2,7 @@
   "id": "FEAT-003",
   "type": "feat",
   "description": "Criar páginas UI para Lot Listing e Lot Details com integração MetaMask, mock data, e QR code generator. Atualizar Sidebar para incluir links de navegação.",
-  "status": "pending",
+  "status": "completed",
   "steps": [
     "Criar dapp/src/app/lote/page.tsx (Lot Listing): tabela/grid de lotes do produtor logado (mock data + filtros por safra/status/certificação), botão 'Criar Novo Lote' com modal simples, cada linha linkada para /lote/[lotId]",
     "Criar dapp/src/app/lote/[lotId]/page.tsx (Lot Details): header com dados do lote (loteId, produtor, safra, origem, area, datas), seção 'Certificações' com cards de status (NFT/ZK/EUDR/ESG), seção 'Timeline de Eventos' com lista visual vertical, botão 'Adicionar Evento' com form (tipo, descricao, localizacao, responsavel) conectado a MetaMask",

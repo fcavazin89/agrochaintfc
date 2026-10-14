@@ -1,0 +1,33 @@
+{
+  "project_type": "Next.js 14 fullstack dApp (frontend + Solidity contracts) com design system próprio",
+  "language": "TypeScript (frontend), Solidity 0.8.37 (contracts), PT-BR (UI labels)",
+  "build_system": "npm workspaces com hardhat (blockchain), Next.js 14 (dapp), sem monorepo tool explícito — scripts em package.json",
+  "test_framework": "Hardhat built-in para contracts (ainda não foi visto test runner para dapp)",
+  "build_command": "npm run blockchain:compile && cd dapp && npm run build",
+  "test_command": "npm run blockchain:compile (contracts); cd dapp && npm run build (frontend)",
+  "verification_instructions": "1) npm run blockchain:compile deve sair sem erros Solidity. 2) cd dapp && npm run build deve sair sem erros Next.js. 3) npx tsc --noEmit verifica tipos TS globalmente.",
+  "snapshot_or_generated_files": "artifacts/ contém ABIs compiladas após hardhat compile. Não faz parte do git.",
+  "environment_constraints": "Dev roda com Sepolia testnet (variáveis .env). Nunca forçar restart de servidor em :9001 (já identificado em docs). Relativo paths em dapp/ resolvem contra workspace root, não contra dapp/.",
+  "contribution_requirements": "Commit frequente local após cada FEAT (git commit, sem push). Padrão de PR/merge tbd. Design system em design.md é mandatório (cores, tipografia, espaçamento, acessibilidade). Tipos em PT-BR (não inglês). Nenhum emoji em produto real — apenas glifos de texto e SVG futuro.",
+  "key_patterns": {
+    "types": "Enums de status em PT-BR (ex: 'Não Iniciado', 'Em Verificação', 'Aprovado', 'Rejeitado'). Interfaces com ? para opcionais. Timestamps como number (ms). Nomes de campos em PT-BR.",
+    "contracts": "Versão 0.8.37, structs para dados, enums para status, mappings para armazenamento, NatSpec comments, Owner pattern para permissões, Events para auditoria.",
+    "utils": "Exportam ABI + MOCK_DATA + helper functions. Funções não fazem blockchain call (mocks). Padrão: filterListings(), submitOriginVerification().",
+    "pages": "'use client' topo, useState/useEffect, layout maxWidth 1320px centered, cabeçalho em serifa, cartões com design tokens, sem chamadas blockchain reais.",
+    "sidebar": "Seções com expand/collapse, items com ícone+label, ativo com fundo #1f6440+texto branco. Novo item: adiciona-se a navSections array.",
+    "design": "Plano claro padrão (#f5f1e7), cores semânticas (verde=#1f6440 ação, ouro=#b8912a atenção, vermelho=#a83226 crítico), tipografia serifa em títulos, sans em corpo, espaço base 4px, raio cartão 16px, sem emoji no produto."
+  },
+  "relevant_files": [
+    "dapp/src/types/agrochain.ts — tipos existentes, modelo para OriginVerification/EUDRCompliance/ESGScore",
+    "dapp/src/lib/contracts/marketplace.ts — ABI + MOCK_DATA + helpers, modelo para verification.ts",
+    "dapp/src/lib/contracts/buyer.ts — outro exemplo de utils",
+    "dapp/src/app/marketplace/page.tsx — página com filtros/tabelas, modelo para verification pages",
+    "dapp/src/app/buyer/page.tsx — outra página exemplo",
+    "dapp/src/components/layout/Sidebar.tsx — estrutura de navSections, local de add VERIFICAÇÃO",
+    "blockchain/contracts/AgroChainMarketplace.sol — contrato multi-struct com enums/mappings, modelo estrutural",
+    "blockchain/contracts/SmartLot.sol — outro contrato para referência",
+    "design.md — design system mandatório (cores, tipografia, componentes, acessibilidade)",
+    "package.json — scripts de build/compile"
+  ],
+  "directory_structure": "workspace-root/ → dapp/ (Next.js, src/types/, src/lib/contracts/, src/app/, src/components/) | blockchain/ (contracts/, scripts/, tests/) | .agents/tasks/verification/ (plano + FEATs)"
+}

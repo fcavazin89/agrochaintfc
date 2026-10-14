@@ -859,13 +859,13 @@ npx hardhat test --gas-reporter
    - [ ] Source code matches repository
 
 2. **Security**
-   - [ ] Reentrancy guards in all critical functions
-   - [ ] Access control properly configured
-   - [ ] Timelock delays set
-   - [ ] Emergency pause mechanism tested
+   - [x] Reentrancy guards in all critical functions
+   - [x] Access control properly configured
+   - [x] Timelock delays set
+   - [x] Emergency pause mechanism tested
 
 3. **Testing**
-   - [ ] All unit tests pass
+   - [x] All unit tests pass
    - [ ] All integration tests pass
    - [ ] Property-based tests verified
    - [ ] Security audit completed
@@ -1027,6 +1027,10 @@ Task 3.1 (Setup) ──> Task 3.2 (Charts) ──> Task 3.3 (UI)
 5. **Frontend**: Separate Next.js project recommended for faster iteration
 
 6. **Testing**: Property-based tests require custom implementation (see Foundry's DappTools for reference)
+
+7. **Phase 5 status (2026)**: The pre-deployment, deployment, and frontend-deployment checklists remain unchecked because they require a live-network deployment, block-explorer source verification, a third-party security audit, and hosting of the separate `cafeswap-frontend` project — none of which are producible from this repository. The security and unit-test items that are verifiable from the codebase are checked above.
+
+8. **CafeGovernance test alignment (2026)**: The `blockchain/tests/CafeGovernance.test.js` suite was aligned to the contract's actual interface — 1-based proposal IDs (`proposalId = ++proposalCount`), block-based `VOTING_PERIOD = 50400` (~7 days), and the error names `InsufficientProposalThreshold`, `InvalidArrayLength`, `ProposalNotActive`, `ProposalNotSucceeded`, `QuorumNotReached`, `AlreadyExecuted`. Full CaféSwap suite: **144 passing**.
 
 ---
 

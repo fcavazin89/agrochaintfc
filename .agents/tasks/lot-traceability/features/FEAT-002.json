@@ -2,7 +2,7 @@
   "id": "FEAT-002",
   "type": "feat",
   "description": "Criar contrato SmartLot em blockchain/contracts/ com registro on-chain de lotes, emissão de eventos, certificações vinculadas, e funcionalidade de transfer condicionada a pagamento em AgroChainPayments.",
-  "status": "pending",
+  "status": "completed",
   "steps": [
     "Criar blockchain/contracts/SmartLot.sol com: struct Lot (loteId bytes32, produtor address, safra string, origem string, area uint256, dataPlantio uint256, dataColheita uint256, status enum, eventos LotEvent[], certificacoes LotCertification[])",
     "Implementar mapping(bytes32 => Lot) public lotes para armazenar lotes on-chain",

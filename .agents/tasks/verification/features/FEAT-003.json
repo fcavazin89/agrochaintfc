@@ -1,0 +1,42 @@
+{
+  "id": "FEAT-003",
+  "type": "feat",
+  "description": "Criar dapp/src/lib/contracts/verification.ts com ABIs dos 3 contratos (copiadas de artifacts/ após hardhat compile em FEAT-002), 10+ exemplos de mock data em diferentes estágios de verificação (Não Iniciado, Em Verificação, Aprovado, Rejeitado), e funções helper (submitOriginVerification, verifyEUDRCompliance, calculateESGScore, filterVerifications). Mock data cobre todos os status e tipos de lote. ABIs e helpers permitem que páginas funcionem sem blockchain.",
+  "status": "completed",
+  "steps": [
+    "Abrir blockchain/artifacts/contracts/OriginVerifier.sol/OriginVerifier.json e extrair campo '.abi' — copiar para novo arquivo",
+    "Idem para EUDRVerifier.json e ESGScorer.json",
+    "Criar dapp/src/lib/contracts/verification.ts iniciando com imports: import { OriginVerification, EUDRCompliance, ESGScore, VerificationStatus } from '@/types/agrochain'",
+    "Adicionar exports: export const ORIGIN_VERIFIER_ABI = [... ABI copiada ...]; export const EUDR_VERIFIER_ABI = [...]; export const ESG_SCORER_ABI = [...]",
+    "Criar MOCK_ORIGIN_VERIFICATIONS: OriginVerification[] com 10+ exemplos cobrindo: 3 aprovadas (países variados), 2 rejeitadas (motivos diferentes), 2 em verificação, 3 não iniciadas — usar loteIds reais de marketplace ou rastreio se possível",
+    "Criar MOCK_EUDR_COMPLIANCES: EUDRCompliance[] com 10+ exemplos: 4 aprovadas (sem desmatamento), 3 rejeitadas (desmatamento detectado), 2 em verificação, 1 não iniciada — variar confiança 60-95%",
+    "Criar MOCK_ESG_SCORES: ESGScore[] com 10+ exemplos: scores ambientais/sociais/governança variados (0-100), scores finais calculados corretamente pela fórmula 40/30/30, status conforme score final ≥70 (aprovado) ou não",
+    "Adicionar função helper submitOriginVerification(lotId, country, region, lat, lng, proofUri) → OriginVerification (mock, cria ID timestamp, status 'Em Verificação')",
+    "Adicionar função helper verifyEUDRCompliance(lotId, deforestationDetected, satelliteUri) → EUDRCompliance (mock, status 'Aprovado' se sem desmatamento, 'Rejeitado' se com)",
+    "Adicionar função helper calculateESGScore(lotId, envScore, socScore, govScore) → ESGScore (calcula finalScore via fórmula, status 'Aprovado' se ≥70)",
+    "Adicionar função filterVerifications(data: OriginVerification[], filter: { status?, country? }) → OriginVerification[] (filtra por status e/ou país)",
+    "Adicionar função similar para EUDR e ESG (filterCompliances, filterScores)",
+    "Verificar tipos: import statement em outro arquivo deve resultar em IntelliSense correto",
+    "Salvar arquivo"
+  ],
+  "acceptance_criteria": [
+    "npx tsc dapp/src/lib/contracts/verification.ts --noEmit compila sem erros",
+    "ABIs exportadas têm estrutura válida (array of objects com type, name, inputs, outputs)",
+    "MOCK_ORIGIN_VERIFICATIONS, MOCK_EUDR_COMPLIANCES, MOCK_ESG_SCORES tem 10+ elementos cada",
+    "Cada elemento do mock cobre status diferente (Não Iniciado, Em Verificação, Aprovado, Rejeitado)",
+    "Helper functions retornam tipos corretos (OriginVerification, EUDRCompliance, ESGScore)",
+    "calculateESGScore usa fórmula 40/30/30 corretamente: (env*40 + soc*30 + gov*30)/100",
+    "filterVerifications, filterCompliances, filterScores funcionam com critérios múltiplos"
+  ],
+  "verification": [
+    "Terminal em dapp/",
+    "Executar: npx tsc src/lib/contracts/verification.ts --noEmit",
+    "Esperado: sem erros, sem warnings",
+    "Executar: node -e \"import('./src/lib/contracts/verification.ts').then(m => console.log(m.MOCK_ORIGIN_VERIFICATIONS.length))\" (ou usar grep)",
+    "Esperado: 10 ou mais",
+    "Executar: grep -c 'Aprovado' src/lib/contracts/verification.ts",
+    "Esperado: múltiplas linhas (10+) com status Aprovado distribuído entre mocks"
+  ],
+  "blocked_reason": null,
+  "findings": ""
+}

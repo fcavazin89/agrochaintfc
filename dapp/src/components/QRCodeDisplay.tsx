@@ -1,30 +1,31 @@
 'use client';
 
-import QRCode from 'qrcode.react';
+import { QRCodeCanvas } from 'qrcode.react';
+
+type Size = 'small' | 'medium' | 'large';
+
+const SIZE_MAP: Record<Size, number> = {
+  small: 128,
+  medium: 200,
+  large: 256,
+};
 
 interface QRCodeDisplayProps {
   lotId: string;
-  size?: 'small' | 'medium' | 'large';
+  size?: Size;
 }
 
 export default function QRCodeDisplay({ lotId, size = 'medium' }: QRCodeDisplayProps) {
-  const sizeMap = {
-    small: 128,
-    medium: 256,
-    large: 384,
-  };
-
-  const qrSize = sizeMap[size];
-  const origin =
-    typeof window !== 'undefined' ? window.location.origin : 'https://agrochain.app';
-  const passportUrl = `${origin}/passport/${lotId}`;
+  const url = typeof window !== 'undefined'
+    ? `${window.location.origin}/passport/${lotId}`
+    : `/passport/${lotId}`;
 
   return (
-    <div className="flex flex-col items-center gap-4">
-      <QRCode value={passportUrl} size={qrSize} />
-      <p style={{ fontSize: '14px', color: 'var(--texto-secundario)' }}>
-        Escaneie para ver detalhes do lote
-      </p>
-    </div>
+    <QRCodeCanvas
+      value={url}
+      size={SIZE_MAP[size]}
+      includeMargin
+      level="M"
+    />
   );
 }

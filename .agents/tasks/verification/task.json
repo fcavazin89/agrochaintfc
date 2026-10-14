@@ -1,0 +1,7 @@
+{
+  "task_id": "task-verification-module",
+  "task_description": "Implementar módulo Verification com 3 camadas de verificação de lotes (Origem, EUDR, ESG), incluindo tipos TypeScript, contratos Solidity, utils com mock data, 4 páginas Next.js e integração Sidebar",
+  "status": "completed",
+  "feature_order": ["FEAT-001", "FEAT-002", "FEAT-003", "FEAT-004", "FEAT-005"],
+  "blocked_reason": null
+}

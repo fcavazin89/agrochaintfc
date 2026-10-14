@@ -179,7 +179,7 @@ export default function CertificacaoPage() {
       if (receipt.status === '0x0') throw new Error('TX revertida no contrato. Verifique os dados.');
 
       // Parse CertificadoMintado event → tokenId
-      const EVENT_SIG = '0xe8b8cdeb24a8038b0bd8b58c33e9a0b5e77f3490b3c15b6f00d0d35f96a5d4e4';
+      const EVENT_SIG = '0x425172b26c617fba6dd5b862e8adaabfde830edd3875c593ae7342a2815f1d26';
       const mintLog = receipt.logs?.find((l: any) =>
         l.topics?.[0]?.toLowerCase() === EVENT_SIG.toLowerCase()
       );

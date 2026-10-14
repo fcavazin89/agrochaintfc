@@ -904,7 +904,7 @@ export default function OrderDetailsPage() {
                 style={{
                   padding: 'var(--e-3) var(--e-4)',
                   background: rejectionReason.trim() ? 'var(--critico)' : 'var(--sup-2)',
-                  color: rejectionReason.trim() ? '#fff' : 'var(--texto-3)',
+                  color: rejectionReason.trim() ? 'var(--branco)' : 'var(--texto-3)',
                   border: 'none',
                   borderRadius: 'var(--raio-xs)',
                   cursor: rejectionReason.trim() ? 'pointer' : 'not-allowed',

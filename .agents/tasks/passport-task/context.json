@@ -1,0 +1,24 @@
+{
+  "project_type": "Next.js 14 + TypeScript + MetaMask Web3 DApp",
+  "language": "TypeScript/TSX",
+  "build_system": "npm (Next.js 14 build)",
+  "test_framework": "não configurado ainda",
+  "build_command": "npm run build",
+  "test_command": "npm run lint (verificação básica)",
+  "verification_instructions": "1. npm run build em dapp/ — confirmar sem erros TS; 2. verificar que qrcode.react foi instalado; 3. leitura manual das páginas e componentes criados",
+  "snapshot_or_generated_files": null,
+  "environment_constraints": "Sepolia testnet, MetaMask integrado via wagmi/viem; servidor local Next.js na porta 3000",
+  "contribution_requirements": "Código segue design.md (design system claro/papel kraft, tipografia serifa para títulos); Next.js 14 patterns com 'use client' onde necessário; tipos TypeScript completos; mock data para lotes existentes (MOCK_LOTS em dapp/src/lib/)",
+  "key_patterns": "1. Componentes cliente em 'use client'; 2. páginas em dapp/src/app/[rota]/page.tsx; 3. tipos em dapp/src/types/agrochain.ts; 4. utils em dapp/src/lib/; 5. design com CSS inline (sem Tailwind — sistema manual); 6. mock data em constantes ou em page.tsx; 7. sidebar em Sidebar.tsx com navSections; 8. layout raiz em layout.tsx com Sidebar + TopBar; 9. QR via QR Server API (https://api.qrserver.com) ou qrcode.react",
+  "relevant_files": [
+    "dapp/package.json — verificar/instalar qrcode.react",
+    "dapp/src/types/agrochain.ts — tipos existentes (Lot, LotEvent, LotCertification, etc.)",
+    "dapp/src/app/lote/[lotId]/page.tsx — exemplo de página interna com mock data e timeline",
+    "dapp/src/app/layout.tsx — layout com Sidebar + TopBar",
+    "dapp/src/components/layout/Sidebar.tsx — estrutura de navegação, navSections",
+    "dapp/src/lib/lotUtils.ts — utilitários existentes (formatarData, formatarArea, etc.)",
+    "dapp/src/lib/lotConstants.ts — tokens de design e cores",
+    "design.md — design system (tokens, tipografia, cores, componentes)"
+  ],
+  "directory_structure": "dapp/src/: app/ (rotas Next.js), components/ (React components), lib/ (utils e contextos), types/ (TS interfaces). Nova estrutura: dapp/src/app/passport/ para [lotId]/page.tsx e generate/page.tsx; dapp/src/components/QRCodeDisplay.tsx; dapp/src/lib/passport.ts para utils de passport."
+}

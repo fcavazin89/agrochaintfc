@@ -515,7 +515,7 @@ export default function BuyerDashboard() {
           style={{
             display: 'inline-block',
             background: 'linear-gradient(180deg, var(--verde-600) 0%, var(--verde-700) 100%)',
-            color: '#fff',
+            color: 'var(--branco)',
             border: 'none',
             padding: 'var(--e-3) var(--e-5)',
             borderRadius: 'var(--raio-sm)',

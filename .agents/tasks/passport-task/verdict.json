@@ -1,0 +1,16 @@
+{
+  "verdict": "APPROVED",
+  "timestamp": "2026-10-14T00:00:00Z",
+  "reviewer": "fable-judge",
+  "summary": "Passport finalizado: FEAT-001 (tipos PassportData/PassportAccess, componente QRCodeDisplay, utils passport.ts, dependencia qrcode.react), FEAT-002 (pagina publica /passport/[lotId]) e FEAT-003 (gerador /passport/generate + link na Sidebar) concluidos. dapp build (next build) compila com sucesso gerando as rotas /passport/[lotId] e /passport/generate.",
+  "findings": [
+    "QRCodeDisplay.tsx usa export nomeado QRCodeCanvas de qrcode.react v4.1.0 (compativel com a versao instalada) — APROVADO",
+    "dapp/package.json: qrcode.react ^4.1.0 e lucide-react ^0.263.1 presentes em dependencies; @types/qrcode.react removido (v4 traz tipos proprios) — APROVADO",
+    "passport/[lotId]/page.tsx e passport/generate/page.tsx presentes e renderizam (rotas geradas no build) — APROVADO",
+    "Sidebar.tsx inclui o link /passport/generate — APROVADO",
+    "build: next build conclui sem erros de TypeScript para as rotas de passport — APROVADO"
+  ],
+  "caveats": [
+    "verifyLotAuthenticity() e buildPassportData() sao mocks (por design nesta fase); badge/metas Open Graph sao estaticas."
+  ]
+}

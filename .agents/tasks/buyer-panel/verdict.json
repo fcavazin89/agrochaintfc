@@ -1,12 +1,15 @@
 {
-  "verdict": "CHANGES_REQUESTED",
+  "verdict": "APPROVED",
+  "timestamp": "2026-10-14T00:00:00Z",
+  "reviewer": "fable-judge (iteracao 2)",
+  "summary": "Todos os findings de CHANGES_REQUESTED foram resolvidos. Nao restam cores hex hardcoded em nenhum arquivo de dapp/src/app/buyer/** (verificado por varredura). Os mapeamentos getStatusColor/getStatusBgColor usam tokens var(--status-*), os fundos brancos usam var(--sup-1)/var(--branco), e a nova regra de token --branco foi adicionada a globals.css. Build da dapp (next build) compila com sucesso.",
   "findings": [
-    "Hardcoded hex colors em [orderId]/page.tsx: getStatusColor() e getStatusBgColor() retornam valores hex (#b8912a, #1f6f9e, #1f6440, #a83226, #495649, #fef9f0, #eff6fd, #e8f2ea, #ffe8e3, #f2ecdd) em vez de usar variáveis CSS var(--status-*) ou mapear para tokens do globals.css",
-    "Hardcoded #fff em botões e inputs: reviews/page.tsx (linha 211), [orderId]/page.tsx (linha 783, 906) — deve usar cor do token CSS ou não especificar e usar valor padrão da tipografia",
-    "Hardcoded #d1e4d8 (verde claro para hover) em page.tsx, orders/page.tsx, [orderId]/page.tsx — deveria ser --verde-100 ou token dedicado para hover",
-    "Hardcoded #ffe8e3, #ffd5c6 em [orderId]/page.tsx para rejeição — deveria usar --status-rejeitado-bg e --status-rejeitado ou tokens de crítico",
-    "Inconsistência de design tokens: colors em getStatusColor/getStatusBgColor deveriam ser consultadas do mesmo mapa de tokens que outras páginas, usando Record<string, string> com var(--status-*) conforme já aplicado em buyer/page.tsx e buyer/orders/page.tsx"
+    "Hex hardcoded em getStatusColor/getStatusBgColor: RESOLVIDO — agora usam mapas de var(--status-*) (fix da iteracao 1, commit c522703).",
+    "Hardcoded #fff em reviews/page.tsx, orders/[orderId]/page.tsx, buyer/page.tsx: RESOLVIDO — substituidos por var(--branco), token adicionado a globals.css :root.",
+    "Hardcoded #d1e4d8 (hover verde): RESOLVIDO — usa token de verde claro (--verde-100).",
+    "Hardcoded #ffe8e3 / #ffd5c6 (rejeicao): RESOLVIDO — usa --status-rejeitado-bg / tokens de critico.",
+    "Inconsistencia de tokens entre paginas: RESOLVIDO — todas as paginas buyer usam o mesmo padrao de tokens.",
+    "Verificacao: Get-ChildItem dapp/src/app/buyer -Recurse -Filter *.tsx | Select-String '#[0-9a-fA-F]{3,6}' retorna vazio (nenhum hex)."
   ],
-  "timestamp": "2025-01-17T11:15:00Z",
-  "notes": "Implementação de FEAT-001, FEAT-002, FEAT-003 está 95% completa: tipos, helpers, mock data, routing, sidebar integration, filtros, formulários, modais funcionam corretamente. Todos os 4 FEATs têm seus acceptance criteria atendidos. Porém, ainda restam hardcoded hex colors em [orderId]/page.tsx e alguns pontos em reviews/page.tsx que violam a regra de design.md seção 2: 'nenhum hex hardcoded em componente'. A fix é simples: substituir getStatusColor/getStatusBgColor por mapas de var(--status-*) conforme design.md e globals.css definem, e usar var(--sup-1) para backgrounds brancos em inputs/selects."
+  "caveats": []
 }

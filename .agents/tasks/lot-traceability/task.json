@@ -1,7 +1,7 @@
 {
   "task_id": "task-lot-traceability",
   "task_description": "Implementar módulo completo de Rastreabilidade de Lotes (Lot Traceability) para AgroChain: tipos TypeScript, contrato SmartLot, utilitários, páginas UI (listagem e detalhes), QR code, integração com MetaMask e AgroChainPayments.",
-  "status": "pending",
+  "status": "completed",
   "feature_order": [
     "FEAT-001",
     "FEAT-002",

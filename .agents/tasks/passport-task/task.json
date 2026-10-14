@@ -1,0 +1,7 @@
+{
+  "task_id": "task-agrochain-public-passport",
+  "task_description": "Implementar módulo Public Passport para AgroChain: página pública de visualização de lotes (/passport/[lotId]), gerador de QR para produtores (/passport/generate), componente QRCodeDisplay reutilizável, tipos e utilitários, instalação de qrcode.react, atualização da sidebar.",
+  "status": "completed",
+  "feature_order": ["FEAT-001", "FEAT-002", "FEAT-003"],
+  "blocked_reason": null
+}

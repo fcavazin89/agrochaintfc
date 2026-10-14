@@ -1,0 +1,13 @@
+{
+  "verdict": "APPROVED",
+  "summary": "Todos os 7 critérios de aceitação foram atendidos. CarbonCredits.sol usa Ownable com eventos corretos e 1 crédito/hectare; analytics/page.tsx tem KPIs, filtros de período funcionais, gráfico div, lista de estados e tabela; credits/page.tsx tem 4 KPIs, tabela com 6 linhas, badges de status e botão 'Solicitar Créditos' habilitado apenas para 'Pendente'; QRCodeDisplay usa a API correta do qrcode.react v1.x (default export); passport/generate/page.tsx protege window.location.origin via useState+useEffect evitando hydration mismatch; Sidebar tem links /analytics e /credits; tipos CarbonCredit e AnalyticsData estão presentes em agrochain.ts.",
+  "findings": [
+    "CarbonCredits.sol: Ownable correto (constructor Ownable(msg.sender)), eventos CreditIssued e CreditTransferred com parâmetros indexed corretos, lógica 1 crédito/hectare via 'uint256 creditos = hectares' — APROVADO",
+    "analytics/page.tsx: 4 KPI cards presentes (Lotes Certificados, Volume MockUSDC, Produtores Ativos, Score ESG Médio), filtros de período 7d/30d/90d/1a com useState e multiplicadores, gráfico de barras com divs flex, lista de estados agrupados por origem, tabela de últimos 6 lotes com colunas Lote ID / Origem / Status / Área / Data Colheita — APROVADO",
+    "credits/page.tsx: 4 KPI cards (Total Emitidos, Pendentes, Vendidos, Área Total), tabela com 6 linhas derivadas de MOCK_LOTS, badges coloridos por status (verde/amarelo/cinza), botão 'Solicitar Créditos' clicável (verde) apenas para status 'Pendente' e desabilitado (cinza, disabled) para 'Emitido'/'Vendido' — APROVADO",
+    "QRCodeDisplay.tsx: usa 'import QRCode from qrcode.react' (default export da v1.x instalada, ^1.0.1) com <QRCode value={passportUrl} size={qrSize} /> — API correta para a versão instalada; window.location.origin protegido por typeof window !== 'undefined' — APROVADO",
+    "passport/generate/page.tsx: origin inicializado como '' via useState e atualizado em useEffect(() => { setOrigin(window.location.origin) }, []), garantindo que o servidor renderize string vazia e evitando hydration mismatch — APROVADO",
+    "Sidebar.tsx: seção 'ANALYTICS & ESG' presente com itens { href: '/analytics', label: 'Analytics', icon: '📈' } e { href: '/credits', label: 'Carbon Credits', icon: '🌿' } — APROVADO",
+    "agrochain.ts: interface CarbonCredit exportada com campos creditId/loteId/produtor/hectares/creditos/status/dataEmissao/dataTransferencia?/destinatario?; interface AnalyticsData exportada com campo lotesPorEstado (camelCase corrigido de 'lotesporEstado' conforme FEAT-001 findings) — APROVADO"
+  ]
+}

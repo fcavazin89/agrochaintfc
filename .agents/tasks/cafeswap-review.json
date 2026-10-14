@@ -1,0 +1,62 @@
+{
+  "verdict": "CHANGES_REQUESTED",
+  "findings": [
+    {
+      "severity": "HIGH",
+      "title": "Farm becomes non-functional at supply cap",
+      "description": "Once MAX_SUPPLY (100M) is reached, all harvest/stake/unstake operations revert because safeCafeTransfer() calls mint(), which reverts. Users can only use emergencyWithdraw() to recover LP tokens without rewards. The protocol has no mechanism to reduce emission rates or handle supply exhaustion gracefully.",
+      "confidence": "confirmed",
+      "action": "Implement supply cap handling: reduce emission rates, allow operations without minting, or set cafePerSecond to 0 when approaching cap."
+    },
+    {
+      "severity": "MEDIUM",
+      "title": "TWAP oracle function name misleading",
+      "description": "getCurrentTWAP() ignores windowSize parameter and returns cumulative values, not averages. The function name suggests it calculates an average, but external contracts must store prior values and compute differences themselves.",
+      "confidence": "confirmed",
+      "action": "Rename to getPriceCumulatives() or implement actual window-based averaging that uses the windowSize parameter."
+    },
+    {
+      "severity": "MEDIUM",
+      "title": "Governance ExecutionFailed lacks diagnostic info",
+      "description": "execute() loops through calls and reverts with ExecutionFailed on any failure, but doesn't include which call index failed or the revert reason. This makes post-mortem debugging harder when a proposal fails to execute.",
+      "confidence": "confirmed",
+      "action": "Bubble up revert data or emit an event with call index and reason before reverting."
+    },
+    {
+      "severity": "MEDIUM",
+      "title": "Factory owner centralization without deployment transition",
+      "description": "Factory owner (deployer) controls certification whitelist indefinitely. Deployment script doesn't transfer ownership to governance or multisig, meaning the deployer retains full certification control post-deployment.",
+      "confidence": "confirmed",
+      "action": "Deployment script should transfer ownership to governance or multisig immediately after initial token certification."
+    },
+    {
+      "severity": "MEDIUM",
+      "title": "No mechanism to delist revoked certifications",
+      "description": "addCertifiedToken() whitelists tokens permanently; no removeCertifiedToken() exists. If AgroChainCertificacoes revokes a certification, the Factory can't delist it. Pools with delisted tokens would continue operating.",
+      "confidence": "confirmed",
+      "action": "Add governance-controlled removeCertifiedToken() function or implement periodic re-verification against AgroChainCertificacoes."
+    },
+    {
+      "severity": "MEDIUM",
+      "title": "setAllocPoint without massUpdatePools causes reward miscalculation",
+      "description": "setAllocPoint(withUpdate=false) changes allocPoint without updating pools first. The next pool update distributes rewards across the time span before and after the change using the current allocPoint, not the historical one, causing miscalculation.",
+      "confidence": "confirmed",
+      "action": "Enforce withUpdate=true by removing the parameter, or document the risk prominently and recommend always passing true."
+    },
+    {
+      "severity": "LOW",
+      "title": "Emergency withdraw by feeToSetter lacks timelock",
+      "description": "Pool.emergencyWithdraw() allows immediate extraction by feeToSetter (initially the deployer). While appropriate for genuine stuck-token recovery, it's a centralization vector if the role is compromised.",
+      "confidence": "confirmed",
+      "action": "Consider adding a timelock or requiring governance approval for emergency withdrawals, especially for amounts above a threshold."
+    },
+    {
+      "severity": "LOW",
+      "title": "Router creates pools without explicit user consent",
+      "description": "addLiquidity() calls createPool() if the pool doesn't exist, potentially incurring deployment costs the user didn't expect. Users calling addLiquidity() may inadvertently create pools.",
+      "confidence": "confirmed",
+      "action": "Add a createPoolIfNeeded boolean parameter to require explicit consent for pool creation during liquidity provision."
+    }
+  ],
+  "reviewDoc": "c:\\Users\\Usuário\\agrochain\\workspace-01a1162b-e061-7ff0-b060-dfa40cc70dfdzip\\.agents\\tasks\\cafeswap-review.md"
+}

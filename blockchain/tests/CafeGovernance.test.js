@@ -69,7 +69,7 @@ describe("CafeGovernance", function () {
 
       await expect(
         governance.connect(poorUser).propose(targets, values, calldatas, description)
-      ).to.be.revertedWithCustomError(governance, "InsufficientVotingPower");
+      ).to.be.revertedWithCustomError(governance, "InsufficientProposalThreshold");
     });
 
     it("reverts when arrays have different lengths", async function () {
@@ -80,7 +80,7 @@ describe("CafeGovernance", function () {
 
       await expect(
         governance.connect(alice).propose(targets, values, calldatas, description)
-      ).to.be.revertedWithCustomError(governance, "ArrayLengthMismatch");
+      ).to.be.revertedWithCustomError(governance, "InvalidArrayLength");
     });
 
     it("reverts with empty proposal", async function () {
@@ -91,7 +91,7 @@ describe("CafeGovernance", function () {
 
       await expect(
         governance.connect(alice).propose(targets, values, calldatas, description)
-      ).to.be.revertedWithCustomError(governance, "EmptyProposal");
+      ).to.be.revertedWithCustomError(governance, "InvalidArrayLength");
     });
 
     it("successfully creates a proposal and emits event", async function () {
@@ -120,62 +120,62 @@ describe("CafeGovernance", function () {
     });
 
     it("records votes correctly", async function () {
-      await governance.connect(alice).vote(0, 1);  // FOR
+      await governance.connect(alice).vote(1, 1);  // FOR
 
-      const proposal = await governance.getProposal(0);
+      const proposal = await governance.getProposal(1);
       expect(proposal.forVotes).to.be.gt(0);
     });
 
     it("prevents double voting", async function () {
-      await governance.connect(alice).vote(0, 1);
+      await governance.connect(alice).vote(1, 1);
 
       await expect(
-        governance.connect(alice).vote(0, 2)
+        governance.connect(alice).vote(1, 2)
       ).to.be.revertedWithCustomError(governance, "AlreadyVoted");
     });
 
     it("supports voteType 1 (FOR)", async function () {
       await expect(
-        governance.connect(alice).vote(0, 1)
+        governance.connect(alice).vote(1, 1)
       ).to.emit(governance, "VoteCast");
 
-      const proposal = await governance.getProposal(0);
+      const proposal = await governance.getProposal(1);
       expect(proposal.forVotes).to.be.gt(0);
     });
 
     it("supports voteType 2 (AGAINST)", async function () {
       await expect(
-        governance.connect(bob).vote(0, 2)
+        governance.connect(bob).vote(1, 2)
       ).to.emit(governance, "VoteCast");
 
-      const proposal = await governance.getProposal(0);
+      const proposal = await governance.getProposal(1);
       expect(proposal.againstVotes).to.be.gt(0);
     });
 
     it("supports voteType 3 (ABSTAIN)", async function () {
       await expect(
-        governance.connect(charlie).vote(0, 3)
+        governance.connect(charlie).vote(1, 3)
       ).to.emit(governance, "VoteCast");
 
-      const proposal = await governance.getProposal(0);
+      const proposal = await governance.getProposal(1);
       expect(proposal.abstainVotes).to.be.gt(0);
     });
 
     it("reverts on invalid voteType", async function () {
       await expect(
-        governance.connect(alice).vote(0, 4)
+        governance.connect(alice).vote(1, 4)
       ).to.be.revertedWithCustomError(governance, "InvalidVoteType");
     });
 
     it("reverts when not in voting period", async function () {
-      const proposal = await governance.getProposal(0);
+      const proposal = await governance.getProposal(1);
       const blocksToMine = Number(proposal.endBlock) - (await ethers.provider.getBlockNumber()) + 1;
 
       await ethers.provider.send("hardhat_mine", [`0x${blocksToMine.toString(16)}`]);
 
       await expect(
-        governance.connect(alice).vote(0, 1)
-      ).to.be.revertedWithCustomError(governance, "NotInVotingPeriod");
+        governance.connect(alice).vote(1, 1)
+      ).to.be.revertedWithCustomError(governance, "ProposalNotActive");
     });
   });
 
@@ -200,19 +200,19 @@ describe("CafeGovernance", function () {
     });
 
     it("reverts when voting period has not ended", async function () {
-      await governance.connect(alice).vote(0, 1);
+      await governance.connect(alice).vote(1, 1);
 
       await expect(
-        governance.connect(owner).execute(0)
-      ).to.be.revertedWithCustomError(governance, "OnlyExecuteAfterEnd");
+        governance.connect(owner).execute(1)
+      ).to.be.revertedWithCustomError(governance, "ProposalNotActive");
     });
 
     it("reverts when forVotes <= againstVotes", async function () {
       // Alice votes FOR (2M), Bob votes AGAINST (5M)
-      await governance.connect(alice).vote(0, 1);
-      await governance.connect(bob).vote(0, 2);
+      await governance.connect(alice).vote(1, 1);
+      await governance.connect(bob).vote(1, 2);
 
-      const proposal = await governance.getProposal(0);
+      const proposal = await governance.getProposal(1);
       const blocksToMine = Number(proposal.endBlock) - (await ethers.provider.getBlockNumber()) + 1;
       await ethers.provider.send("hardhat_mine", [`0x${blocksToMine.toString(16)}`]);
 
@@ -220,8 +220,8 @@ describe("CafeGovernance", function () {
       await ethers.provider.send("hardhat_mine", ["0x1"]);
 
       await expect(
-        governance.connect(owner).execute(0)
-      ).to.be.revertedWithCustomError(governance, "NotSucceeded");
+        governance.connect(owner).execute(1)
+      ).to.be.revertedWithCustomError(governance, "ProposalNotSucceeded");
     });
 
     it("reverts when quorum not met", async function () {
@@ -237,7 +237,7 @@ describe("CafeGovernance", function () {
       const description = "Low vote proposal";
 
       await governance.connect(alice).propose(targets, values, calldatas, description);
-      const proposalId = 1;
+      const proposalId = 2;
 
       // Only poor alice votes (100k < 1M quorum from 10M total)
       await governance.connect(poorAlice).vote(proposalId, 1);
@@ -251,29 +251,29 @@ describe("CafeGovernance", function () {
 
       await expect(
         governance.connect(owner).execute(proposalId)
-      ).to.be.revertedWithCustomError(governance, "QuorumNotMet");
+      ).to.be.revertedWithCustomError(governance, "QuorumNotReached");
     });
 
     it("reverts when timelock has not elapsed", async function () {
-      await governance.connect(alice).vote(0, 1);
-      await governance.connect(bob).vote(0, 1);
+      await governance.connect(alice).vote(1, 1);
+      await governance.connect(bob).vote(1, 1);
 
-      const proposal = await governance.getProposal(0);
+      const proposal = await governance.getProposal(1);
       const blocksToMine = Number(proposal.endBlock) - (await ethers.provider.getBlockNumber()) + 1;
       await ethers.provider.send("hardhat_mine", [`0x${blocksToMine.toString(16)}`]);
 
       // Try to execute without waiting for timelock
       await expect(
-        governance.connect(owner).execute(0)
+        governance.connect(owner).execute(1)
       ).to.be.revertedWithCustomError(governance, "TimelockNotElapsed");
     });
 
     it("succeeds after timelock elapsed and conditions met", async function () {
       // Get enough votes to pass and meet quorum
-      await governance.connect(alice).vote(0, 1);
-      await governance.connect(bob).vote(0, 1);
+      await governance.connect(alice).vote(1, 1);
+      await governance.connect(bob).vote(1, 1);
 
-      const proposal = await governance.getProposal(0);
+      const proposal = await governance.getProposal(1);
       const blocksToMine = Number(proposal.endBlock) - (await ethers.provider.getBlockNumber()) + 1;
       await ethers.provider.send("hardhat_mine", [`0x${blocksToMine.toString(16)}`]);
 
@@ -281,18 +281,18 @@ describe("CafeGovernance", function () {
       await ethers.provider.send("hardhat_mine", ["0x1"]);
 
       await expect(
-        governance.connect(owner).execute(0)
+        governance.connect(owner).execute(1)
       ).to.emit(governance, "ProposalExecuted");
 
-      const executedProposal = await governance.getProposal(0);
+      const executedProposal = await governance.getProposal(1);
       expect(executedProposal.executed).to.be.true;
     });
 
     it("can execute proposals that call setRewardRate on farm", async function () {
-      await governance.connect(alice).vote(0, 1);
-      await governance.connect(bob).vote(0, 1);
+      await governance.connect(alice).vote(1, 1);
+      await governance.connect(bob).vote(1, 1);
 
-      const proposal = await governance.getProposal(0);
+      const proposal = await governance.getProposal(1);
       const blocksToMine = Number(proposal.endBlock) - (await ethers.provider.getBlockNumber()) + 1;
       await ethers.provider.send("hardhat_mine", [`0x${blocksToMine.toString(16)}`]);
 
@@ -300,7 +300,7 @@ describe("CafeGovernance", function () {
       await ethers.provider.send("hardhat_mine", ["0x1"]);
 
       const newRate = ethers.parseEther("2");
-      await governance.connect(owner).execute(0);
+      await governance.connect(owner).execute(1);
 
       // Verify the reward rate was changed
       const updatedRate = await mockFarm.cafePerSecond();
@@ -320,23 +320,23 @@ describe("CafeGovernance", function () {
 
     it("only proposer can cancel", async function () {
       await expect(
-        governance.connect(bob).cancel(0)
+        governance.connect(bob).cancel(1)
       ).to.be.revertedWithCustomError(governance, "OnlyProposer");
     });
 
     it("proposer can cancel", async function () {
       await expect(
-        governance.connect(alice).cancel(0)
+        governance.connect(alice).cancel(1)
       ).to.emit(governance, "ProposalCanceled");
     });
 
     it("reverts when trying to cancel executed proposal", async function () {
       // Get enough votes
-      await governance.connect(alice).vote(0, 1);
-      await governance.connect(bob).vote(0, 1);
+      await governance.connect(alice).vote(1, 1);
+      await governance.connect(bob).vote(1, 1);
 
       // Mine past voting period
-      const proposal = await governance.getProposal(0);
+      const proposal = await governance.getProposal(1);
       const blocksToMine = Number(proposal.endBlock) - (await ethers.provider.getBlockNumber()) + 1;
       await ethers.provider.send("hardhat_mine", [`0x${blocksToMine.toString(16)}`]);
 
@@ -344,12 +344,12 @@ describe("CafeGovernance", function () {
       await ethers.provider.send("evm_increaseTime", [TIMELOCK_DELAY + 1]);
       await ethers.provider.send("hardhat_mine", ["0x1"]);
 
-      await governance.connect(owner).execute(0);
+      await governance.connect(owner).execute(1);
 
       // Try to cancel executed proposal
       await expect(
-        governance.connect(alice).cancel(0)
-      ).to.be.revertedWithCustomError(governance, "InvalidProposal");
+        governance.connect(alice).cancel(1)
+      ).to.be.revertedWithCustomError(governance, "AlreadyExecuted");
     });
   });
 
@@ -364,39 +364,39 @@ describe("CafeGovernance", function () {
     });
 
     it("returns Pending or Active state right after proposal", async function () {
-      const state = await governance.state(0);
+      const state = await governance.state(1);
       // Could be either Pending (0) or Active (1) depending on exact block timing
       expect([0n, 1n]).to.include(state);
     });
 
     it("returns Active state during voting period", async function () {
-      await governance.connect(alice).vote(0, 1);
+      await governance.connect(alice).vote(1, 1);
 
-      const state = await governance.state(0);
+      const state = await governance.state(1);
       expect(state).to.equal(1);  // Active
     });
 
     it("returns Succeeded when forVotes > againstVotes and quorum met", async function () {
-      await governance.connect(alice).vote(0, 1);
-      await governance.connect(bob).vote(0, 1);
+      await governance.connect(alice).vote(1, 1);
+      await governance.connect(bob).vote(1, 1);
 
-      const proposal = await governance.getProposal(0);
+      const proposal = await governance.getProposal(1);
       const blocksToMine = Number(proposal.endBlock) - (await ethers.provider.getBlockNumber()) + 1;
       await ethers.provider.send("hardhat_mine", [`0x${blocksToMine.toString(16)}`]);
 
-      const state = await governance.state(0);
+      const state = await governance.state(1);
       expect(state).to.equal(2);  // Succeeded
     });
 
     it("returns Defeated when forVotes <= againstVotes", async function () {
-      await governance.connect(alice).vote(0, 1);  // 2M
-      await governance.connect(bob).vote(0, 2);    // 5M against
+      await governance.connect(alice).vote(1, 1);  // 2M
+      await governance.connect(bob).vote(1, 2);    // 5M against
 
-      const proposal = await governance.getProposal(0);
+      const proposal = await governance.getProposal(1);
       const blocksToMine = Number(proposal.endBlock) - (await ethers.provider.getBlockNumber()) + 1;
       await ethers.provider.send("hardhat_mine", [`0x${blocksToMine.toString(16)}`]);
 
-      const state = await governance.state(0);
+      const state = await governance.state(1);
       expect(state).to.equal(3);  // Defeated
     });
 
@@ -431,9 +431,9 @@ describe("CafeGovernance", function () {
     });
 
     it("returns Canceled when proposal is canceled", async function () {
-      await governance.connect(alice).cancel(0);
+      await governance.connect(alice).cancel(1);
 
-      const state = await governance.state(0);
+      const state = await governance.state(1);
       expect(state).to.equal(5);  // Canceled
     });
   });
@@ -441,7 +441,7 @@ describe("CafeGovernance", function () {
   describe("Constants", function () {
     it("defines correct VOTING_PERIOD", async function () {
       const votingPeriod = await governance.VOTING_PERIOD();
-      expect(votingPeriod).to.equal(7n * 24n * 60n * 60n);  // 7 days in seconds
+      expect(votingPeriod).to.equal(50400n);  // ~7 days in blocks
     });
 
     it("defines correct TIMELOCK_DELAY", async function () {

@@ -40,6 +40,7 @@
     "circomlib": "^2.0.5",
     "circomlibjs": "^0.1.7",
     "ethers": "^6.17.0",
+    "fast-check": "^4.10.2",
     "hardhat": "^3.18.1",
     "snarkjs": "^0.7.6",
     "solc": "^0.8.37"

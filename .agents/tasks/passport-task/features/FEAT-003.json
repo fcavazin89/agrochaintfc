@@ -1,0 +1,35 @@
+{
+  "id": "FEAT-003",
+  "type": "feat",
+  "description": "Criar página QR Code Generator em dapp/src/app/passport/generate/page.tsx para produtores logados. Página exibe: seletor de lote (dropdown com listagem mock), pré-visualização de QR em tempo real, botões 'Baixar QR' (PNG) e 'Copiar Link'. Atualizar Sidebar.tsx para adicionar link /passport/generate na seção RASTREIO (apenas para usuários autenticados).",
+  "status": "completed",
+  "steps": [
+    "Criar diretório dapp/src/app/passport/generate/ se não existir",
+    "Criar dapp/src/app/passport/generate/page.tsx: página 'use client' que (1) verifica autenticação via useAccount de wagmi (redireciona ou mostra mensagem se não autenticado); (2) exibe título 'Gerador de QR Code'; (3) seletor (dropdown/combobox) com lista de lotes mock (usar MOCK_LOTS ou lista pré-definida de LOT-2026-001, LOT-2026-002, LOT-2025-015); (4) ao selecionar lote, atualiza estado e re-renderiza QR; (5) preview de QR code em tamanho 200x200px; (6) botão 'Baixar QR' — usa library qrcode.react com canvas.toDataURL para gerar PNG e download via blob; (7) botão 'Copiar Link' — copia URL https://agrochain.example.com/passport/[lotId] para clipboard e mostra toast de confirmação; (8) URL da QR sempre é https://agrochain.example.com/passport/[lotId]; (9) layout segue design.md, responsivo",
+    "Implementar função downloadQR(lotId: string) em passport.ts ou inline: recebe canvas ref, converte para PNG via canvas.toDataURL('image/png'), cria blob, gera download com nome 'passport-[lotId].png'",
+    "Implementar função copyLinkToClipboard(lotId: string): copia 'https://agrochain.example.com/passport/[lotId]' para navigator.clipboard, mostra toast sucesso",
+    "Atualizar dapp/src/components/layout/Sidebar.tsx: adicionar item { href: '/passport/generate', label: 'Gerar QR Passport', icon: '🔗' } na seção RASTREIO (entre 'Certificação ZK' e fim da seção); item deve renderizar apenas se useAccount().isConnected === true (ou mostra item desabilitado com tooltip 'Conecte MetaMask')",
+    "Adicionar verificação de autenticação na page: se useAccount().isConnected === false, exibir card com mensagem 'Conecte sua carteira MetaMask para acessar o Gerador de QR' e botão 'Conectar Carteira'"
+  ],
+  "acceptance_criteria": [
+    "Página existe em dapp/src/app/passport/generate/page.tsx",
+    "Acessar /passport/generate sem MetaMask conectado mostra mensagem e botão conectar",
+    "Com MetaMask conectado, página exibe seletor de lotes",
+    "Ao selecionar lote, QR é renderizado em preview",
+    "Botão 'Baixar QR' executa download de PNG com nome correto",
+    "Botão 'Copiar Link' copia URL correta e mostra feedback",
+    "Sidebar mostra item 'Gerar QR Passport' em seção RASTREIO quando autenticado",
+    "Item da sidebar está desabilitado ou oculto quando sem MetaMask"
+  ],
+  "verification": [
+    "npm run build em dapp/ — sem erros",
+    "Sem MetaMask: /passport/generate mostra mensagem conectar",
+    "Com MetaMask conectado: página carrega, dropdown funciona, selecionar lote renderiza QR",
+    "Clicar 'Baixar QR' — arquivo PNG baixado com nome correto",
+    "Clicar 'Copiar Link' — URL copiada (verificar em clipboard), toast exibe",
+    "Sidebar: item 'Gerar QR Passport' visível quando autenticado, invisível quando não",
+    "npm run lint — sem erros de linting"
+  ],
+  "blocked_reason": null,
+  "findings": "Integração com autenticação MetaMask completa; fluxo de geração de QR para produtores finalizado; sidebar atualizada com novo link contexto"
+}

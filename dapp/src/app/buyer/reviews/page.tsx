@@ -212,7 +212,7 @@ export default function ReviewsPage() {
           onClick={handleAddReview}
           style={{
             background: 'linear-gradient(180deg, var(--verde-600) 0%, var(--verde-700) 100%)',
-            color: '#fff',
+            color: 'var(--branco)',
             border: 'none',
             padding: '12px 24px',
             borderRadius: 'var(--raio-sm)',
