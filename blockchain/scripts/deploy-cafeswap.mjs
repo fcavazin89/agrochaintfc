@@ -1,130 +1,109 @@
+import { writeFile } from "node:fs/promises";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { network } from "hardhat";
-import { getAddress, ZeroAddress } from "ethers";
-import fs from "fs";
-import path from "path";
 
-const main = async () => {
-  const { ethers } = await network.connect();
-  const [deployer] = await ethers.getSigners();
-  const deployerAddress = await deployer.getAddress();
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
+const { ethers } = await network.connect();
+const [deployer] = await ethers.getSigners();
 
-  console.log("Deploying Coffee/Cacao Swap Protocol...");
-  console.log(`Deployer: ${deployerAddress}`);
-  console.log(`Network: ${(await ethers.provider.getNetwork()).name}`);
+console.log("Deploying CaféSwap Protocol");
+console.log("═══════════════════════════════════════");
+console.log(`Deployer: ${deployer.address}`);
+console.log(`Network: ${network.name}`);
+console.log("");
 
-  // 1. Deploy CAFE Token
-  console.log("\n[1/5] Deploying CafeToken...");
-  const CafeToken = await ethers.getContractFactory("CafeToken");
-  const cafeToken = await CafeToken.deploy();
-  await cafeToken.waitForDeployment();
-  const cafeTokenAddress = await cafeToken.getAddress();
-  console.log(`✓ CafeToken deployed: ${cafeTokenAddress}`);
+// Get AgroChainCertificacoes address (must be deployed already)
+const agroChainCertificacoesAddress = process.env.AGROCHAIN_CERT_ADDRESS;
+if (!agroChainCertificacoesAddress) {
+  throw new Error("AGROCHAIN_CERT_ADDRESS environment variable required");
+}
 
-  // Grant MINTER_ROLE to deployer for initial setup
-  const MINTER_ROLE = await cafeToken.MINTER_ROLE();
-  await cafeToken.grantRole(MINTER_ROLE, deployerAddress);
-  console.log(`✓ MINTER_ROLE granted to deployer`);
+const deployments = {};
 
-  // 2. Deploy CoffeeCacaoSwapFactory
-  console.log("\n[2/5] Deploying CoffeeCacaoSwapFactory...");
-  // For local deployment, use a placeholder address if AGROCHAIN_CERTIFICATIONS_ADDRESS not set
-  let certificationsAddress = process.env.AGROCHAIN_CERTIFICATIONS_ADDRESS;
-  if (!certificationsAddress) {
-    console.log("⚠ AGROCHAIN_CERTIFICATIONS_ADDRESS not set, using placeholder address");
-    certificationsAddress = "0x1234567890123456789012345678901234567890";
-  }
-  certificationsAddress = getAddress(certificationsAddress);
+// 1. Deploy CafeToken
+console.log("1. Deploying CafeToken...");
+const CafeToken = await ethers.getContractFactory("CafeToken");
+const cafe = await CafeToken.deploy();
+await cafe.waitForDeployment();
+deployments.cafeToken = await cafe.getAddress();
+console.log(`✓ CafeToken: ${deployments.cafeToken}\n`);
 
-  const CoffeeCacaoSwapFactory = await ethers.getContractFactory("CoffeeCacaoSwapFactory");
-  const factory = await CoffeeCacaoSwapFactory.deploy(certificationsAddress);
-  await factory.waitForDeployment();
-  const factoryAddress = await factory.getAddress();
-  console.log(`✓ CoffeeCacaoSwapFactory deployed: ${factoryAddress}`);
+// 2. Deploy Factory
+console.log("2. Deploying CafeSwapFactory...");
+const Factory = await ethers.getContractFactory("CafeSwapFactory");
+const factory = await Factory.deploy(agroChainCertificacoesAddress);
+await factory.waitForDeployment();
+deployments.factory = await factory.getAddress();
+console.log(`✓ Factory: ${deployments.factory}\n`);
 
-  // 3. Deploy CoffeeCacaoSwapRouter
-  console.log("\n[3/5] Deploying CoffeeCacaoSwapRouter...");
-  const CoffeeCacaoSwapRouter = await ethers.getContractFactory("CoffeeCacaoSwapRouter");
-  const router = await CoffeeCacaoSwapRouter.deploy(factoryAddress);
-  await router.waitForDeployment();
-  const routerAddress = await router.getAddress();
-  console.log(`✓ CoffeeCacaoSwapRouter deployed: ${routerAddress}`);
+// 3. Deploy Router
+console.log("3. Deploying CafeSwapRouter...");
+const Router = await ethers.getContractFactory("CafeSwapRouter");
+const router = await Router.deploy(deployments.factory);
+await router.waitForDeployment();
+deployments.router = await router.getAddress();
+console.log(`✓ Router: ${deployments.router}\n`);
 
-  // 4. Deploy CoffeeCacaoFarm
-  console.log("\n[4/5] Deploying CoffeeCacaoFarm...");
-  const cafePerSecond = ethers.parseEther("1");  // 1 CAFE per second
-  const governance = deployerAddress;  // Initial governance is deployer
+// 4. Deploy Farm (1 CAFE per second)
+console.log("4. Deploying CafeFarm...");
+const Farm = await ethers.getContractFactory("CafeFarm");
+const farm = await Farm.deploy(deployments.cafeToken, ethers.parseEther("1"));
+await farm.waitForDeployment();
+deployments.farm = await farm.getAddress();
+console.log(`✓ Farm: ${deployments.farm}\n`);
 
-  const CoffeeCacaoFarm = await ethers.getContractFactory("CoffeeCacaoFarm");
-  const farm = await CoffeeCacaoFarm.deploy(
-    cafeTokenAddress,
-    factoryAddress,
-    cafePerSecond,
-    governance
-  );
-  await farm.waitForDeployment();
-  const farmAddress = await farm.getAddress();
-  console.log(`✓ CoffeeCacaoFarm deployed: ${farmAddress}`);
+// 5. Deploy Governance
+console.log("5. Deploying CafeGovernance...");
+const Governance = await ethers.getContractFactory("CafeGovernance");
+const governance = await Governance.deploy(deployments.cafeToken);
+await governance.waitForDeployment();
+deployments.governance = await governance.getAddress();
+console.log(`✓ Governance: ${deployments.governance}\n`);
 
-  // Grant MINTER_ROLE to farm
-  await cafeToken.grantRole(MINTER_ROLE, farmAddress);
-  console.log(`✓ MINTER_ROLE granted to farm`);
+// 6. Setup permissions
+console.log("6. Setting up permissions...");
+const MINTER_ROLE = await cafe.MINTER_ROLE();
+await (await cafe.grantRole(MINTER_ROLE, deployments.farm)).wait();
+console.log("  ✓ Farm granted MINTER_ROLE");
 
-  // 5. Deploy CafeGovernance
-  console.log("\n[5/5] Deploying CafeGovernance...");
-  const CafeGovernance = await ethers.getContractFactory("CafeGovernance");
-  const cafeGovernance = await CafeGovernance.deploy(cafeTokenAddress);
-  await cafeGovernance.waitForDeployment();
-  const governanceAddress = await cafeGovernance.getAddress();
-  console.log(`✓ CafeGovernance deployed: ${governanceAddress}`);
+const GOVERNANCE_ROLE = await farm.GOVERNANCE_ROLE();
+await (await farm.grantRole(GOVERNANCE_ROLE, deployments.governance)).wait();
+console.log("  ✓ Governance granted GOVERNANCE_ROLE on Farm");
 
-  // Set governance in farm if not already deployer
-  if (governance !== governanceAddress) {
-    await farm.setGovernance(governanceAddress);
-    console.log(`✓ Farm governance set to: ${governanceAddress}`);
-  }
+await (await router.setGovernance(deployments.governance)).wait();
+console.log("  ✓ Router governance set\n");
 
-  // Summary of deployments
-  const deployments = {
-    network: (await ethers.provider.getNetwork()).name,
-    chainId: (await ethers.provider.getNetwork()).chainId,
-    deployer: deployerAddress,
-    timestamp: new Date().toISOString(),
-    contracts: {
-      CafeToken: cafeTokenAddress,
-      CoffeeCacaoSwapFactory: factoryAddress,
-      CoffeeCacaoSwapRouter: routerAddress,
-      CoffeeCacaoFarm: farmAddress,
-      CafeGovernance: governanceAddress
+// 7. Save deployment addresses
+console.log("7. Saving deployment addresses...");
+const deploymentPath = path.join(root, "blockchain", "cafeswap-deployments.json");
+await writeFile(
+  deploymentPath,
+  JSON.stringify(
+    {
+      network: network.name,
+      deployer: deployer.address,
+      timestamp: new Date().toISOString(),
+      contracts: deployments,
     },
-    roles: {
-      cafeTokenMinter: farmAddress,
-      farmGovernance: governance
-    }
-  };
+    null,
+    2
+  ) + "\n"
+);
+console.log(`✓ Saved to ${deploymentPath}\n`);
 
-  // Save deployments to JSON
-  const deploymentsDir = "./blockchain/deployments";
-  if (!fs.existsSync(deploymentsDir)) {
-    fs.mkdirSync(deploymentsDir, { recursive: true });
-  }
-
-  const fileName = path.join(deploymentsDir, "cafeswap-addresses.json");
-  fs.writeFileSync(fileName, JSON.stringify(deployments, null, 2));
-  console.log(`\n✓ Deployments saved to ${fileName}`);
-
-  // Print summary
-  console.log("\n" + "=".repeat(60));
-  console.log("DEPLOYMENT SUMMARY");
-  console.log("=".repeat(60));
-  console.log(JSON.stringify(deployments, null, 2));
-  console.log("=".repeat(60));
-
-  return deployments;
-};
-
-main()
-  .then(() => process.exit(0))
-  .catch((error) => {
-    console.error(error);
-    process.exit(1);
-  });
+console.log("═══════════════════════════════════════");
+console.log("✓ CaféSwap deployment complete!");
+console.log("═══════════════════════════════════════");
+console.log("\nDeployed Contracts:");
+console.log(`  CafeToken:    ${deployments.cafeToken}`);
+console.log(`  Factory:      ${deployments.factory}`);
+console.log(`  Router:       ${deployments.router}`);
+console.log(`  Farm:         ${deployments.farm}`);
+console.log(`  Governance:   ${deployments.governance}`);
+console.log("\nNext Steps:");
+console.log("  1. Verify contracts on block explorer");
+console.log("  2. Add certified tokens via Factory.addCertifiedToken()");
+console.log("  3. Create initial pools");
+console.log("  4. Add farm pools via Farm.addPool()");
+console.log("  5. Transfer admin roles to multisig/DAO");
