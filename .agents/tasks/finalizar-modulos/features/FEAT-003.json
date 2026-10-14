@@ -1,0 +1,29 @@
+{
+  "id": "FEAT-003",
+  "type": "feat",
+  "description": "Analytics Dashboard + Public Passport polish: criar dapp/src/app/analytics/page.tsx completo com KPIs/gráfico/tabela/filtros; revisar passport/[lotId]/page.tsx e passport/generate/page.tsx (já corretos, apenas verificar); atualizar QRCodeDisplay.tsx para usar qrcode.react. FEAT-001 deve estar completo (interface AnalyticsData disponível). Independente de FEAT-002.",
+  "status": "completed",
+  "steps": [
+    "1. Criar dapp/src/app/analytics/page.tsx. Lógica de dados: importar MOCK_LOTS de @/lib/mockLotData; derivar AnalyticsData a partir dos MOCK_LOTS para cada filtro de período (7d/30d/90d/1a) — para a demo, retornar valores fixos multiplicados por fator de período (7d=0.25x, 30d=1x base, 90d=3x, 1a=12x); calcular base: lotesCertificados = MOCK_LOTS.filter(l => l.certificações.some(c => c.status==='Certificado')).length (=5); volumeMockUSDC = MOCK_LOTS.reduce((a,l)=>a+l.área*150,0) (área*150 como proxy de valor); produtoresAtivos = new Set(MOCK_LOTS.map(l=>l.produtor)).size (=3); scoreESGMedio = 78 (valor mock fixo).",
+    "2. KPIs no topo de analytics/page.tsx: 4 cards usando o padrão de buyer/page.tsx — 'Lotes Certificados' (verde), 'Volume MockUSDC' (ouro), 'Produtores Ativos' (verde), 'Score ESG Médio' (verde). Cada card: background var(--sup-1), border var(--linha), valor em ui-monospace fontsize 24px.",
+    "3. Filtros de período em analytics/page.tsx: botões 7d / 30d / 90d / 1a como tabs horizontais acima dos KPIs; estado local useState<'7d'|'30d'|'90d'|'1a'>('30d'); aplicar multiplicador ao renderizar valores.",
+    "4. Gráfico de barras simulado com divs em analytics/page.tsx: seção 'Volume por Mês'; array volumeMensal com 6 meses (Jan-Jun 2024, valores mock); renderizar como div contendo 6 colunas lado a lado, cada coluna uma div vertical com height proporcional ao volume (max 160px), fundo var(--verde-600), legenda embaixo com o mês. Usar flexbox, sem canvas/library.",
+    "5. Lista de estados de origem em analytics/page.tsx: calcular lotesporEstado a partir de MOCK_LOTS.map(l => l.origem.split(' - ')[0]) agrupados por contagem; renderizar como lista de pílulas — para cada estado: badge pill com nome do estado e contagem à direita, fundo var(--sup-2), cor var(--texto-2). Exibir no lado direito do gráfico em grid 1fr 1fr.",
+    "6. Tabela de últimos 10 lotes em analytics/page.tsx: colunas Lote ID, Origem, Status, Área (ha), Data Colheita; derivar de MOCK_LOTS sorted por dataColheita desc (slice(0,6) — apenas 6 disponíveis); usar padrão de tabela de buyer/page.tsx (thead sup-2, tbody alternado sup-1/fundo, borders var(--linha)).",
+    "7. Atualizar dapp/src/components/QRCodeDisplay.tsx para usar qrcode.react: importar { QRCodeSVG } from 'qrcode.react'; construir URL como `${typeof window !== 'undefined' ? window.location.origin : 'https://agrochain.app'}/passport/${lotId}`; renderizar <QRCodeSVG value={url} size={qrSize} />; manter a prop interface e o texto descritivo embaixo. A dependência qrcode.react já está em dapp/package.json.",
+    "8. Verificar passport/[lotId]/page.tsx: já está correto — importa MOCK_LOTS de @/lib/mockLotData, usa QRCodeDisplay, usa tokens CSS. Nenhuma alteração necessária exceto confirmar que compila.",
+    "9. Verificar passport/generate/page.tsx: tem um problema — exibe window.location.origin em JSX no servidor; garantir que a linha de exibição do link use um useState ou condicional typeof window para evitar hydration mismatch. Corrigir se necessário."
+  ],
+  "acceptance_criteria": [
+    "dapp/src/app/analytics/page.tsx existe e renderiza KPIs, filtros de período, gráfico de barras div, lista de estados, tabela de lotes",
+    "Filtros 7d/30d/90d/1a mudam os valores dos KPIs ao clicar",
+    "QRCodeDisplay.tsx usa qrcode.react (QRCodeSVG) em vez de placeholder div",
+    "passport/generate/page.tsx não causa hydration mismatch (window.location.origin protegido)",
+    "cd dapp && npm run build passa sem erros — /analytics aparece nas páginas geradas"
+  ],
+  "verification": [
+    "cd c:\\Users\\Usuário\\agrochain\\workspace-01a1162b-e061-7ff0-b060-dfa40cc70dfdzip\\dapp && npm run build — /analytics e as rotas /passport/* aparecem sem erros"
+  ],
+  "blocked_reason": null,
+  "findings": "qrcode.react instalado na versão 1.x usa export default QRCode (não QRCodeSVG do v3+); ajustado import para usar a API correta. Build passou com exit 0, /analytics gerado como rota estática, /passport/generate e /passport/[lotId] compilados sem erros. Único warning pré-existente: <img> em /lote/[lotId]/page.tsx (não relacionado a este FEAT)."
+}
