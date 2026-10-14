@@ -1,0 +1,7 @@
+{
+  "task_id": "task-finalizar-modulos",
+  "task_description": "Implementar módulo Analytics Dashboard, módulo Carbon Credits (contrato + ABI helpers + UI), corrigir/completar Public Passport, e atualizar Sidebar e tipos agrochain com novos links e interfaces.",
+  "status": "completed",
+  "feature_order": ["FEAT-001", "FEAT-002", "FEAT-003"],
+  "blocked_reason": null
+}
