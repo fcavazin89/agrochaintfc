@@ -246,3 +246,71 @@ html, body {
     font-size: 11px;
   }
 }
+
+/* === Componentes base design.md v3.0 === */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 40px; padding: 0 18px; border-radius: var(--raio-sm); font-size: 13.5px; font-weight: 600; cursor: pointer; transition: all var(--t-rapida); border: none; font-family: var(--fonte); text-decoration: none; }
+.btn-primario { background: linear-gradient(180deg, var(--verde-600), var(--verde-700)); color: #f3f7f2; }
+.btn-primario:hover { filter: brightness(1.1); box-shadow: 0 4px 12px rgba(31,100,64,.35); }
+.btn-sec { background: var(--sup-1); color: var(--texto-1); border: 1px solid var(--linha-forte) !important; }
+.btn-sec:hover { background: var(--sup-2); }
+.btn-ouro { background: rgba(184,145,42,.15); color: var(--ouro-claro); border: 1px solid rgba(184,145,42,.35) !important; }
+.btn-ouro:hover { background: rgba(184,145,42,.25); }
+.btn-mini { height: 32px; padding: 0 12px; font-size: 12px; }
+
+.cartao { background: var(--sup-1); border: 1px solid var(--linha); border-radius: var(--raio); box-shadow: var(--sombra-2), var(--brilho); }
+.cartao-body { padding: 18px 20px; }
+.cartao-kpi { padding: 20px 22px; }
+.cartao h2 { font-family: var(--serifa); font-size: 15.5px; font-weight: 600; color: var(--texto-1); margin: 0 0 16px; }
+
+.kpi-rotulo { font-size: 10.5px; font-weight: 600; letter-spacing: .6px; text-transform: uppercase; color: var(--texto-3); margin-bottom: 8px; }
+.kpi-valor { font-size: 26px; font-weight: 600; font-family: var(--serifa); color: var(--verde-700); font-variant-numeric: tabular-nums; line-height: 1; }
+.kpi-valor-xl { font-size: 34px; }
+.kpi-delta { font-size: 12px; color: var(--texto-3); margin-top: 6px; }
+.kpi-delta.pos { color: var(--positivo); }
+.kpi-delta.neg { color: var(--negativo); }
+
+.chip { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: var(--raio-pill); font-size: 11.5px; font-weight: 600; white-space: nowrap; }
+.chip-ok { background: var(--verde-100); color: var(--verde-700); }
+.chip-atencao { background: rgba(178,106,6,.12); color: #7a4800; }
+.chip-critico { background: rgba(168,50,38,.10); color: var(--critico); }
+.chip-info { background: rgba(31,111,158,.10); color: var(--info); }
+.chip-especial { background: rgba(95,74,160,.10); color: var(--especial); }
+.chip-neutro { background: var(--sup-2); color: var(--texto-2); }
+
+.tabela { width: 100%; border-collapse: collapse; font-size: 13.5px; font-family: var(--fonte); }
+.tabela thead tr { background: var(--sup-3); }
+.tabela th { padding: 11px 16px; text-align: left; font-size: 10.5px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; color: var(--texto-3); border-bottom: 1px solid var(--linha-forte); white-space: nowrap; }
+.tabela td { padding: 12px 16px; border-bottom: 1px solid var(--linha); color: var(--texto-1); vertical-align: middle; }
+.tabela tbody tr:hover td { background: var(--sup-2); }
+.tabela .cel-num { text-align: right; font-variant-numeric: tabular-nums; font-family: var(--mono); font-size: 13px; }
+.tabela .cel-addr { font-family: var(--mono); font-size: 12px; color: var(--texto-2); }
+
+.grade { display: grid; gap: 14px; }
+.g2 { grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+.g3 { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+.g4 { grid-template-columns: repeat(auto-fit, minmax(184px, 1fr)); }
+
+.tela-cabecalho { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 28px; }
+.tela-titulo { font-family: var(--serifa); font-size: 26px; font-weight: 600; color: var(--verde-700); margin: 0 0 4px; line-height: 1.2; }
+.tela-sub { font-size: 13.5px; color: var(--texto-3); margin: 0; }
+
+.nota { font-size: 12px; color: var(--texto-3); margin-top: 10px; line-height: 1.5; }
+.divisor { border: none; border-top: 1px solid var(--linha); margin: 24px 0; }
+
+.vazio { text-align: center; padding: 56px 24px; color: var(--texto-3); }
+.vazio-titulo { font-family: var(--serifa); font-size: 15.5px; font-weight: 600; color: var(--texto-2); margin-bottom: 8px; }
+
+/* Escopo escuro para o topo */
+.topo {
+  --fundo: #0b1d12; --sup-1: #102519; --sup-2: #16301f; --sup-3: #1b3a26;
+  --linha: rgba(233,243,236,.12); --linha-forte: rgba(233,243,236,.22);
+  --texto-1: #f3f7f2; --texto-2: #ccdbd1; --texto-3: #9db2a4;
+  --ouro-claro: #e8c95a;
+  background: var(--fundo);
+  color: var(--texto-1);
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .4; }
+}

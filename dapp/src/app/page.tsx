@@ -1,173 +1,188 @@
-// import { MetricCard } from '@/components/ui/MetricCard';
-// import { Badge } from '@/components/ui/Badge';
-import dynamic from 'next/dynamic';
-const MetricCard = ({ title, value, subtitle, icon, color }: { title: string; value: string; subtitle: string; icon: string; color: string }) => (
-  <div style={{ background: '#fff', borderRadius: '12px', padding: '20px', border: '1px solid #e6ddc9', boxShadow: '0 1px 2px rgba(31,42,34,.06)' }}>
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '12px' }}>
-      <div style={{ fontSize: '24px' }}>{icon}</div>
-    </div>
-    <div style={{ fontSize: '12px', color: '#6b7d6b', marginBottom: '4px' }}>{title}</div>
-    <div style={{ fontSize: '28px', fontWeight: 'bold', color: color || '#1e2a22', marginBottom: '4px' }}>{value}</div>
-    <div style={{ fontSize: '11px', color: '#6b7d6b' }}>{subtitle}</div>
-  </div>
-);
-const Badge = ({ variant, children }: { variant?: 'coffee' | 'cacao'; children?: React.ReactNode }) => {
-  const colors = {
-    coffee: { bg: '#f0faf4', color: '#1f6440' },
-    cacao: { bg: '#f9f7f2', color: '#6b4426' },
-  };
-  const style = variant ? colors[variant] : { bg: '#f2ecdd', color: '#495649' };
-  return (
-    <span style={{
-      background: style.bg,
-      color: style.color,
-      padding: '4px 12px',
-      borderRadius: '12px',
-      fontSize: '12px',
-      fontWeight: '600',
-    }}>
-      {variant === 'coffee' ? '☕ Coffee' : variant === 'cacao' ? '🍫 Cacao' : children}
-    </span>
-  );
-};
+import Link from 'next/link';
 
-const FarmGlobe = () => <div>FarmGlobe</div>;
-// const FarmGlobe = dynamic(
-//   () => import('@/components/three/FarmGlobe').then(m => m.FarmGlobe),
-//   { ssr: false, loading: () => <div style={{height: '400px', background: '#0b1d12', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#f3f7f2'}}>Carregando globo 3D...</div> }
-// );
+const modules = [
+  { href: '/producer', title: 'Painel Produtor', desc: 'Gerencie lotes, safras e certificações', tag: 'Operação' },
+  { href: '/lote', title: 'Rastreabilidade', desc: 'Histórico completo de cada lote na cadeia', tag: 'Operação' },
+  { href: '/marketplace', title: 'Marketplace', desc: 'Negocie lotes certificados com escrow seguro', tag: 'Mercado' },
+  { href: '/buyer', title: 'Painel Comprador', desc: 'Acompanhe pedidos, entregas e avaliações', tag: 'Mercado' },
+  { href: '/verification', title: 'Verificação', desc: 'Origem, EUDR e ESG para cada lote', tag: 'Conformidade' },
+  { href: '/passport/generate', title: 'Passaporte Digital', desc: 'QR Code público de rastreabilidade', tag: 'Conformidade' },
+  { href: '/analytics', title: 'Analytics', desc: 'Métricas agregadas da plataforma', tag: 'Análise' },
+  { href: '/credits', title: 'Carbon Credits', desc: 'Créditos de carbono por área certificada', tag: 'ESG' },
+];
 
-const recentCerts = [
-  { id: '0x1a2b...', type: 'coffee' as const, batch: 'COFFEE-2024-001', origin: 'Minas Gerais', score: 96 },
-  { id: '0x3c4d...', type: 'cacao' as const, batch: 'CACAO-2024-015', origin: 'Bahia',        score: 88 },
-  { id: '0x5e6f...', type: 'coffee' as const, batch: 'COFFEE-2024-002', origin: 'São Paulo',   score: 91 },
-  { id: '0x7g8h...', type: 'cacao' as const, batch: 'CACAO-2024-016', origin: 'Pará',          score: 84 },
+const kpis = [
+  { rotulo: 'Lotes Certificados', valor: '2.157', delta: '+19 esta semana' },
+  { rotulo: 'Volume Negociado', valor: 'R$ 1,84M', delta: '+12% vs. mês anterior' },
+  { rotulo: 'Produtores Ativos', valor: '348', delta: 'Safra 2025/2026' },
+  { rotulo: 'Score ESG Médio', valor: '87 / 100', delta: 'Acima da meta 80' },
+];
+
+const certs = [
+  { id: '0x1a2b…cd3e', tipo: 'Café', lote: 'COFFEE-2026-0212', origem: 'Minas Gerais', score: 96 },
+  { id: '0x4f5g…hi6j', tipo: 'Cacau', lote: 'CACAO-2026-0098', origem: 'Bahia', score: 88 },
+  { id: '0x7k8l…mn9o', tipo: 'Café', lote: 'COFFEE-2026-0211', origem: 'São Paulo', score: 91 },
+  { id: '0xpq1r…st2u', tipo: 'Cacau', lote: 'CACAO-2026-0097', origem: 'Pará', score: 84 },
+  { id: '0xvw3x…yz4a', tipo: 'Café', lote: 'COFFEE-2026-0210', origem: 'Espírito Santo', score: 93 },
 ];
 
 export default function DashboardPage() {
   return (
-    <div style={{maxWidth: '1200px', margin: '0 auto'}}>
-      {/* Hero Section */}
-      <div style={{marginBottom: '48px', textAlign: 'center'}}>
-        <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '16px', marginBottom: '24px'}}>
-          <span style={{fontSize: '64px'}}>🌾</span>
+    <div>
+      {/* Cabeçalho da tela */}
+      <div className="tela-cabecalho">
+        <div>
+          <h1 className="tela-titulo">Dashboard</h1>
+          <p className="tela-sub">
+            Visão geral da cadeia de café e cacau — AgroChain · Safra 2025/2026
+          </p>
         </div>
-        <h1 style={{margin: '0 0 8px', fontFamily: 'Georgia, serif', fontSize: '42px', color: '#1e2a22', fontWeight: '700'}}>
-          AgroChain
-        </h1>
-        <p style={{margin: '0 0 24px', color: '#495649', fontSize: '18px', fontWeight: '500'}}>
-          Rastreabilidade de Coffee &amp; Cacao na Blockchain com Certificação ZK
-        </p>
-        
-        {/* Feature badges */}
-        <div style={{display: 'flex', justifyContent: 'center', gap: '12px', marginBottom: '32px', flexWrap: 'wrap'}}>
-          <span style={{background: '#f0faf4', color: '#1f6440', padding: '8px 16px', borderRadius: '20px', fontSize: '14px', fontWeight: '600'}}>
-            ☕ Coffee Arabica &amp; Robusta
-          </span>
-          <span style={{background: '#f9f7f2', color: '#6b4426', padding: '8px 16px', borderRadius: '20px', fontSize: '14px', fontWeight: '600'}}>
-            🍫 Cacao Premium
-          </span>
-          <span style={{background: '#e8f2ea', color: '#195236', padding: '8px 16px', borderRadius: '20px', fontSize: '14px', fontWeight: '600'}}>
-            🔐 Zero-Knowledge Proofs
-          </span>
-        </div>
-
-        {/* CTA Buttons */}
-        <div style={{display: 'flex', justifyContent: 'center', gap: '12px', flexWrap: 'wrap'}}>
-          <a href="/erp" style={{display: 'inline-block', background: '#1f6440', color: '#fff', padding: '14px 32px', borderRadius: '8px', textDecoration: 'none', fontWeight: '700', fontSize: '15px', cursor: 'pointer'}}>
-            📊 Ver Dashboard
-          </a>
-          <a href="/dex" style={{display: 'inline-block', background: '#b8912a', color: '#fff', padding: '14px 32px', borderRadius: '8px', textDecoration: 'none', fontWeight: '700', fontSize: '15px', cursor: 'pointer'}}>
-            💱 Explorar DEX
-          </a>
-          <a href="/certificacao" style={{display: 'inline-block', background: '#2f8f52', color: '#fff', padding: '14px 32px', borderRadius: '8px', textDecoration: 'none', fontWeight: '700', fontSize: '15px', cursor: 'pointer'}}>
-            🏆 Certificação ZK
-          </a>
-        </div>
+        <Link href="/certificacao" className="btn btn-primario">
+          Nova Certificação
+        </Link>
       </div>
 
-      {/* Features Grid */}
-      <div style={{marginBottom: '48px'}}>
-        <h2 style={{margin: '0 0 24px', textAlign: 'center', fontFamily: 'Georgia, serif', fontSize: '28px', color: '#1e2a22'}}>
-          Recursos Principais
-        </h2>
-        <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px'}}>
-          {[
-            { icon: '🔍', title: 'Rastreabilidade', desc: 'Rastreie cada lote na blockchain' },
-            { icon: '🏆', title: 'Certificação ZK', desc: 'Provas criptográficas verificáveis' },
-            { icon: '💱', title: 'DEX Integrado', desc: 'Troque Coffee por Cacao facilmente' },
-            { icon: '📊', title: 'ERP Completo', desc: 'Gestão financeira integrada' },
-            { icon: '📡', title: 'IoT Monitoramento', desc: 'Sensores em tempo real' },
-            { icon: '🤖', title: 'IA Assistente', desc: 'Consultoria agrícola com IA' },
-          ].map((feat, i) => (
-            <div key={i} style={{background: '#fff', borderRadius: '12px', padding: '20px', border: '1px solid #ddd8cc', textAlign: 'center'}}>
-              <div style={{fontSize: '40px', marginBottom: '12px'}}>{feat.icon}</div>
-              <h3 style={{margin: '0 0 8px', fontFamily: 'Georgia, serif', fontSize: '16px', color: '#1e2a22'}}>{feat.title}</h3>
-              <p style={{margin: 0, fontSize: '13px', color: '#495649'}}>{feat.desc}</p>
-            </div>
-          ))}
+      {/* KPIs */}
+      <div className="grade g4" style={{ marginBottom: '28px' }}>
+        {kpis.map((k) => (
+          <div key={k.rotulo} className="cartao cartao-kpi">
+            <div className="kpi-rotulo">{k.rotulo}</div>
+            <div className="kpi-valor">{k.valor}</div>
+            <div className="kpi-delta">{k.delta}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Módulos */}
+      <div className="cartao" style={{ marginBottom: '28px' }}>
+        <div className="cartao-body">
+          <h2>Módulos da Plataforma</h2>
+          <div className="grade g4">
+            {modules.map((m) => (
+              <Link key={m.href} href={m.href} style={{ textDecoration: 'none' }}>
+                <ModuleCard tag={m.tag} title={m.title} desc={m.desc} />
+              </Link>
+            ))}
+          </div>
         </div>
       </div>
 
-      <hr style={{border: 'none', borderTop: '1px solid #ddd8cc', margin: '48px 0'}} />
-
-      {/* Dashboard Content Below */}
-      <div style={{marginBottom: '24px'}}>
-        <h1 style={{margin: '0 0 8px', fontFamily: 'Georgia, serif', fontSize: '28px', color: '#1e2a22'}}>
-          📊 Dashboard em Tempo Real
-        </h1>
-        <p style={{margin: '0 0 24px', color: '#495649', fontSize: '14px'}}>
-          Visão geral da cadeia Coffee &amp; Cacao — AgroChain
-        </p>
-      </div>
-
-      {/* Métricas */}
-      <div style={{display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '24px'}}>
-        <MetricCard title="Lotes Coffee Cert." value="1.284" subtitle="+12 esta semana" icon="☕" color="#4a2f1c" />
-        <MetricCard title="Lotes Cacao Cert." value="873" subtitle="+7 esta semana" icon="🍫" color="#b8912a" />
-        <MetricCard title="Volume DEX 24h" value="$48.2K" subtitle="Coffee ↔ Cacao" icon="🔄" color="#1f6440" />
-        <MetricCard title="Compliance Score" value="94/100" subtitle="Média global" icon="🏆" color="#2f8f52" />
-      </div>
-
-      {/* Globo 3D */}
-      <div style={{marginBottom: '24px'}}>
-        <h2 style={{margin: '0 0 12px', fontFamily: 'Georgia, serif', fontSize: '18px', color: '#1e2a22'}}>
-          🌍 Mapa de Fazendas Certificadas
-        </h2>
-        <FarmGlobe />
-      </div>
-
-      {/* Últimas Certificações */}
-      <div>
-        <h2 style={{margin: '0 0 12px', fontFamily: 'Georgia, serif', fontSize: '18px', color: '#1e2a22'}}>
-          📜 Últimas Certificações
-        </h2>
-        <div style={{background: '#fff', borderRadius: '12px', border: '1px solid #ddd8cc', overflow: 'hidden'}}>
-          <table style={{width: '100%', borderCollapse: 'collapse', fontSize: '14px'}}>
-            <thead>
-              <tr style={{background: '#f5f1e7'}}>
-                <th style={{padding: '12px 16px', textAlign: 'left', color: '#495649', fontWeight: '600'}}>TX Hash</th>
-                <th style={{padding: '12px 16px', textAlign: 'left', color: '#495649', fontWeight: '600'}}>Tipo</th>
-                <th style={{padding: '12px 16px', textAlign: 'left', color: '#495649', fontWeight: '600'}}>Batch ID</th>
-                <th style={{padding: '12px 16px', textAlign: 'left', color: '#495649', fontWeight: '600'}}>Origem</th>
-                <th style={{padding: '12px 16px', textAlign: 'left', color: '#495649', fontWeight: '600'}}>Score</th>
-              </tr>
-            </thead>
-            <tbody>
-              {recentCerts.map((cert, i) => (
-                <tr key={cert.id} style={{borderTop: i > 0 ? '1px solid #eee8da' : 'none'}}>
-                  <td style={{padding: '12px 16px', fontFamily: 'monospace', color: '#1f6440'}}>{cert.id}</td>
-                  <td style={{padding: '12px 16px'}}><Badge variant={cert.type} /></td>
-                  <td style={{padding: '12px 16px', fontFamily: 'monospace', fontSize: '12px'}}>{cert.batch}</td>
-                  <td style={{padding: '12px 16px', color: '#495649'}}>{cert.origin}</td>
-                  <td style={{padding: '12px 16px'}}>
-                    <span style={{fontWeight: '700', color: cert.score >= 90 ? '#1f6440' : '#b8912a'}}>{cert.score}</span>
-                  </td>
+      {/* Últimas certificações */}
+      <div className="cartao">
+        <div className="cartao-body">
+          <h2>Últimas Certificações</h2>
+          <div style={{ overflowX: 'auto' }}>
+            <table className="tabela">
+              <thead>
+                <tr>
+                  <th>Hash</th>
+                  <th>Tipo</th>
+                  <th>Lote</th>
+                  <th>Origem</th>
+                  <th className="cel-num">Score ZK</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {certs.map((c) => (
+                  <tr key={c.id}>
+                    <td className="cel-addr">{c.id}</td>
+                    <td>
+                      <span
+                        className={
+                          c.tipo === 'Café' ? 'chip chip-ok' : 'chip chip-atencao'
+                        }
+                      >
+                        {c.tipo}
+                      </span>
+                    </td>
+                    <td
+                      style={{
+                        fontFamily: 'var(--mono)',
+                        fontSize: '13px',
+                      }}
+                    >
+                      {c.lote}
+                    </td>
+                    <td>{c.origem}</td>
+                    <td
+                      className="cel-num"
+                      style={{
+                        color:
+                          c.score >= 90
+                            ? 'var(--positivo)'
+                            : 'var(--texto-1)',
+                        fontWeight: 600,
+                      }}
+                    >
+                      {c.score}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="nota">
+            Fonte: AgroChain Smart Contracts · Sepolia Testnet · Atualizado em outubro de 2026
+          </p>
         </div>
+      </div>
+    </div>
+  );
+}
+
+// Extracted to avoid inline event handlers in server component
+function ModuleCard({
+  tag,
+  title,
+  desc,
+}: {
+  tag: string;
+  title: string;
+  desc: string;
+}) {
+  return (
+    <div
+      style={{
+        padding: '16px',
+        borderRadius: 'var(--raio-sm)',
+        border: '1px solid var(--linha)',
+        background: 'var(--sup-2)',
+        cursor: 'pointer',
+        height: '100%',
+        boxSizing: 'border-box',
+      }}
+    >
+      <div
+        style={{
+          fontSize: '10.5px',
+          fontWeight: 600,
+          letterSpacing: '.5px',
+          textTransform: 'uppercase',
+          color: 'var(--verde-600)',
+          marginBottom: '6px',
+        }}
+      >
+        {tag}
+      </div>
+      <div
+        style={{
+          fontFamily: 'var(--serifa)',
+          fontSize: '14px',
+          fontWeight: 600,
+          color: 'var(--texto-1)',
+          marginBottom: '6px',
+        }}
+      >
+        {title}
+      </div>
+      <div
+        style={{
+          fontSize: '12px',
+          color: 'var(--texto-3)',
+          lineHeight: 1.5,
+        }}
+      >
+        {desc}
       </div>
     </div>
   );
