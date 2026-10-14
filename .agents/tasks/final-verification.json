@@ -1,0 +1,13 @@
+{
+  "dapp_build": {
+    "status": "SUCCESS",
+    "exit_code": 0,
+    "notes": "Build do dapp concluído com sucesso pelo step anterior (fix-build). Artefatos em dapp/dist/."
+  },
+  "blockchain_compile": {
+    "status": "SUCCESS",
+    "exit_code": 0,
+    "notes": "31 contratos Solidity compilados com solc 0.8.37 via npx hardhat compile --force. Apenas avisos não-críticos de mutabilidade de estado. Artefatos em blockchain/artifacts/."
+  },
+  "summary": "Todas as tarefas concluídas"
+}
