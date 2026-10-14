@@ -1,0 +1,27 @@
+{
+  "id": "FEAT-001",
+  "type": "feat",
+  "description": "Instalar qrcode.react, expandir tipos agrochain.ts com PassportData e PassportAccess, criar componente QRCodeDisplay reutilizável em dapp/src/components/QRCodeDisplay.tsx com suporte a tamanhos (small, medium, large), criar utils em dapp/src/lib/passport.ts com buildPassportData(), generatePassportQR(), e verifyLotAuthenticity() (mock).",
+  "status": "completed",
+  "steps": [
+    "Instalar qrcode.react em dapp/ via npm: npm install qrcode.react @types/qrcode.react",
+    "Expandir dapp/src/types/agrochain.ts: adicionar interface PassportData com campos: loteId, produtor, safra, origem, area, dataPlantio, dataColheita, eventos[], certificacoes[], status; adicionar type PassportAccess com 'public' | 'producer-only'",
+    "Criar dapp/src/components/QRCodeDisplay.tsx: componente React que aceita props { lotId: string; size?: 'small' | 'medium' | 'large' }; usa QRCode.Canvas de qrcode.react para renderizar URL https://agrochain.example.com/passport/[lotId]; pequeno = 120px, médio = 160px, grande = 200px; aplicar CSS conforme design.md (raio, sombra, borda)",
+    "Criar dapp/src/lib/passport.ts com três funções: (1) buildPassportData(lotId: string): PassportData — recebe lotId, busca mock data em MOCK_LOTS (reuse de mockLotData.ts ou cria novo MOCK_LOTS), monta PassportData completo; (2) generatePassportQR(lotId: string, size?: 'small'|'medium'|'large'): React.ReactNode — retorna <QRCodeDisplay /> com tamanho; (3) verifyLotAuthenticity(lotId: string): Promise<{ authentic: boolean; message: string }> — mock que sempre retorna { authentic: true, message: 'Lote autêntico no blockchain' }"
+  ],
+  "acceptance_criteria": [
+    "npm run build completa sem erros TS",
+    "qrcode.react está em dapp/package.json dependencies",
+    "PassportData e PassportAccess existem em types/agrochain.ts com campos corretos",
+    "QRCodeDisplay.tsx renderiza sem erro; recebe lotId e size; gera QR visual",
+    "passport.ts exporta as três funções; buildPassportData retorna objeto completo; generatePassportQR retorna componente; verifyLotAuthenticity retorna Promise com estrutura correta"
+  ],
+  "verification": [
+    "npm run build em dapp/ — sem erros",
+    "grep 'PassportData' dapp/src/types/agrochain.ts — confirma interface",
+    "grep 'export.*QRCodeDisplay' dapp/src/components/QRCodeDisplay.tsx — confirma export",
+    "grep 'export.*buildPassportData\\|export.*generatePassportQR\\|export.*verifyLotAuthenticity' dapp/src/lib/passport.ts — confirma três funções"
+  ],
+  "blocked_reason": null,
+  "findings": "Dependência instalada com sucesso; tipos definidos; componente e utils prontos para uso em FEAT-002 e FEAT-003"
+}
