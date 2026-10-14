@@ -4,8 +4,29 @@ import { useParams } from 'next/navigation';
 import { useAccount } from 'wagmi';
 import Link from 'next/link';
 import type { Lot, LotEvent } from '@/types/agrochain';
-import { formatarData, gerarUriQRCode, ordenarEventosPorData, obterCorStatus } from '@/lib/lotUtils';
-import { DESIGN_TOKENS } from '@/lib/lotConstants';
+import { getSmartLotContractAddress, DEFAULT_CONTRACT_ADDRESS } from '@/lib/contracts/smartlot';
+// import { formatarData, gerarUriQRCode, ordenarEventosPorData, obterCorStatus } from '@/lib/lotUtils';
+// import { DESIGN_TOKENS } from '@/lib/lotConstants';
+
+// Constantes locais
+const DESIGN_TOKENS = {
+  typography: {
+    titleFont: 'Georgia, serif',
+    bodyFont: 'system-ui, -apple-system, sans-serif',
+  },
+  colors: {
+    texto1: '#1e2a22',
+    texto2: '#495649',
+    texto3: '#6b7d6b',
+    verde600: 'var(--verde-profundo)',
+  },
+};
+const formatarData = (timestamp: number) => new Date(timestamp * 1000).toLocaleDateString('pt-BR');
+const obterCorStatus = (status: string) => {
+  if (status === 'Ativo') return DESIGN_TOKENS.colors.verde600;
+  if (status === 'Transferindo') return '#f59e0b';
+  return DESIGN_TOKENS.colors.texto2;
+};
 
 // Mock data
 const MOCK_LOTS: Record<string, Lot> = {
@@ -87,6 +108,10 @@ export default function LoteDetalhes() {
 
   const lot = MOCK_LOTS[lotId];
 
+  // Verifica se o endereço do contrato SmartLot está configurado
+  const contractAddress = getSmartLotContractAddress();
+  const contratoNaoConfigurado = !contractAddress || contractAddress === DEFAULT_CONTRACT_ADDRESS;
+
   if (!lot) {
     return (
       <div style={{ maxWidth: '960px', margin: '0 auto' }}>
@@ -95,7 +120,7 @@ export default function LoteDetalhes() {
         </h1>
         <div style={{ background: '#f9f7f2', borderRadius: '12px', padding: '48px', textAlign: 'center', color: '#495649' }}>
           <p>Lote {lotId} não encontrado</p>
-          <Link href="/lote" style={{ color: DESIGN_TOKENS.colors.verde600, textDecoration: 'none' }}>
+          <Link href="/lote" style={{ color: 'var(--verde-profundo)', textDecoration: 'none' }}>
             ← Voltar para Lotes
           </Link>
         </div>
@@ -113,8 +138,8 @@ export default function LoteDetalhes() {
     setNewEvent({ tipo: 'Colheita', descrição: '', localização: '', responsável: '' });
   };
 
-  const qrCodeUri = gerarUriQRCode(lot.loteId);
-  const eventosSorteados = ordenarEventosPorData(lot.eventos);
+  const qrCodeUri = `/passport/${lot.loteId}`;
+  const eventosSorteados = lot.eventos.sort((a, b) => b.data - a.data);
 
   return (
     <div style={{ maxWidth: '1320px', margin: '0 auto' }}>
@@ -124,6 +149,27 @@ export default function LoteDetalhes() {
           ← Voltar para Lotes
         </Link>
       </div>
+
+      {/* Aviso de contrato não configurado */}
+      {contratoNaoConfigurado && (
+        <div style={{
+          background: '#fff3cd',
+          border: '1px solid #ffc107',
+          borderRadius: '8px',
+          padding: '12px 16px',
+          marginBottom: '20px',
+          fontSize: '13px',
+          color: '#856404',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+        }}>
+          <span>⚠️</span>
+          <span>
+            Configure <strong>NEXT_PUBLIC_SMARTLOT_CONTRACT_ADDRESS</strong> para habilitar funcionalidades blockchain (registro, eventos e certificações on-chain).
+          </span>
+        </div>
+      )}
 
       {/* Cabeçalho com dados do lote */}
       <div style={{

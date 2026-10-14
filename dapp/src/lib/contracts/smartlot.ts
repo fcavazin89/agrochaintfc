@@ -653,14 +653,23 @@ export const SMARTLOT_ABI = [
 ] as const;
 
 /**
- * Obtém endereço do contrato SmartLot
+ * Endereço padrão quando nenhum contrato estiver configurado.
+ * Use este valor para verificar se o endereço está configurado:
+ * `if (!contractAddress || contractAddress === DEFAULT_CONTRACT_ADDRESS) { ... }`
+ */
+export const DEFAULT_CONTRACT_ADDRESS = '';
+
+/**
+ * Obtém endereço do contrato SmartLot.
+ * Prioridade: localStorage > variável de ambiente NEXT_PUBLIC_SMARTLOT_CONTRACT_ADDRESS.
+ * Retorna string vazia ('') quando nenhum endereço estiver disponível.
  */
 export function getSmartLotContractAddress(): string {
   if (typeof window !== 'undefined') {
     const stored = localStorage.getItem('smartlot_contract_address');
-    if (stored) return stored;
+    if (stored && stored.trim() !== '') return stored.trim();
   }
-  return process.env.NEXT_PUBLIC_SMARTLOT_CONTRACT_ADDRESS || '0x';
+  return process.env.NEXT_PUBLIC_SMARTLOT_CONTRACT_ADDRESS || DEFAULT_CONTRACT_ADDRESS;
 }
 
 /**
@@ -687,7 +696,11 @@ export async function registerLot(
     dataPlantio: bigint;
   }
 ): Promise<string> {
-  const contractAddress = getSmartLotContractAddress() as `0x${string}`;
+  const rawAddress = getSmartLotContractAddress();
+  if (!rawAddress || rawAddress === DEFAULT_CONTRACT_ADDRESS) {
+    throw new Error('Configure o endereço do contrato SmartLot antes de registrar lotes.');
+  }
+  const contractAddress = rawAddress as `0x${string}`;
   
   try {
     const hash = await writeContract(config, {
@@ -718,7 +731,11 @@ export async function addEvent(
     localizacao: string;
   }
 ): Promise<string> {
-  const contractAddress = getSmartLotContractAddress() as `0x${string}`;
+  const rawAddress = getSmartLotContractAddress();
+  if (!rawAddress || rawAddress === DEFAULT_CONTRACT_ADDRESS) {
+    throw new Error('Configure o endereço do contrato SmartLot antes de adicionar eventos.');
+  }
+  const contractAddress = rawAddress as `0x${string}`;
   
   try {
     const hash = await writeContract(config, {
@@ -748,7 +765,11 @@ export async function addCertification(
     comprovante: string;
   }
 ): Promise<string> {
-  const contractAddress = getSmartLotContractAddress() as `0x${string}`;
+  const rawAddress = getSmartLotContractAddress();
+  if (!rawAddress || rawAddress === DEFAULT_CONTRACT_ADDRESS) {
+    throw new Error('Configure o endereço do contrato SmartLot antes de adicionar certificações.');
+  }
+  const contractAddress = rawAddress as `0x${string}`;
   
   try {
     const hash = await writeContract(config, {
@@ -777,7 +798,11 @@ export async function transferLot(
   novoProdutor: string,
   orderId: bigint
 ): Promise<string> {
-  const contractAddress = getSmartLotContractAddress() as `0x${string}`;
+  const rawAddress = getSmartLotContractAddress();
+  if (!rawAddress || rawAddress === DEFAULT_CONTRACT_ADDRESS) {
+    throw new Error('Configure o endereço do contrato SmartLot antes de transferir lotes.');
+  }
+  const contractAddress = rawAddress as `0x${string}`;
   
   try {
     const hash = await writeContract(config, {
@@ -800,7 +825,11 @@ export async function transferLot(
  * @returns Promise com array de certificações
  */
 export async function getCertifications(config: any, loteId: string): Promise<any[]> {
-  const contractAddress = getSmartLotContractAddress() as `0x${string}`;
+  const rawAddress = getSmartLotContractAddress();
+  if (!rawAddress || rawAddress === DEFAULT_CONTRACT_ADDRESS) {
+    throw new Error('Configure o endereço do contrato SmartLot (NEXT_PUBLIC_SMARTLOT_CONTRACT_ADDRESS) para usar funcionalidades blockchain.');
+  }
+  const contractAddress = rawAddress as `0x${string}`;
   
   try {
     const certs = await readContract(config, {
@@ -823,7 +852,11 @@ export async function getCertifications(config: any, loteId: string): Promise<an
  * @returns Promise com dados formatados do lote
  */
 export async function getLot(config: any, loteId: string): Promise<Lot> {
-  const contractAddress = getSmartLotContractAddress() as `0x${string}`;
+  const rawAddress = getSmartLotContractAddress();
+  if (!rawAddress || rawAddress === DEFAULT_CONTRACT_ADDRESS) {
+    throw new Error('Configure o endereço do contrato SmartLot (NEXT_PUBLIC_SMARTLOT_CONTRACT_ADDRESS) para usar funcionalidades blockchain.');
+  }
+  const contractAddress = rawAddress as `0x${string}`;
   
   try {
     const lotData = await readContract(config, {

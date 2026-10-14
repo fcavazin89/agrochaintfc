@@ -1,0 +1,8 @@
+{
+  "status": "FIXED",
+  "files_changed": [
+    "dapp/src/lib/contracts/smartlot.ts",
+    "dapp/src/app/lote/[lotId]/page.tsx"
+  ],
+  "notes": "1) Adicionada constante exportada DEFAULT_CONTRACT_ADDRESS='' em smartlot.ts. 2) getSmartLotContractAddress() agora retorna '' (string vazia) como fallback em vez de '0x', e ignora valores em branco do localStorage. 3) Todas as 6 funções helper (registerLot, addEvent, addCertification, transferLot, getCertifications, getLot) agora lançam erro descritivo em português quando o endereço não está configurado. 4) page.tsx importa getSmartLotContractAddress e DEFAULT_CONTRACT_ADDRESS, verifica o endereço no render e exibe um banner de aviso amarelo quando o contrato não está configurado — sem quebrar a exibição dos dados mock existentes. Build compilou com sucesso (✓ Compiled successfully); única mensagem foi aviso pre-existente de <img> no ESLint."
+}
