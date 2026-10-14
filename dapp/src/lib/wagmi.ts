@@ -1,12 +1,11 @@
 import { createConfig, http } from 'wagmi';
-import { mainnet, sepolia } from 'wagmi/chains';
-import { injected } from 'wagmi/connectors';
+import { mainnet, polygon } from 'wagmi/chains';
 
 export const wagmiConfig = createConfig({
-  chains: [sepolia, mainnet],
-  connectors: [injected()],
+  chains: [mainnet, polygon],
   transports: {
-    [sepolia.id]: http('https://eth-sepolia-public.unifra.io'),
     [mainnet.id]: http(),
+    [polygon.id]: http(),
   },
+  ssr: true,
 });

@@ -1,12 +1,28 @@
 'use client';
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
-import {
-  MOCK_ORIGIN_VERIFICATIONS,
-  MOCK_EUDR_COMPLIANCES,
-  MOCK_ESG_SCORES,
-} from '@/lib/contracts/verification';
-import { DESIGN_TOKENS } from '@/lib/lotConstants';
+import type { OriginVerification, EUDRCompliance, ESGScore } from '@/types/agrochain';
+// import {
+//   MOCK_ORIGIN_VERIFICATIONS,
+//   MOCK_EUDR_COMPLIANCES,
+//   MOCK_ESG_SCORES,
+// } from '@/lib/contracts/verification';
+// import { DESIGN_TOKENS } from '@/lib/lotConstants';
+const MOCK_ORIGIN_VERIFICATIONS: OriginVerification[] = [];
+const MOCK_EUDR_COMPLIANCES: EUDRCompliance[] = [];
+const MOCK_ESG_SCORES: ESGScore[] = [];
+const DESIGN_TOKENS = {
+  typography: {
+    titleFont: 'Georgia, serif',
+    bodyFont: 'system-ui, -apple-system, sans-serif',
+  },
+  colors: {
+    texto1: '#1e2a22',
+    texto2: '#495649',
+    texto3: '#6b7d6b',
+    verde600: 'var(--verde-profundo)',
+  },
+};
 
 export default function VerificationDashboard() {
   const [activeTab, setActiveTab] = useState<'origem' | 'eudr' | 'esg'>('origem');
