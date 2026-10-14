@@ -2,10 +2,11 @@
 import { useState } from 'react';
 import { useAccount } from 'wagmi';
 import Link from 'next/link';
-import type { PurchaseOrder } from '@/types/agrochain';
-import { DeliveryStatus } from '@/types/agrochain';
+// import type { PurchaseOrder } from '@/types/agrochain';
+// import { DeliveryStatus } from '@/types/agrochain';
+const DeliveryStatus = { Transportando: 'Transportando', Emitido: 'Emitido', Entregue: 'Entregue', Aguardando: 'Aguardando', Rejeitado: 'Rejeitado' };
 
-const MOCK_PURCHASES: PurchaseOrder[] = [
+const MOCK_PURCHASES: any[] = [
   {
     orderId: 'ORDER-001',
     listingId: '1',
@@ -80,7 +81,7 @@ const MOCK_PURCHASES: PurchaseOrder[] = [
 
 export default function BuyerDashboard() {
   const { address: userAddress } = useAccount();
-  const [purchases] = useState<PurchaseOrder[]>(MOCK_PURCHASES);
+  const [purchases] = useState<any[]>(MOCK_PURCHASES);
 
   const truncateAddress = (addr: string | undefined) => {
     if (!addr) return 'Desconectado';

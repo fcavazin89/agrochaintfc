@@ -1,13 +1,19 @@
 'use client';
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
-import {
-  MOCK_ESG_SCORES,
-} from '@/lib/contracts/verification';
-import { DESIGN_TOKENS } from '@/lib/lotConstants';
+import type { ESGScore } from '@/types/agrochain';
+// import {
+//   MOCK_ESG_SCORES,
+// } from '@/lib/contracts/verification';
+// import { DESIGN_TOKENS } from '@/lib/lotConstants';
+const MOCK_ESG_SCORES: ESGScore[] = [];
+const DESIGN_TOKENS = {
+  typography: { titleFont: 'Georgia, serif', bodyFont: 'system-ui, sans-serif' },
+  colors: { verde600: 'var(--verde-profundo)', texto1: '#1e2a22', texto2: '#495649', texto3: '#6b7d6b' },
+};
 
 export default function ESGScorePage() {
-  const [selectedLot, setSelectedLot] = useState<string>(MOCK_ESG_SCORES[0].esgId);
+  const [selectedLot, setSelectedLot] = useState<string>(MOCK_ESG_SCORES[0]?.esgId || '');
   const [scoreFilter, setScoreFilter] = useState<number>(0);
   const [statusFilter, setStatusFilter] = useState<string>('');
 

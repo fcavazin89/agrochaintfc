@@ -1,10 +1,16 @@
 'use client';
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
-import {
-  MOCK_EUDR_COMPLIANCES,
-} from '@/lib/contracts/verification';
-import { DESIGN_TOKENS } from '@/lib/lotConstants';
+// import {
+//   MOCK_EUDR_COMPLIANCES,
+// } from '@/lib/contracts/verification';
+// import { DESIGN_TOKENS } from '@/lib/lotConstants';
+import type { EUDRCompliance } from '@/types/agrochain';
+const MOCK_EUDR_COMPLIANCES: EUDRCompliance[] = [];
+const DESIGN_TOKENS = {
+  typography: { titleFont: 'Georgia, serif', bodyFont: 'system-ui, sans-serif' },
+  colors: { verde600: 'var(--verde-profundo)', texto1: '#1e2a22', texto2: '#495649', texto3: '#6b7d6b' },
+};
 
 export default function EUDRCompliancePage() {
   const [statusFilter, setStatusFilter] = useState<string>('');

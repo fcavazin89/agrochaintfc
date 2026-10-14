@@ -109,9 +109,9 @@ export default function CertificacaoPage() {
     try {
       // ─── Step 1: Validar ───────────────────────────────────────────
       setSteps(prev => prev.map((s, i) => i === 0 ? { ...s, status: 'ACTIVE' } : s));
-      if (!window.ethereum) throw new Error('MetaMask não encontrado');
+      if (!(window as any).ethereum) throw new Error('MetaMask não encontrado');
 
-      const codeResp = await window.ethereum.request({
+      const codeResp = await (window as any).ethereum.request({
         method: 'eth_getCode',
         params: [contractAddress.toLowerCase(), 'latest'],
       }) as string;
@@ -155,7 +155,7 @@ export default function CertificacaoPage() {
         args: [form.batchId, form.type, form.variety, BigInt(form.weightKg), form.origin],
       });
 
-      const hash = await window.ethereum.request({
+      const hash = await (window as any).ethereum.request({
         method: 'eth_sendTransaction',
         params: [{ to: getAddress(contractAddress), from: address, value: '0x0', data: callData }],
       }) as string;
@@ -171,7 +171,7 @@ export default function CertificacaoPage() {
       while (!receipt) {
         if (Date.now() - t0 > 60000) throw new Error('Timeout. Verifique no Etherscan.');
         await new Promise(r => setTimeout(r, 2000));
-        receipt = await window.ethereum.request({
+        receipt = await (window as any).ethereum.request({
           method: 'eth_getTransactionReceipt',
           params: [hash],
         });

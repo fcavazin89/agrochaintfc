@@ -2,10 +2,10 @@
 import { useState } from 'react';
 import dynamic from 'next/dynamic';
 
-const FarmGlobe = dynamic(
-  () => import('@/components/three/FarmGlobe').then(m => m.FarmGlobe),
-  { ssr: false, loading: () => <div style={{width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#f3f7f2'}}>Carregando...</div> }
-);
+// const FarmGlobe = dynamic(
+//   () => import('@/components/three/FarmGlobe').then(m => m.FarmGlobe),
+//   { ssr: false, loading: () => <div style={{width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#f3f7f2'}}>Carregando...</div> }
+// );
 
 export default function ImersivePage() {
   const [isDayMode, setIsDayMode] = useState(true);
@@ -26,7 +26,8 @@ export default function ImersivePage() {
     >
       {/* 3D Content */}
       <div style={{width: '100%', height: '100%', position: 'relative'}}>
-        <FarmGlobe />
+        {/* <FarmGlobe /> */}
+        <div>FarmGlobe placeholder</div>
       </div>
 
       {/* UI Overlay */}

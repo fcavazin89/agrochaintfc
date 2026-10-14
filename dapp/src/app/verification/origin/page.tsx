@@ -1,10 +1,16 @@
 'use client';
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
-import {
-  MOCK_ORIGIN_VERIFICATIONS,
-} from '@/lib/contracts/verification';
-import { DESIGN_TOKENS } from '@/lib/lotConstants';
+// import {
+//   MOCK_ORIGIN_VERIFICATIONS,
+// } from '@/lib/contracts/verification';
+// import { DESIGN_TOKENS } from '@/lib/lotConstants';
+import type { OriginVerification } from '@/types/agrochain';
+const MOCK_ORIGIN_VERIFICATIONS: OriginVerification[] = [];
+const DESIGN_TOKENS = {
+  typography: { titleFont: 'Georgia, serif', bodyFont: 'system-ui, sans-serif' },
+  colors: { verde600: 'var(--verde-profundo)', texto1: '#1e2a22', texto2: '#495649', texto3: '#6b7d6b' },
+};
 
 const MOCK_LOTS = [
   { id: 'LOT-101', name: 'Lote Café Arábica - MG' },

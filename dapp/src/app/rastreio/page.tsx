@@ -3,10 +3,10 @@ import { useState } from 'react';
 import dynamic from 'next/dynamic';
 import type { TraceNode } from '@/types/agrochain';
 
-const TraceChain = dynamic(
-  () => import('@/components/three/TraceChain').then(m => m.TraceChain),
-  { ssr: false, loading: () => <div style={{height: '280px', background: '#0b1d12', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#f3f7f2'}}>Carregando visualização 3D...</div> }
-);
+// const TraceChain = dynamic(
+//   () => import('@/components/three/TraceChain').then(m => m.TraceChain),
+//   { ssr: false, loading: () => <div style={{height: '280px', background: '#0b1d12', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#f3f7f2'}}>Carregando visualização 3D...</div> }
+// );
 
 const MOCK_NODES: TraceNode[] = [
   { id: '1', label: 'Originação', stage: 'ORIGINATION', status: 'DONE', timestamp: 1724000000 },
@@ -54,7 +54,8 @@ export default function RastreioPage() {
             <p style={{margin: 0, fontSize: '13px', color: '#495649'}}>Cadeia de custódia blockchain · Coffee · Origem: Minas Gerais · 500kg</p>
           </div>
           <h2 style={{margin: '0 0 12px', fontFamily: 'Georgia, serif', fontSize: '18px', color: '#1e2a22'}}>Jornada 3D</h2>
-          <TraceChain nodes={MOCK_NODES} />
+          {/* <TraceChain nodes={MOCK_NODES} /> */}
+          <div>TraceChain placeholder</div>
           <div style={{marginTop: '24px', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px'}}>
             {MOCK_NODES.map(node => (
               <div key={node.id} style={{ background: '#fff', borderRadius: '10px', padding: '16px', border: `2px solid ${node.status === 'DONE' ? '#1f6440' : node.status === 'ACTIVE' ? '#b8912a' : '#ddd8cc'}` }}>

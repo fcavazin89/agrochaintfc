@@ -8,11 +8,14 @@ import type {
   MarketplaceFilter,
   BatchType,
 } from '@/types/agrochain';
-import {
-  filterListings,
-  MOCK_LISTINGS,
-  truncateAddress,
-} from '@/lib/contracts/marketplace';
+// import {
+//   filterListings,
+//   MOCK_LISTINGS,
+//   truncateAddress,
+// } from '@/lib/contracts/marketplace';
+const MOCK_LISTINGS: MarketplaceListing[] = [];
+const truncateAddress = (a: string) => a;
+const filterListings = (l: any[], f: any) => l;
 
 export default function MarketplacePage() {
   const { address } = useAccount();

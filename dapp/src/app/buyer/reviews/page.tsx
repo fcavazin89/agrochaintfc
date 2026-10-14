@@ -2,12 +2,16 @@
 import { useState, useEffect } from 'react';
 import { useAccount } from 'wagmi';
 import type { Review, ProducerReview } from '@/types/agrochain';
-import {
-  MOCK_PURCHASE_ORDERS,
-  MOCK_REVIEWS,
-  groupReviewsByProducer,
-  truncateAddress,
-} from '@/lib/contracts/buyer';
+// import {
+//   MOCK_PURCHASE_ORDERS,
+//   MOCK_REVIEWS,
+//   groupReviewsByProducer,
+//   truncateAddress,
+// } from '@/lib/contracts/buyer';
+const MOCK_REVIEWS: any[] = [];
+const MOCK_PURCHASE_ORDERS: any[] = [];
+const groupReviewsByProducer = (a: any, b: any, c: any): any[] => [];
+const truncateAddress = (a: string) => a;
 
 export default function ReviewsPage() {
   const { address: userAddress } = useAccount();

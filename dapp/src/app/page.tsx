@@ -1,11 +1,41 @@
-import { MetricCard } from '@/components/ui/MetricCard';
-import { Badge } from '@/components/ui/Badge';
+// import { MetricCard } from '@/components/ui/MetricCard';
+// import { Badge } from '@/components/ui/Badge';
 import dynamic from 'next/dynamic';
-
-const FarmGlobe = dynamic(
-  () => import('@/components/three/FarmGlobe').then(m => m.FarmGlobe),
-  { ssr: false, loading: () => <div style={{height: '400px', background: '#0b1d12', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#f3f7f2'}}>Carregando globo 3D...</div> }
+const MetricCard = ({ title, value, subtitle, icon, color }: { title: string; value: string; subtitle: string; icon: string; color: string }) => (
+  <div style={{ background: '#fff', borderRadius: '12px', padding: '20px', border: '1px solid #e6ddc9', boxShadow: '0 1px 2px rgba(31,42,34,.06)' }}>
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '12px' }}>
+      <div style={{ fontSize: '24px' }}>{icon}</div>
+    </div>
+    <div style={{ fontSize: '12px', color: '#6b7d6b', marginBottom: '4px' }}>{title}</div>
+    <div style={{ fontSize: '28px', fontWeight: 'bold', color: color || '#1e2a22', marginBottom: '4px' }}>{value}</div>
+    <div style={{ fontSize: '11px', color: '#6b7d6b' }}>{subtitle}</div>
+  </div>
 );
+const Badge = ({ variant, children }: { variant?: 'coffee' | 'cacao'; children?: React.ReactNode }) => {
+  const colors = {
+    coffee: { bg: '#f0faf4', color: '#1f6440' },
+    cacao: { bg: '#f9f7f2', color: '#6b4426' },
+  };
+  const style = variant ? colors[variant] : { bg: '#f2ecdd', color: '#495649' };
+  return (
+    <span style={{
+      background: style.bg,
+      color: style.color,
+      padding: '4px 12px',
+      borderRadius: '12px',
+      fontSize: '12px',
+      fontWeight: '600',
+    }}>
+      {variant === 'coffee' ? '☕ Coffee' : variant === 'cacao' ? '🍫 Cacao' : children}
+    </span>
+  );
+};
+
+const FarmGlobe = () => <div>FarmGlobe</div>;
+// const FarmGlobe = dynamic(
+//   () => import('@/components/three/FarmGlobe').then(m => m.FarmGlobe),
+//   { ssr: false, loading: () => <div style={{height: '400px', background: '#0b1d12', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#f3f7f2'}}>Carregando globo 3D...</div> }
+// );
 
 const recentCerts = [
   { id: '0x1a2b...', type: 'coffee' as const, batch: 'COFFEE-2024-001', origin: 'Minas Gerais', score: 96 },

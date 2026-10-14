@@ -3,8 +3,37 @@ import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { useAccount } from 'wagmi';
 import type { Lot } from '@/types/agrochain';
-import { obterCorStatus, obterStatusCertificacaoAgregado } from '@/lib/lotUtils';
-import { DESIGN_TOKENS, LotStatus, CertificationType } from '@/lib/lotConstants';
+// import { obterCorStatus, obterStatusCertificacaoAgregado } from '@/lib/lotUtils';
+// import { DESIGN_TOKENS, LotStatus, CertificationType } from '@/lib/lotConstants';
+
+// Funções auxiliares locais
+const obterCorStatus = (status: string) => {
+  if (status === 'Ativo') return 'var(--verde-profundo)';
+  if (status === 'Transferindo') return '#f59e0b';
+  return '#6b7280';
+};
+
+const obterStatusCertificacaoAgregado = (certificacoes: any[]) => {
+  const certificado = certificacoes.some(c => c.status === 'Certificado');
+  const pendente = certificacoes.some(c => c.status === 'Pendente');
+  if (certificado && !pendente) return 'Certificado';
+  if (pendente) return 'Parcial';
+  return 'Nenhum';
+};
+
+const DESIGN_TOKENS = {
+  typography: {
+    titleFont: 'Georgia, serif',
+    bodyFont: 'system-ui, -apple-system, sans-serif',
+  },
+  colors: {
+    verde600: 'var(--verde-profundo)',
+    texto1: '#1e2a22',
+    texto2: '#495649',
+    texto3: '#6b7d6b',
+    fundo: '#f5f1e7',
+  },
+};
 
 // Mock data de lotes do produtor logado
 const MOCK_LOTS: Lot[] = [

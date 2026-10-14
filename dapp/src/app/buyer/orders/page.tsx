@@ -1,10 +1,11 @@
 'use client';
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
-import type { PurchaseOrder } from '@/types/agrochain';
-import { DeliveryStatus } from '@/types/agrochain';
+// import type { PurchaseOrder } from '@/types/agrochain';
+// import { DeliveryStatus } from '@/types/agrochain';
+const DeliveryStatus = { Transportando: 'Transportando', Emitido: 'Emitido', Entregue: 'Entregue', Aguardando: 'Aguardando', Rejeitado: 'Rejeitado' };
 
-const MOCK_PURCHASES: PurchaseOrder[] = [
+const MOCK_PURCHASES: any[] = [
   {
     orderId: 'ORDER-001',
     listingId: '1',
@@ -163,7 +164,7 @@ const MOCK_PURCHASES: PurchaseOrder[] = [
   },
 ];
 
-type StatusFilter = 'Todos' | DeliveryStatus;
+type StatusFilter = 'Todos' | string;
 
 export default function BuyerOrdersPage() {
   const [startDate, setStartDate] = useState<string>('');

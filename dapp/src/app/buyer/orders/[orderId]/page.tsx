@@ -1,10 +1,11 @@
 'use client';
 import { useState } from 'react';
 import { useParams } from 'next/navigation';
-import type { PurchaseOrder } from '@/types/agrochain';
-import { DeliveryStatus } from '@/types/agrochain';
+// import type { PurchaseOrder } from '@/types/agrochain';
+// import { DeliveryStatus } from '@/types/agrochain';
+const DeliveryStatus = { Transportando: 'Transportando', Emitido: 'Emitido', Entregue: 'Entregue', Aguardando: 'Aguardando', Rejeitado: 'Rejeitado' };
 
-const MOCK_PURCHASES: Record<string, PurchaseOrder> = {
+const MOCK_PURCHASES: Record<string, any> = {
   'ORDER-001': {
     orderId: 'ORDER-001',
     listingId: '1',

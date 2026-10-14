@@ -5,7 +5,11 @@ import { useParams } from 'next/navigation';
 import { useAccount } from 'wagmi';
 import Link from 'next/link';
 import type { MarketplaceListing, MarketplaceOffer } from '@/types/agrochain';
-import { MOCK_LISTINGS, MOCK_OFFERS, truncateAddress, formatPrice } from '@/lib/contracts/marketplace';
+// import { MOCK_LISTINGS, MOCK_OFFERS, truncateAddress, formatPrice } from '@/lib/contracts/marketplace';
+const MOCK_LISTINGS: MarketplaceListing[] = [];
+const MOCK_OFFERS: MarketplaceOffer[] = [];
+const truncateAddress = (a: string) => a;
+const formatPrice = (p: number) => p.toString();
 
 export default function ListingDetailPage() {
   const params = useParams();

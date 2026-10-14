@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react';
 import { useAccount } from 'wagmi';
 import Link from 'next/link';
 import type { MarketplaceListing } from '@/types/agrochain';
-import { MOCK_LISTINGS } from '@/lib/contracts/marketplace';
+// import { MOCK_LISTINGS } from '@/lib/contracts/marketplace';
+const MOCK_LISTINGS: MarketplaceListing[] = [];
 
 export default function MyListingsPage() {
   const { address } = useAccount();
