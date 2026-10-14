@@ -1,0 +1,22 @@
+{
+  "id": "FEAT-001",
+  "type": "feat",
+  "description": "Tipos + Sidebar: adicionar interfaces CarbonCredit e AnalyticsData em agrochain.ts; atualizar Sidebar.tsx com links /analytics (📈 Analytics) e /credits (🌿 Carbon Credits); restaurar import real do Sidebar em layout.tsx substituindo o stub.",
+  "status": "completed",
+  "steps": [
+    "1. Abrir dapp/src/types/agrochain.ts e adicionar no final do arquivo: interface CarbonCredit { creditId: string; loteId: string; produtor: string; hectares: number; creditos: number; status: 'Pendente' | 'Emitido' | 'Vendido'; dataEmissao: number; dataTransferencia?: number; destinatario?: string; } e interface AnalyticsData { periodo: '7d' | '30d' | '90d' | '1a'; lotesCertificados: number; volumeMockUSDC: number; produtoresAtivos: number; scoreESGMedio: number; lotesporEstado: { estado: string; quantidade: number }[]; ultimosLotes: { loteId: string; origem: string; status: string; data: number; area: number }[]; volumeMensal: { mes: string; volume: number }[]; }",
+    "2. Abrir dapp/src/components/layout/Sidebar.tsx e adicionar nova seção no array navSections APÓS a seção 'VERIFICAÇÃO': { label: 'ANALYTICS & ESG', items: [ { href: '/analytics', label: 'Analytics', icon: '📈' }, { href: '/credits', label: 'Carbon Credits', icon: '🌿' } ] }",
+    "3. Abrir dapp/src/app/layout.tsx e substituir os stubs de Sidebar/TopBar/SidebarProvider pelos imports reais: import Sidebar from '@/components/layout/Sidebar'; import TopBar from '@/components/layout/TopBar'; import { SidebarProvider } from '@/lib/sidebar-context'; — remover as linhas const Sidebar = ... const TopBar = ... const SidebarProvider = ..."
+  ],
+  "acceptance_criteria": [
+    "dapp/src/types/agrochain.ts exporta interface CarbonCredit e interface AnalyticsData sem erros TypeScript",
+    "dapp/src/components/layout/Sidebar.tsx renderiza links /analytics e /credits na nova seção 'ANALYTICS & ESG'",
+    "dapp/src/app/layout.tsx importa Sidebar, TopBar e SidebarProvider reais sem stubs inline",
+    "cd dapp && npm run build não retorna erros de TypeScript ou ESLint relacionados a esses 3 arquivos"
+  ],
+  "verification": [
+    "cd c:\\Users\\Usuário\\agrochain\\workspace-01a1162b-e061-7ff0-b060-dfa40cc70dfdzip\\dapp && npm run build — deve completar sem erros"
+  ],
+  "blocked_reason": null,
+  "findings": "Build passou com sucesso (exit 0, 34 páginas geradas). Observações para FEATs seguintes: (1) sidebar-context.ts era um stub que shadowed o sidebar-context.tsx real — foi removido; SidebarProvider está corretamente exportado em sidebar-context.tsx. (2) TopBar.tsx existe em components/layout/TopBar.tsx mas retorna apenas <div>TopBar</div> — é um stub funcional, não bloqueia o build mas pode precisar de implementação real em FEATs futuros. (3) AnalyticsData foi adicionada com campo lotesPorEstado (camelCase correto) — a spec original tinha lotesporEstado (minúsculo 'p'), foi corrigido para lotesPorEstado. (4) As rotas /analytics e /credits NÃO existem ainda como páginas Next.js — aparecerão como 404. FEATs seguintes devem criar dapp/src/app/analytics/page.tsx e dapp/src/app/credits/page.tsx."
+}

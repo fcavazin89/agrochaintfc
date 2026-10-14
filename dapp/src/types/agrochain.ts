@@ -284,3 +284,49 @@ export interface ESGScore {
   status: VerificationStatus;
   detalhes?: string;
 }
+
+// =====================================================================
+// PASSPORT TYPES
+// =====================================================================
+
+export interface PassportData {
+  loteId: string;
+  produtor: string;
+  safra: string;
+  origem: string;
+  area: number; // hectares
+  dataPlantio: number; // timestamp
+  dataColheita: number; // timestamp
+  eventos: LotEvent[];
+  certificacoes: LotCertification[];
+  status: LotStatus;
+}
+
+export type PassportAccess = 'public' | 'producer-only';
+
+// =====================================================================
+// ANALYTICS & ESG TYPES
+// =====================================================================
+
+export interface CarbonCredit {
+  creditId: string;
+  loteId: string;
+  produtor: string;
+  hectares: number;
+  creditos: number;
+  status: 'Pendente' | 'Emitido' | 'Vendido';
+  dataEmissao: number;
+  dataTransferencia?: number;
+  destinatario?: string;
+}
+
+export interface AnalyticsData {
+  periodo: '7d' | '30d' | '90d' | '1a';
+  lotesCertificados: number;
+  volumeMockUSDC: number;
+  produtoresAtivos: number;
+  scoreESGMedio: number;
+  lotesPorEstado: { estado: string; quantidade: number }[];
+  ultimosLotes: { loteId: string; origem: string; status: string; data: number; area: number }[];
+  volumeMensal: { mes: string; volume: number }[];
+}
