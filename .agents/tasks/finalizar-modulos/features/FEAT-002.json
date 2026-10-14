@@ -1,0 +1,26 @@
+{
+  "id": "FEAT-002",
+  "type": "feat",
+  "description": "Carbon Credits Module: criar CarbonCredits.sol, dapp/src/lib/contracts/carboncredits.ts com ABI + helpers, e dapp/src/app/credits/page.tsx com dashboard completo. FEAT-001 deve estar completo (interface CarbonCredit disponível). Independente de FEAT-003.",
+  "status": "completed",
+  "steps": [
+    "1. Criar blockchain/contracts/CarbonCredits.sol — contrato Solidity 0.8.20 com: mapping(bytes32 => uint256) de loteId para créditos emitidos, 1 crédito por hectare; função issueCredits(bytes32 loteId, uint256 hectares) onlyOwner emite evento CreditIssued(bytes32 indexed loteId, address indexed produtor, uint256 creditos, uint256 timestamp); função transferCredits(bytes32 loteId, address destinatario, uint256 quantidade) emite CreditTransferred(bytes32 indexed loteId, address indexed de, address indexed para, uint256 quantidade, uint256 timestamp); função getCredits(bytes32 loteId) view returns (uint256); mapping de saldo por endereço. Usar Ownable de @openzeppelin/contracts/access/Ownable.sol (já usados em outros contratos).",
+    "2. Compilar contrato: no diretório blockchain/, executar npx hardhat compile para confirmar que CarbonCredits.sol compila sem erros.",
+    "3. Criar dapp/src/lib/contracts/carboncredits.ts — exportar CARBONCREDITS_ABI (array const com os eventos CreditIssued, CreditTransferred e funções issueCredits, transferCredits, getCredits, extraídos do contrato criado no passo 1); exportar helpers: issueCredits(config, loteId, hectares) — usa writeContract do wagmi/actions; transferCredits(config, loteId, destinatario, quantidade) — usa writeContract; getCredits(config, address, loteId) — usa readContract; seguir o mesmo padrão de dapp/src/lib/contracts/payments.ts.",
+    "4. Criar mock data local no próprio arquivo dapp/src/app/credits/page.tsx — array MOCK_CARBON_CREDITS: CarbonCredit[] com 6 entradas mapeadas dos 6 lotes de MOCK_LOTS (importar MOCK_LOTS de @/lib/mockLotData para calcular area => creditos = Math.floor(lot.área)); distribuir status entre 'Emitido' (4), 'Pendente' (1), 'Vendido' (1).",
+    "5. Criar dapp/src/app/credits/page.tsx com: 'use client'; KPIs no topo (4 cards): Total de Créditos Emitidos, Créditos Pendentes, Créditos Vendidos, Área Total (ha) — derivados de MOCK_CARBON_CREDITS; seção de lista de lotes com créditos em tabela (colunas: Lote ID, Origem, Área (ha), Créditos, Status, Ação); coluna Status usa badge colorido por valor ('Pendente'=amarelo/atencao, 'Emitido'=verde/verde-600, 'Vendido'=cinza/texto-3); coluna Ação mostra botão 'Solicitar Créditos' desabilitado cinza se Emitido/Vendido, ou botão verde clicável com onClick={() => alert('Solicitação enviada (mock)')} se Pendente; usar inline styles com os design tokens var(--sup-1), var(--linha), var(--verde-600), var(--texto-1/2/3), var(--raio), var(--sombra) — padrão de buyer/page.tsx; sem wallet gate (não exigir conexão para visualizar)."
+  ],
+  "acceptance_criteria": [
+    "blockchain/contracts/CarbonCredits.sol existe e npx hardhat compile retorna 0 erros",
+    "dapp/src/lib/contracts/carboncredits.ts exporta CARBONCREDITS_ABI, issueCredits, transferCredits, getCredits sem erros TypeScript",
+    "dapp/src/app/credits/page.tsx renderiza 4 KPI cards e tabela com 6 linhas dos mock lots",
+    "Botão 'Solicitar Créditos' é clicável apenas para entradas com status 'Pendente'",
+    "cd dapp && npm run build passa sem erros — rota /credits aparece nas páginas geradas"
+  ],
+  "verification": [
+    "cd c:\\Users\\Usuário\\agrochain\\workspace-01a1162b-e061-7ff0-b060-dfa40cc70dfdzip\\blockchain && npx hardhat compile — sem erros",
+    "cd c:\\Users\\Usuário\\agrochain\\workspace-01a1162b-e061-7ff0-b060-dfa40cc70dfdzip\\dapp && npm run build — /credits aparece na listagem de páginas"
+  ],
+  "blocked_reason": null,
+  "findings": "CarbonCredits.sol compila com solc 0.8.37 (pragma ^0.8.20 compat). dapp build passa sem erros TypeScript/ESLint. Rota /credits aparece na listagem de páginas estáticas (3.57 kB). MOCK_CARBON_CREDITS: 6 entradas — 4 Emitido, 1 Pendente, 1 Vendido. Botão Solicitar Créditos clicável apenas em status Pendente."
+}
