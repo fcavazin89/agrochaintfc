@@ -48,6 +48,12 @@ const ICOS: Record<string, string> = {
   chart: 'M18 20V10|M12 20V4|M6 20v-6',
   tree: 'M12 22v-7|M12 15l-4-4|M12 15l4-4|M5 10a7 7 0 0114 0',
   qr: 'M3 3h7v7H3V3z|M14 3h7v7h-7V3z|M3 14h7v7H3v-7z|M14 14h2v2h-2v-2|M18 14h3v2h-3v-2|M14 18h2v3h-2v-3|M18 18h3v3h-3v-3',
+  brain: 'M9.5 2a2.5 2.5 0 01.5 4.975V8h4v-.975A2.5 2.5 0 1115.5 2a2.5 2.5 0 01.5 4.975V8a2 2 0 012 2v1a2 2 0 01-2 2h-.025A2.5 2.5 0 0114 15.5c0 1.38 1.12 2.5 2.5 2.5a2.5 2.5 0 000-5h-.025A2.5 2.5 0 0114 10.975V10h-4v.975A2.5 2.5 0 019.5 13a2.5 2.5 0 010 5 2.5 2.5 0 010-5h.025A2.5 2.5 0 0110 10.975V10H9a2 2 0 01-2-2V9A2 2 0 019 7h.025A2.5 2.5 0 019.5 2z',
+  cpu: 'M9 3H7a2 2 0 00-2 2v2|M15 3h2a2 2 0 012 2v2|M9 21H7a2 2 0 01-2-2v-2|M15 21h2a2 2 0 002-2v-2|M3 9v2|M3 13v2|M21 9v2|M21 13v2|M9 9h6v6H9V9z',
+  link: 'M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71|M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71',
+  expandir: 'M8 3H5a2 2 0 00-2 2v3|M21 8V5a2 2 0 00-2-2h-3|M3 16v3a2 2 0 002 2h3|M16 21h3a2 2 0 002-2v-3',
+  info: 'M12 22a10 10 0 100-20 10 10 0 000 20z|M12 16v-4|M12 8h.01',
+  selo: 'M12 15a4 4 0 100-8 4 4 0 000 8z|M8.5 13.5L7 22l5-3 5 3-1.5-8.5',
 };
 
 const sections = [
@@ -56,6 +62,15 @@ const sections = [
     items: [
       { href: '/', label: 'Dashboard', ico: 'grid' },
       { href: '/passport/generate', label: 'Passaporte Digital', ico: 'qr' },
+      { href: '/assistente', label: 'Assistente IA', ico: 'brain' },
+      { href: '/sobre', label: 'Sobre', ico: 'info' },
+    ],
+  },
+  {
+    label: 'GESTÃO',
+    items: [
+      { href: '/erp', label: 'ERP Agro', ico: 'briefcase' },
+      { href: '/lavoura', label: 'Lavouras', ico: 'leaf' },
     ],
   },
   {
@@ -66,7 +81,7 @@ const sections = [
     ],
   },
   {
-    label: 'MERCADO',
+    label: 'MARKETPLACE',
     items: [
       { href: '/marketplace', label: 'Marketplace', ico: 'store' },
       { href: '/marketplace/my-listings', label: 'Meus Anúncios', ico: 'list' },
@@ -81,12 +96,29 @@ const sections = [
     ],
   },
   {
+    label: 'CAMPO',
+    items: [
+      { href: '/iot', label: 'IoT e Sensores', ico: 'satellite' },
+      { href: '/ia', label: 'Inteligência Artificial', ico: 'cpu' },
+      { href: '/imersivo', label: 'Modo Imersivo', ico: 'expandir' },
+    ],
+  },
+  {
     label: 'VERIFICAÇÃO',
     items: [
       { href: '/verification', label: 'Painel Verificação', ico: 'shield' },
       { href: '/verification/origin', label: 'Origem', ico: 'pin' },
       { href: '/verification/eudr', label: 'EUDR', ico: 'satellite' },
       { href: '/verification/esg', label: 'ESG', ico: 'leaf' },
+    ],
+  },
+  {
+    label: 'CADEIA',
+    items: [
+      { href: '/blockchain', label: 'Blockchain', ico: 'link' },
+      { href: '/mercado', label: 'Mercado', ico: 'store' },
+      { href: '/certificacao', label: 'Certificação', ico: 'selo' },
+      { href: '/auditoria', label: 'Auditoria', ico: 'shield' },
     ],
   },
   {

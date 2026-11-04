@@ -5,7 +5,8 @@ import { getAddress } from 'viem';
 import { AGRO_CERT_NFT_ABI, CERTIFICADO_MINTADO_TOPIC } from '@/lib/contracts';
 
 const NFT_CONTRACT_KEY = 'agrochain_nft_contract_address';
-const NFT_CONTRACT_DEFAULT = '0x444853d891F884EbD1b69Dc6F044a2Ff4f9C9269';
+const NFT_CONTRACT_DEFAULT =
+  process.env.NEXT_PUBLIC_NFT_CONTRACT_ADDRESS || '0x444853d891F884EbD1b69Dc6F044a2Ff4f9C9269';
 
 type CertStep = { label: string; status: 'DONE' | 'ACTIVE' | 'PENDING' | 'ERROR' };
 type ZKProof = { commitment: string; proof: any; proofType: string; score: number };
@@ -43,8 +44,11 @@ export default function CertificacaoPage() {
   const { data: receipt, error: receiptError } = useWaitForTransactionReceipt({ hash: pendingHash });
 
   useEffect(() => {
-    const saved = localStorage.getItem(NFT_CONTRACT_KEY) || NFT_CONTRACT_DEFAULT;
-    setContractAddressState(saved);
+    const saved = localStorage.getItem(NFT_CONTRACT_KEY);
+    const valid = !!saved && saved.startsWith('0x') && saved.length === 42;
+    const addr = valid ? saved : NFT_CONTRACT_DEFAULT;
+    setContractAddressState(addr);
+    if (!valid) localStorage.setItem(NFT_CONTRACT_KEY, NFT_CONTRACT_DEFAULT);
     setIsMounted(true);
   }, []);
 

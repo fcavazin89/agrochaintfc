@@ -160,12 +160,16 @@ export const CERTIFICADO_MINTADO_TOPIC =
 
 export const NFT_CONTRACT_STORAGE_KEY = 'agrochain_nft_contract_address';
 
+// Endereço oficial da plataforma (AgroChainCertNFT na Sepolia)
+export const NFT_CONTRACT_OFICIAL =
+  process.env.NEXT_PUBLIC_NFT_CONTRACT_ADDRESS || '0x444853d891F884EbD1b69Dc6F044a2Ff4f9C9269';
+
 export function getNFTContractAddress(): string {
   if (typeof window !== 'undefined') {
     const stored = localStorage.getItem(NFT_CONTRACT_STORAGE_KEY);
-    if (stored) return stored;
+    if (stored && stored.startsWith('0x') && stored.length === 42) return stored;
   }
-  return process.env.NEXT_PUBLIC_NFT_CONTRACT_ADDRESS || '';
+  return NFT_CONTRACT_OFICIAL;
 }
 
 export function setNFTContractAddress(address: string) {

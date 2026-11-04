@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { ModuleCard } from './_components/ModuleCard';
 
 const modules = [
   { href: '/producer', title: 'Painel Produtor', desc: 'Gerencie lotes, safras e certificações', tag: 'Operação' },
@@ -130,60 +131,4 @@ export default function DashboardPage() {
   );
 }
 
-// Extracted to avoid inline event handlers in server component
-function ModuleCard({
-  tag,
-  title,
-  desc,
-}: {
-  tag: string;
-  title: string;
-  desc: string;
-}) {
-  return (
-    <div
-      style={{
-        padding: '16px',
-        borderRadius: 'var(--raio-sm)',
-        border: '1px solid var(--linha)',
-        background: 'var(--sup-2)',
-        cursor: 'pointer',
-        height: '100%',
-        boxSizing: 'border-box',
-      }}
-    >
-      <div
-        style={{
-          fontSize: '10.5px',
-          fontWeight: 600,
-          letterSpacing: '.5px',
-          textTransform: 'uppercase',
-          color: 'var(--verde-600)',
-          marginBottom: '6px',
-        }}
-      >
-        {tag}
-      </div>
-      <div
-        style={{
-          fontFamily: 'var(--serifa)',
-          fontSize: '14px',
-          fontWeight: 600,
-          color: 'var(--texto-1)',
-          marginBottom: '6px',
-        }}
-      >
-        {title}
-      </div>
-      <div
-        style={{
-          fontSize: '12px',
-          color: 'var(--texto-3)',
-          lineHeight: 1.5,
-        }}
-      >
-        {desc}
-      </div>
-    </div>
-  );
-}
+

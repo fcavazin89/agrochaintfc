@@ -1,5 +1,5 @@
 'use client';
-import { useAccount } from 'wagmi';
+import { useAccount, useConnect, useDisconnect } from 'wagmi';
 
 const IcoSeed = () => (
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -11,7 +11,17 @@ const IcoSeed = () => (
 
 export default function TopBar() {
   const { address, isConnected } = useAccount();
+  const { connect, connectors, isPending, error } = useConnect();
+  const { disconnect } = useDisconnect();
   const shortAddr = address ? `${address.slice(0, 6)}…${address.slice(-4)}` : null;
+
+  const injectedConnector =
+    connectors.find((c) => c.id === 'injected') ?? connectors[0];
+
+  const handleConnect = () => {
+    if (!injectedConnector) return;
+    connect({ connector: injectedConnector });
+  };
 
   return (
     <header
@@ -90,21 +100,70 @@ export default function TopBar() {
         </span>
       </div>
 
+      {/* Erro de conexão */}
+      {!isConnected && error && (
+        <div
+          title={error.message}
+          style={{
+            fontSize: '11.5px',
+            color: '#ffb4a8',
+            padding: '5px 12px',
+            borderRadius: '999px',
+            background: 'rgba(220,80,60,.15)',
+            border: '1px solid rgba(220,80,60,.35)',
+            maxWidth: '260px',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {error.message.includes('User rejected')
+            ? 'Conexão recusada'
+            : 'MetaMask não encontrada'}
+        </div>
+      )}
+
       {/* Wallet */}
-      <div
-        style={{
-          fontSize: '12px',
-          fontFamily: 'var(--mono)',
-          color: isConnected ? '#7fe0a4' : '#9db2a4',
-          padding: '5px 12px',
-          borderRadius: '999px',
-          background: 'rgba(233,243,236,.08)',
-          border: '1px solid rgba(233,243,236,.12)',
-          whiteSpace: 'nowrap',
-        }}
-      >
-        {isConnected && shortAddr ? shortAddr : 'Não conectado'}
-      </div>
+      {isConnected && shortAddr ? (
+        <button
+          type="button"
+          onClick={() => disconnect()}
+          title={`${address}\nClique para desconectar`}
+          style={{
+            fontSize: '12px',
+            fontFamily: 'var(--mono)',
+            color: '#7fe0a4',
+            padding: '5px 12px',
+            borderRadius: '999px',
+            background: 'rgba(47,143,82,.15)',
+            border: '1px solid rgba(47,143,82,.35)',
+            whiteSpace: 'nowrap',
+            cursor: 'pointer',
+          }}
+        >
+          {shortAddr}
+        </button>
+      ) : (
+        <button
+          type="button"
+          onClick={handleConnect}
+          disabled={isPending}
+          title="Conectar MetaMask"
+          style={{
+            fontSize: '12px',
+            fontWeight: 600,
+            color: '#0b2216',
+            padding: '6px 14px',
+            borderRadius: '999px',
+            background: isPending ? '#7fae90' : '#7fe0a4',
+            border: '1px solid rgba(127,224,164,.6)',
+            whiteSpace: 'nowrap',
+            cursor: isPending ? 'wait' : 'pointer',
+          }}
+        >
+          {isPending ? 'Conectando…' : 'Conectar Carteira'}
+        </button>
+      )}
     </header>
   );
 }

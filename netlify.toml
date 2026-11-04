@@ -1,51 +1,32 @@
-﻿[build]
-  publish = "prototipo-agrochain"
-  command = ""
+# Netlify • AgroChain DApp (Next.js)
+# O app Next.js fica em dapp/. O runtime do Next.js no Netlify (@netlify/plugin-nextjs)
+# cuida das rotas, API routes e otimizações automaticamente.
+# Documentação: https://docs.netlify.com/frameworks/next-js/overview/
+
+[build]
+  base = "dapp"
+  command = "npm run build"
+  publish = ".next"
 
 [build.environment]
   NODE_VERSION = "20"
+  NEXT_TELEMETRY_DISABLED = "1"
+  # Endereço oficial do contrato NFT AgroChainCertNFT (Sepolia) — plataforma
+  NEXT_PUBLIC_NFT_CONTRACT_ADDRESS = "0x444853d891F884EbD1b69Dc6F044a2Ff4f9C9269"
+  # RPC público da Sepolia (fallback para consultas on-chain)
+  NEXT_PUBLIC_SEPOLIA_RPC_URL = "https://ethereum-sepolia-rpc.publicnode.com"
+  # API de Compliance (IA / FastAPI). Configure a URL pública do seu backend
+  # no painel do Netlify (Site settings → Environment variables) e descomente:
+  # NEXT_PUBLIC_COMPLIANCE_API_URL = "https://seu-backend.exemplo.com"
 
+# Runtime oficial do Next.js no Netlify
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+# Headers de segurança básicos (sem CSP restritiva para não quebrar o app)
 [[headers]]
   for = "/*"
   [headers.values]
     X-Frame-Options = "SAMEORIGIN"
     X-Content-Type-Options = "nosniff"
-    X-XSS-Protection = "1; mode=block"
     Referrer-Policy = "strict-origin-when-cross-origin"
-    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
-    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://unpkg.com; style-src 'self' 'unsafe-inline'; connect-src 'self' https://*.infura.io https://*.alchemy.com wss://*.infura.io wss://*.alchemy.com https://sepolia.etherscan.io; img-src 'self' data: https://ipfs.io https://*.ipfs.io; font-src 'self' data:; frame-src 'none';"
-
-[[headers]]
-  for = "/src/*.js"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
-
-[[headers]]
-  for = "/*.js"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
-
-[[headers]]
-  for = "/*.html"
-  [headers.values]
-    Cache-Control = "public, max-age=0, must-revalidate"
-
-[[redirects]]
-  from = "/app"
-  to = "/AgroChain.html"
-  status = 200
-
-[[redirects]]
-  from = "/certificador"
-  to = "/certificador.html"
-  status = 200
-
-[[redirects]]
-  from = "/web3"
-  to = "/certificador.html"
-  status = 200
-
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 404
